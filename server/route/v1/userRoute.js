@@ -4,11 +4,13 @@ const userController = require("../../controller/userController.js");
 const checkAdmin = require("../../middleware/checkAdmin.js");
 
 // All user management routes require super admin privileges
-router.get("/getAllUsers", checkAdmin, userController.getAllUsers);
+router.get("/", checkAdmin, userController.getAllUsers);
+router.post("/", checkAdmin, userController.addUser);
+router.patch("/status", checkAdmin, userController.updateUserStatus);
+router.delete("/:id", checkAdmin, userController.deleteUser);
+
+// Keeping old ones for compatibility if needed elsewhere, but cleaning up main ones
 router.get("/getUser", checkAdmin, userController.getUser);
-router.post("/addUser", checkAdmin, userController.addUser);
 router.put("/updateUser", checkAdmin, userController.updateUser);
-router.delete("/deleteUser", checkAdmin, userController.deleteUser);
-router.put("/updateUserStatus", checkAdmin, userController.updateUserStatus);
 
 module.exports = router;

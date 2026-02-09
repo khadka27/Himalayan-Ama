@@ -1,23 +1,24 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Star, Trash2, CheckCircle, XCircle, MessageSquare } from "lucide-react"
+import { Star, Trash2, CheckCircle, MessageSquare } from "lucide-react"
 import { toast } from "sonner"
 import axiosInstance from "@/services/axios-instance"
 import Cookies from "js-cookie"
 import Loading from "../loading"
 import Swal from "sweetalert2"
 
-
 interface Review {
-  id: string
-  name: string
-  email: string
+  _id: string
+  userName: string
+  userEmail: string
   rating: number
   review: string
-  service: string
-  status: boolean
-  created_at: string
+  flat?: {
+    flatName: string
+  }
+  isPublished: boolean
+  createdAt: string
 }
 
 export function ReviewsSection() {
@@ -26,38 +27,35 @@ export function ReviewsSection() {
   const TOKEN = Cookies.get("auth_token")
 
   useEffect(() => {
-    const getReviews = async () => {
-      try {
-        setIsLoading(true)
-        const { data } = await axiosInstance.get("/api/reviews", {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
-        })
-
-        if (data.status) {
-          setReviews(data.data)
-        }
-      } catch (err) {
-        const Err = err as Error
-        toast.error(Err.message)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    getReviews()
+    fetchReviews()
   }, [])
 
+  const fetchReviews = async () => {
+    try {
+      setIsLoading(true)
+      const { data } = await axiosInstance.get("/api/v1/review", {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+        },
+      })
 
+      if (data.success) {
+        setReviews(data.reviews)
+      }
+    } catch (err) {
+      const Err = err as Error
+      toast.error(Err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleApprove = async (id: string) => {
     try {
-      // Call API to approve the review
       setIsLoading(true)
-      const { data } = await axiosInstance.post(
-        `/api/reviews/${id}/approve`,
-        {},
+      const { data } = await axiosInstance.patch(
+        `/api/v1/review/status`,
+        { id, status: true },
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -65,8 +63,8 @@ export function ReviewsSection() {
         }
       )
 
-      if (data.status) {
-        setReviews(reviews.map((r) => (r.id === id ? { ...r, status: true } : r)))
+      if (data.success) {
+        setReviews(reviews.map((r) => (r._id === id ? { ...r, isPublished: true } : r)))
         toast.success("Review approved")
       }
     } catch (err) {
@@ -74,7 +72,6 @@ export function ReviewsSection() {
       toast.error(Err.message)
     } finally {
       setIsLoading(false)
-
     }
   }
 
@@ -85,13 +82,21 @@ export function ReviewsSection() {
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Delete",
+      confirmButtonColor: "#EF4444",
+      cancelButtonColor: "#64748b",
+      background: "#ffffff",
+      color: "#0f172a"
     });
+
     if (!result.isConfirmed) return;
+
     try {
       setIsLoading(true)
-      const { data } = await axiosInstance.delete(`/api/reviews/${id}`, { headers: { Authorization: `Bearer ${TOKEN}` } })
-      if (data.status) {
-        setReviews(reviews.filter((r) => r.id !== id))
+      const { data } = await axiosInstance.delete(`/api/v1/review/${id}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` }
+      })
+      if (data.success) {
+        setReviews(reviews.filter((r) => r._id !== id))
         toast.success("Review deleted successfully")
       }
     } catch (err) {
@@ -128,184 +133,149 @@ export function ReviewsSection() {
           <Star
             key={i}
             size={16}
-            className={i < rating ? "fill-amber-400 text-amber-400" : "text-sage-300"}
+            className={i < rating ? "fill-amber-400 text-amber-400" : "text-slate-200"}
           />
         ))}
       </div>
     )
   }
 
-  const getStatusBadge = (status: boolean) => {
-    return status ? (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-emerald-100 text-emerald-700 border-emerald-200">
+  const getStatusBadge = (isPublished: boolean) => {
+    return isPublished ? (
+      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">
         Approved
       </span>
     ) : (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border bg-amber-100 text-amber-700 border-amber-200">
+      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">
         Pending
       </span>
     )
   }
 
-  // Calculate counts - these will automatically update when reviews state changes
-  const pendingCount = reviews.filter((r) => !r.status).length
-  const approvedCount = reviews.filter((r) => r.status).length
+  const pendingCount = reviews.filter((r) => !r.isPublished).length
+  const approvedCount = reviews.filter((r) => r.isPublished).length
   const totalCount = reviews.length
   const averageRating = reviews.length > 0
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : "0.0"
 
-  if (isLoading) {
+  if (isLoading && reviews.length === 0) {
     return <Loading color="rgba(0, 0, 0, 0.3)" />
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-sage-100 p-3 rounded-lg">
-              <MessageSquare size={20} className="text-sage-600" />
-            </div>
-            <div>
-              <p className="text-sm text-sage-600">Total Reviews</p>
-              <p className="text-2xl font-bold text-sage-900">{totalCount}</p>
-            </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Reviews</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{totalCount}</p>
+            <MessageSquare size={16} className="text-slate-300 mb-2" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-emerald-100 p-3 rounded-lg">
-              <CheckCircle size={20} className="text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-sm text-sage-600">Approved</p>
-              <p className="text-2xl font-bold text-sage-900">
-                {approvedCount}
-              </p>
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Approved</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{approvedCount}</p>
+            <CheckCircle size={16} className="text-emerald-300 mb-2" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-amber-100 p-3 rounded-lg">
-              <MessageSquare size={20} className="text-amber-600" />
-            </div>
-            <div>
-              <p className="text-sm text-sage-600">Pending</p>
-              <p className="text-2xl font-bold text-sage-900">{pendingCount}</p>
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Pending</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{pendingCount}</p>
+            <div className="w-4 h-4 rounded-full bg-amber-100 border-2 border-amber-300 animate-pulse mb-2"></div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-amber-100 p-3 rounded-lg">
-              <Star size={20} className="text-amber-600 fill-amber-600" />
-            </div>
-            <div>
-              <p className="text-sm text-sage-600">Avg. Rating</p>
-              <p className="text-2xl font-bold text-sage-900">
-                {averageRating}
-              </p>
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Avg. Rating</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{averageRating}</p>
+            <Star size={16} className="text-blue-300 fill-blue-300 mb-2" />
           </div>
         </div>
       </div>
 
       {/* Reviews Table */}
-      <div className="bg-white rounded-lg border border-sage-200 shadow-sm overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-sage-200">
-          <h2 className="text-lg font-semibold text-sage-900">All Reviews</h2>
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+          <h2 className="text-xl font-bold text-slate-900">Guest Feedback</h2>
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{totalCount} Total Items</span>
         </div>
 
         {reviews.length === 0 ? (
-          <div className="text-center py-12">
-            <MessageSquare size={48} className="mx-auto text-sage-300 mb-4" />
-            <p className="text-sage-600">No reviews found</p>
+          <div className="text-center py-20 px-6">
+            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-200">
+              <MessageSquare size={32} />
+            </div>
+            <p className="text-slate-500 font-medium">No reviews found in the database.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-full divide-y divide-sage-200">
+            <table className="w-full min-w-full">
               <thead>
-                <tr className="bg-sage-50">
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Member
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Service
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Rating
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider">
-                    Review
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Status
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Date
-                  </th>
-                  <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-700 uppercase tracking-wider whitespace-nowrap">
-                    Actions
-                  </th>
+                <tr className="bg-slate-50/50">
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Guest</th>
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Apartment</th>
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Rating</th>
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Feedback</th>
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Status</th>
+                  <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Date</th>
+                  <th className="px-8 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-sage-200 bg-white">
+              <tbody className="divide-y divide-slate-50">
                 {reviews.map((review) => (
-                  <tr key={review.id} className="hover:bg-sage-50/50 transition-colors">
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-sage-200 rounded-full flex items-center justify-center text-xs font-semibold text-sage-700 shrink-0">
-                          {getInitials(review.name)}
+                  <tr key={review._id} className="hover:bg-slate-50/30 transition-colors group">
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xs font-bold text-blue-600 border border-blue-100">
+                          {getInitials(review.userName)}
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-sage-900 truncate">{review.name}</p>
-                          <p className="text-xs text-sage-600 truncate">{review.email}</p>
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{review.userName}</p>
+                          <p className="text-xs font-medium text-slate-400">{review.userEmail}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-sage-700">{review.service}</span>
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <span className="text-sm font-bold text-slate-600">{review.flat?.flatName || "Unknown Stay"}</span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-8 py-6 whitespace-nowrap">
                       {renderStars(review.rating)}
                     </td>
-                    <td className="px-4 sm:px-6 py-4">
-                      <p className="text-sm text-sage-700 line-clamp-1 max-w-[200px]">
-                        {review.review}
+                    <td className="px-8 py-6">
+                      <p className="text-sm text-slate-600 line-clamp-2 max-w-[250px] font-medium leading-relaxed">
+                        "{review.review}"
                       </p>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(review.status)}
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      {getStatusBadge(review.isPublished)}
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-sage-600">{formatDate(review.created_at)}</span>
+                    <td className="px-8 py-6 whitespace-nowrap">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{formatDate(review.createdAt)}</span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {/* Show approve button only for pending reviews (status = false) */}
-                        {!review.status && (
+                    <td className="px-8 py-6 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!review.isPublished && (
                           <button
-                            onClick={() => handleApprove(review.id)}
-                            className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors"
-                            title="Approve"
+                            onClick={() => handleApprove(review._id)}
+                            className="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all p-2.5 rounded-xl border border-emerald-100"
+                            title="Approve Review"
                           >
-                            <CheckCircle size={16} />
+                            <CheckCircle size={18} />
                           </button>
                         )}
-
-                        {/* Show delete button for all reviews */}
                         <button
-                          onClick={() => handleDelete(review.id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-                          title="Delete"
+                          onClick={() => handleDelete(review._id)}
+                          className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all p-2.5 rounded-xl border border-red-100"
+                          title="Delete Review"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>

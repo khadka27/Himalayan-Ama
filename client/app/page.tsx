@@ -144,7 +144,7 @@ export default function HomePage() {
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-serif)]">
                 <span className="text-white">Experience</span>
                 <br />
-                <span className="text-amber-100">Pokhara</span> 
+                <span className="text-blue-200">Pokhara</span> 
                 <span className="text-white"> Refined</span>
               </h1>
             </div>

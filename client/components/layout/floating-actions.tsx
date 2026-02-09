@@ -3,9 +3,13 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowUp } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 export function FloatingActions() {
+    const pathname = usePathname()
     const [showScrollTop, setShowScrollTop] = useState(false)
+
+    if (pathname.startsWith("/admin")) return null
 
     useEffect(() => {
         const handleScroll = () => {

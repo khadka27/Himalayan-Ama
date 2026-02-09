@@ -13,6 +13,7 @@ const statsRoute = require("./route/v1/statsRoute.js");
 const redirectRoute = require("./route/v1/redirectRoute.js");
 const flatsRouter = require("./route/v1/flatsRoute.js");
 const servicesRouter = require("./route/v1/servicesRoute.js");
+const bookingRouter = require("./route/v1/bookingRoute.js");
 
 
 const PORT = process.env.PORT || 4000;
@@ -44,6 +45,7 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/stats", statsRoute);
 app.use("/api/v1/flats", flatsRouter);
 app.use("/api/v1/services", servicesRouter);
+app.use("/api/v1/bookings", bookingRouter);
 app.use("/s", redirectRoute);
 
 

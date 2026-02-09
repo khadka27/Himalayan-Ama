@@ -45,19 +45,16 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
 
             const bookingData = {
                 userName: formData.name,
-                userEmail: formData.email,
+                email: formData.email,
                 phone: formData.phone,
-                service_id: flat._id,
-                fromDate: formData.checkInDate,
-                toDate: formData.checkOutDate,
+                flat: flat._id,
+                startDate: formData.checkInDate,
+                endDate: formData.checkOutDate || formData.checkInDate, // Fallback
                 participants: parseInt(formData.guests),
-                price: flat.price,
-                status: "pending",
-                paymentType: "inquiry",
-                pricing_tier_description: `Apartment Inquiry for ${flat.flatName}. Message: ${formData.message}`
+                message: formData.message
             }
 
-            const { data } = await axiosInstance.post("/api/bookings", bookingData)
+            const { data } = await axiosInstance.post("/api/v1/bookings", bookingData)
 
             if (data.status || data.success) {
                 toast.success("Booking inquiry sent successfully!")

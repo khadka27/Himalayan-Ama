@@ -10,7 +10,7 @@ exports.getAllBlogs = async (req, res) => {
         console.log(err.message);
         return res.status(500).json({ success: false, message: `Error while fetching all blogs: ${err.message}` })
     }
-} 
+}
 
 exports.getPublishedBlogs = async (req, res) => {
     try {
@@ -52,8 +52,11 @@ exports.addBlog = async (req, res) => {
             }
         }
 
-        // No need for parseNestedBody as there are no nested fields like affilatedLink
-        const blogData = { ...req.body, postedBy: req.user._id };
+        const blogData = {
+            ...req.body,
+            postedBy: req.user._id,
+            isActive: req.body.is_active === "true" || req.body.is_active === true
+        };
         const result = await blogServices.addBlog(blogData, banner);
 
         if (result.success) {

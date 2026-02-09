@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CheckCircle, Clock, Mail, Users, Calendar, DollarSign } from "lucide-react"
+import { CheckCircle, Clock, Mail, Users, Calendar, DollarSign, Trash2 } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import Swal from "sweetalert2"
 import Loading from "../loading"
@@ -9,16 +9,20 @@ import Cookies from "js-cookie"
 import { toast } from "sonner"
 
 interface Booking {
-  id: string
+  _id: string
   userName: string
-  userEmail: string
-  service: string
-  fromDate: string
-  toDate: string
-  time: string
-  status: "confirmed" | "pending" | "cancelled"
-  participants: number
-  price: number
+  email: string
+  flat?: {
+    flatName: string
+    price: number
+  }
+  startDate: string
+  endDate: string
+  isVerified: boolean
+  createdAt: string
+  // For backward compatibility or extra info
+  participants?: number
+  phone?: string
 }
 
 export function Bookings() {
@@ -27,97 +31,82 @@ export function Bookings() {
   const TOKEN = Cookies.get("auth_token");
 
   useEffect(() => {
-    const getBookings = async () => {
-      try {
-        setIsLoading(true)
-        const { data } = await axiosInstance.get("/api/bookings", {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`
-          }
-        })
-
-        if (data.status) {
-          setBookings(data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching bookings:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    getBookings()
+    fetchBookings()
   }, [])
+
+  const fetchBookings = async () => {
+    try {
+      setIsLoading(true)
+      const { data } = await axiosInstance.get("/api/v1/bookings", {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`
+        }
+      })
+
+      if (data.success) {
+        setBookings(data.bookings);
+      }
+    } catch (error) {
+      console.error("Error fetching bookings:", error)
+      toast.error("Failed to load bookings")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleConfirm = async (id: string) => {
     try {
       setIsLoading(true)
-      const { data } = await axiosInstance.put(`/api/bookings/${id}/status`,
-        { status: "confirmed" },
+      const { data } = await axiosInstance.patch(`/api/v1/bookings/status`,
+        { id, isVerified: true },
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`
           }
         })
 
-      if (data.status) {
-        toast.success(data.message || "Booking confirmed")
+      if (data.success) {
+        toast.success("Booking confirmed")
         setBookings(bookings.map((booking) =>
-          booking.id === id ? { ...booking, status: "confirmed" as const } : booking
+          booking._id === id ? { ...booking, isVerified: true } : booking
         ))
       }
     } catch (error) {
-      console.error("Error fetching bookings:", error)
+      console.error("Error confirming booking:", error)
+      toast.error("Failed to confirm booking")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleCancel = async (id: string) => {
+  const handleDelete = async (id: string) => {
     const result = await Swal.fire({
-      title: "Cancel this booking?",
-      text: "You won't be able to undo this.",
+      title: "Delete this booking?",
+      text: "This action cannot be undone.",
       icon: "warning",
-      showCancelButton: false,
+      showCancelButton: true,
       confirmButtonText: "Delete",
+      confirmButtonColor: "#EF4444",
+      cancelButtonColor: "#64748b"
     });
+
     if (!result.isConfirmed) return;
 
     try {
       setIsLoading(true)
-      const { data } = await axiosInstance.put(`/api/bookings/${id}/status`,
-        { status: "cancelled" },
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`
-          }
-        })
+      const { data } = await axiosInstance.delete(`/api/v1/bookings/${id}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` }
+      })
 
-      if (data.status) {
-        toast.success(data.message || "Booking confirmed")
-        setBookings(bookings.map((booking) =>
-          booking.id === id ? { ...booking, status: "cancelled" as const } : booking
-        ))
+      if (data.success) {
+        toast.success("Booking deleted")
+        setBookings(bookings.filter((b) => b._id !== id))
       }
     } catch (error) {
-      console.error("Error fetching bookings:", error)
+      console.error("Error deleting booking:", error)
+      toast.error("Failed to delete booking")
     } finally {
       setIsLoading(false)
-    }
-
-
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "bg-green-100 text-green-700 border-green-200"
-      case "pending":
-        return "bg-terracotta-100 text-terracotta-700 border-terracotta-200"
-      case "cancelled":
-        return "bg-red-100 text-red-700 border-red-200"
-      default:
-        return "bg-sage-100 text-sage-700 border-sage-200"
     }
   }
 
@@ -137,259 +126,160 @@ export function Bookings() {
     }).format(amount)
   }
 
-  if (isLoading) {
-    return (
-      <Loading color="rgba(0, 0, 0, 0.3)" />
-    )
+  const calculateDuration = (start: string, end: string) => {
+    const s = new Date(start)
+    const e = new Date(end)
+    const diffTime = Math.abs(e.getTime() - s.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays || 1
   }
 
+  if (isLoading && bookings.length === 0) {
+    return <Loading color="rgba(0, 0, 0, 0.3)" />
+  }
+
+  const pendingCount = bookings.filter(b => !b.isVerified).length
+  const confirmedCount = bookings.filter(b => b.isVerified).length
+  const totalRevenue = bookings.reduce((acc, b) => {
+    const days = calculateDuration(b.startDate, b.endDate)
+    return acc + (b.flat?.price || 0) * days
+  }, 0)
+
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-serif font-bold text-sage-900">Bookings Management</h2>
-        <p className="text-sage-600 mt-2">Manage all yoga class bookings and schedules</p>
-      </div>
-
+    <div className="space-y-8">
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-sage-600">Total Bookings</p>
-              <p className="text-2xl font-bold text-sage-900">{bookings.length}</p>
-            </div>
-            <div className="bg-sage-100 p-3 rounded-lg">
-              <Calendar size={20} className="text-sage-600" />
-            </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Bookings</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{bookings.length}</p>
+            <Calendar size={16} className="text-slate-300 mb-2" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-sage-600">Pending</p>
-              <p className="text-2xl font-bold text-sage-900">
-                {bookings.filter(b => b.status === "pending").length}
-              </p>
-            </div>
-            <div className="bg-terracotta-100 p-3 rounded-lg">
-              <Clock size={20} className="text-terracotta-600" />
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">Pending</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{pendingCount}</p>
+            <Clock size={16} className="text-amber-300 mb-2" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-sage-600">Confirmed</p>
-              <p className="text-2xl font-bold text-sage-900">
-                {bookings.filter(b => b.status === "confirmed").length}
-              </p>
-            </div>
-            <div className="bg-green-100 p-3 rounded-lg">
-              <CheckCircle size={20} className="text-green-600" />
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-1">Confirmed</p>
+          <div className="flex items-end gap-2">
+            <p className="text-3xl font-bold text-slate-900">{confirmedCount}</p>
+            <CheckCircle size={16} className="text-emerald-300 mb-2" />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-sage-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-sage-900">
-                {formatCurrency(bookings.reduce((acc, b) => acc + b.price, 0))}
-              </p>
-            </div>
-            <div className="bg-amber-100 p-3 rounded-lg">
-              <DollarSign size={20} className="text-amber-600" />
-            </div>
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+          <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Est. Revenue</p>
+          <div className="flex items-end gap-2">
+            <p className="text-2xl font-bold text-slate-900">{formatCurrency(totalRevenue)}</p>
+            <DollarSign size={16} className="text-blue-300 mb-2" />
           </div>
         </div>
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-white rounded-lg border border-sage-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+          <h2 className="text-xl font-bold text-slate-900">Apartment Inquiries</h2>
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{bookings.length} Total</span>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full min-w-full">
-            <thead className="bg-sage-50 border-b border-sage-200">
-              <tr>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Customer
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Service
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Date Range
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Time
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Details
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Status
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-sage-900 uppercase tracking-wider whitespace-nowrap">
-                  Actions
-                </th>
+            <thead>
+              <tr className="bg-slate-50/50">
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Guest</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Property</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Stay Window</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Details</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Status</th>
+                <th className="px-8 py-4 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100 whitespace-nowrap">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-sage-200">
+            <tbody className="divide-y divide-slate-50">
               {bookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-sage-50/50 transition-colors">
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-sage-900 truncate">{booking.userName}</p>
-                      <p className="text-xs text-sage-600 truncate flex items-center gap-1 mt-1">
-                        <Mail size={12} />
-                        {booking.userEmail}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-sage-700 font-medium">{booking.service}</span>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="text-sm text-sage-700">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={12} />
-                        {formatDate(booking.fromDate)}
+                <tr key={booking._id} className="hover:bg-slate-50/30 transition-colors group">
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xs font-bold text-blue-600 border border-blue-100">
+                        {booking.userName.charAt(0).toUpperCase()}
                       </div>
-                      <div className="text-xs text-sage-500 ml-4">
-                        to {formatDate(booking.toDate)}
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">{booking.userName}</p>
+                        <p className="text-xs font-medium text-slate-400">{booking.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-sage-600">{booking.time}</span>
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    <span className="text-sm font-bold text-slate-600">{booking.flat?.flatName || "Unknown Property"}</span>
                   </td>
-                  <td className="px-4 sm:px-6 py-4">
+                  <td className="px-8 py-6">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-1 text-sm text-sage-700">
-                        <Users size={14} />
-                        <span>{booking.participants} {booking.participants === 1 ? 'person' : 'people'}</span>
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <Calendar size={12} className="text-blue-400" />
+                        {formatDate(booking.startDate)}
                       </div>
-                      <div className="flex items-center gap-1 text-sm font-medium text-sage-900">
-                        <span>{formatCurrency(booking.price)}</span>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-5">
+                        to {formatDate(booking.endDate)}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                    </span>
+                  <td className="px-8 py-6">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+                        <Users size={12} className="text-slate-300" />
+                        <span>{booking.participants || 1} Guests</span>
+                      </div>
+                      <div className="text-sm font-bold text-slate-900">
+                        {formatCurrency((booking.flat?.price || 0) * calculateDuration(booking.startDate, booking.endDate))}
+                      </div>
+                    </div>
                   </td>
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {booking.status === "pending" && (
+                  <td className="px-8 py-6 whitespace-nowrap">
+                    {booking.isVerified ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">Confirmed</span>
+                    ) : (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">Pending</span>
+                    )}
+                  </td>
+                  <td className="px-8 py-6 whitespace-nowrap text-right">
+                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {!booking.isVerified && (
                         <button
-                          onClick={() => handleConfirm(booking.id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors"
+                          onClick={() => handleConfirm(booking._id)}
+                          className="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all p-2.5 rounded-xl border border-emerald-100"
                           title="Confirm Booking"
                         >
-                          <CheckCircle size={16} />
+                          <CheckCircle size={18} />
                         </button>
                       )}
-                      {booking.status !== "cancelled" && (
-                        <button
-                          onClick={() => handleCancel(booking.id)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-                          title="Cancel Booking"
-                        >
-                          <Clock size={16} />
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleDelete(booking._id)}
+                        className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all p-2.5 rounded-xl border border-red-100"
+                        title="Delete inquiry"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-
-        {bookings.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar size={48} className="mx-auto text-sage-300 mb-4" />
-            <p className="text-sage-600">No bookings found</p>
-            <p className="text-sm text-sage-500 mt-1">All bookings will appear here</p>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile Cards View (Hidden on desktop) */}
-      <div className="lg:hidden space-y-4">
-        {bookings.map((booking) => (
-          <div key={booking.id} className="bg-white rounded-lg border border-sage-200 p-4 shadow-sm">
-            <div className="space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-sage-900">{booking.userName}</h3>
-                  <p className="text-xs text-sage-600 flex items-center gap-1 mt-1">
-                    <Mail size={10} />
-                    {booking.userEmail}
-                  </p>
-                </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                  {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                </span>
+          {bookings.length === 0 && (
+            <div className="text-center py-20 px-6">
+              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-200">
+                <Calendar size={32} />
               </div>
-
-              <div className="border-t border-sage-100 pt-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-xs text-sage-500">Service</p>
-                    <p className="text-sm font-medium text-sage-900">{booking.service}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-sage-500">Time</p>
-                    <p className="text-sm font-medium text-sage-900">{booking.time}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-sage-500">Date Range</p>
-                    <p className="text-sm font-medium text-sage-900">
-                      {formatDate(booking.fromDate)} - {formatDate(booking.toDate)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-sage-500">Price</p>
-                    <p className="text-sm font-medium text-sage-900">{formatCurrency(booking.price)}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-sage-100 pt-3">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-sm text-sage-700">
-                    <Users size={14} />
-                    <span>{booking.participants} {booking.participants === 1 ? 'person' : 'people'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {booking.status === "pending" && (
-                      <button
-                        onClick={() => handleConfirm(booking.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-100 text-green-600 hover:bg-green-200 transition-colors text-sm"
-                      >
-                        <CheckCircle size={14} />
-                        Confirm
-                      </button>
-                    )}
-                    {booking.status !== "cancelled" && (
-                      <button
-                        onClick={() => handleCancel(booking.id)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors text-sm"
-                      >
-                        <Clock size={14} />
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <p className="text-slate-500 font-medium">No booking inquiries found yet.</p>
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   )
