@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X } from "lucide-react"
+import { X, Sparkles } from "lucide-react"
 import { usePathname } from "next/navigation"
 import axiosInstance from "@/services/axios-instance"
-
 
 export function OfferBanner() {
     const [isVisible, setIsVisible] = useState(false)
@@ -12,21 +11,19 @@ export function OfferBanner() {
     const pathname = usePathname()
     const [bannerData, setBannerData] = useState({
         text: "",
-        backgroundColor: "#6B8E6A",
+        backgroundColor: "#3B82F6", // Lighter blue
         textColor: "#ffffff",
         isActive: false
     })
 
     useEffect(() => {
         const checkBanner = async () => {
-            // Don't show on admin pages
             if (pathname?.startsWith("/admin")) {
                 setIsVisible(false)
                 setIsLoading(false)
                 return
             }
 
-            // Check local storage for dismissed state
             const dismissed = sessionStorage.getItem("offer-banner-dismissed")
             if (dismissed) {
                 setIsVisible(false)
@@ -35,7 +32,6 @@ export function OfferBanner() {
             }
 
             try {
-                // If fetching data, keep loading true
                 await fetchBannerData()
             } catch (error) {
                 console.error("Error checking banner:", error)
@@ -60,13 +56,12 @@ export function OfferBanner() {
             }
 
             if (banner) {
-                // Check if active
                 const isActive = banner.is_active === true || banner.is_active === "active" || banner.is_active === 1
 
                 if (isActive) {
                     setBannerData({
                         text: banner.banner_text || "",
-                        backgroundColor: banner.background_color || "#6B8E6A",
+                        backgroundColor: banner.background_color || "#3B82F6",
                         textColor: banner.text_color || "#ffffff",
                         isActive: true
                     })
@@ -85,32 +80,29 @@ export function OfferBanner() {
         sessionStorage.setItem("offer-banner-dismissed", "true")
     }
 
-    if (isLoading) {
-        return (
-            <div className="w-full h-10 bg-gray-200 animate-pulse" />
-        )
-    }
+    if (isLoading) return null
 
     if (!isVisible) return null
 
     return (
         <div
-            className="relative px-4 py-2 text-center text-sm font-medium z-50 transition-all duration-300"
+            className="relative px-6 py-3 text-center text-xs font-bold uppercase tracking-[0.2em] z-50 transition-all duration-500 shadow-2xl"
             style={{
                 backgroundColor: bannerData.backgroundColor,
                 color: bannerData.textColor
             }}
         >
-            <div className="container mx-auto flex items-center justify-center">
-                <div className="flex-1">
+            <div className="container mx-auto flex items-center justify-center gap-4">
+                <Sparkles className="h-4 w-4 animate-pulse shrink-0" />
+                <div className="flex-1 truncate">
                     {bannerData.text}
                 </div>
                 <button
                     onClick={handleClose}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-black/10 rounded-full transition"
+                    className="h-8 w-8 rounded-xl bg-black/10 flex items-center justify-center hover:bg-black/20 transition-all backdrop-blur-md border border-white/10"
                     aria-label="Close banner"
                 >
-                    <X size={16} />
+                    <X size={14} />
                 </button>
             </div>
         </div>

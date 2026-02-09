@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, MapPin, DollarSign, Home } from "lucide-react"
+import { ArrowLeft, MapPin, DollarSign, Home, Share2, Sparkles, ShieldCheck } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { ApartmentBookingModal } from "@/components/apartment-booking-modal"
@@ -58,7 +58,6 @@ export default function ApartmentDetailPage() {
       }
     }
 
-    // Try to find in existing context first
     if (flats.length > 0) {
       const found = flats.find(f => f._id === slug);
       if (found) {
@@ -98,12 +97,16 @@ export default function ApartmentDetailPage() {
 
   if (!flat) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#F8FAFC]">
         <Header />
-        <div className="container mx-auto py-20 text-center">
-          <h2 className="text-2xl font-bold">Apartment not found</h2>
+        <div className="container mx-auto py-32 text-center">
+          <div className="h-20 w-20 rounded-3xl bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-6">
+            <Home className="h-10 w-10" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Apartment not found</h2>
+          <p className="text-gray-500 font-medium mb-8">This listing may have been moved or removed.</p>
           <Link href="/apartments">
-            <Button className="mt-4">Back to Apartments</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600 rounded-2xl h-12 px-8 font-bold">Back to Apartments</Button>
           </Link>
         </div>
         <Footer />
@@ -113,81 +116,118 @@ export default function ApartmentDetailPage() {
 
   const images = flat.imagesUri && flat.imagesUri.length > 0
     ? flat.imagesUri.map(uri => uri.startsWith("http") ? uri : `${BACKEND}/images/${uri}`)
-    : ["/placeholder.svg"];
+    : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop"];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Header />
 
-      <div className="border-b bg-white py-4 shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-6">
+      <div className="bg-white/80 backdrop-blur-md py-4 border-b border-gray-100 sticky top-20 z-10">
+        <div className="container mx-auto px-6 flex items-center justify-between">
           <Link
             href="/apartments"
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#627A64] transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-blue-500 transition-all uppercase tracking-widest"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Apartments
+            Explore List
           </Link>
+          <div className="flex items-center gap-4">
+            <button className="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-blue-50 hover:text-blue-500 transition-all">
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <section className="py-8 md:py-12">
+      <section className="py-20">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
 
-            <div className="order-2 lg:order-1 flex flex-col h-full">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#627A64]/10 px-3 py-1 text-xs font-semibold text-[#627A64] w-fit">
-                <Home className="w-3 h-3" />
-                Apartment for Rent
-              </div>
-
-              <h1 className="mb-4 text-3xl md:text-4xl font-serif text-gray-900">{flat.flatName}</h1>
-
-              <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-[#627A64]" />
-                  {flat.location}
+            <div className="space-y-10">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 rounded-2xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 shadow-sm border border-blue-100 uppercase tracking-widest">
+                  <Sparkles className="h-4 w-4" />
+                  Premium Residence
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <DollarSign className="h-4 w-4 text-[#627A64]" />
-                  <span className="font-semibold text-gray-900">${flat.price}</span> / month
+
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{flat.flatName}</h1>
+
+                <div className="flex flex-wrap gap-8 items-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-blue-400" />
+                    <span>{flat.location}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="prose prose-stone max-w-none mb-8 text-gray-600 leading-relaxed">
-                <p>{flat.description || "A beautiful apartment available for rent. Contact us for more details and to schedule a viewing."}</p>
-              </div>
+              <Card className="p-10 bg-white border-none shadow-2xl rounded-[40px] border border-gray-50">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Monthly Rate</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-bold text-gray-900">${flat.price}</span>
+                      <span className="text-sm font-bold text-gray-400">/ USD</span>
+                    </div>
+                  </div>
+                  <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                    <DollarSign className="h-7 w-7" />
+                  </div>
+                </div>
 
-              <div className="mt-auto pt-6 border-t border-gray-200">
-                <Button size="lg" className="w-full md:w-auto bg-[#627A64] hover:bg-[#4A5D4C] text-white px-8" onClick={toggleBooking}>
-                  Inquire Now
+                <div className="space-y-8 prose prose-slate prose-lg max-w-none text-gray-600 leading-relaxed font-medium mb-10">
+                  <p>{flat.description || "Indulge in the perfect blend of modern comfort and Nepalese hospitality. This sanctuary is thoughtfully designed to provide a peaceful living experience in one of Pokhara's most sought-after locations."}</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl">
+                    <ShieldCheck className="h-6 w-6 text-green-500" />
+                    <span className="font-bold text-gray-900 text-sm">Verified Listing</span>
+                  </div>
+                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl">
+                    <Sparkles className="h-6 w-6 text-blue-500" />
+                    <span className="font-bold text-gray-900 text-sm">Fully Furnished</span>
+                  </div>
+                </div>
+
+                <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold h-16 rounded-2xl shadow-xl shadow-blue-100 transition-all text-lg" onClick={toggleBooking}>
+                  Inquire Availability
                 </Button>
-              </div>
+              </Card>
             </div>
 
-            <div className="order-1 lg:order-2 space-y-4">
-              <div className="relative h-[300px] md:h-[400px] overflow-hidden rounded-2xl shadow-md bg-gray-200">
+            <div className="space-y-6 lg:sticky lg:top-40">
+              <div className="relative h-[450px] md:h-[600px] overflow-hidden rounded-[40px] shadow-2xl border-8 border-white bg-white group">
                 <Image
                   src={images[selectedImage]}
                   alt={flat.flatName}
                   fill
-                  className="object-cover transition-all duration-300"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
+                <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/20 to-transparent">
+                  <div className="h-1 bg-white/30 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-white transition-all duration-300"
+                      style={{ width: `${((selectedImage + 1) / images.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
               </div>
 
               {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-2">
                   {images.map((img, index) => (
                     <button
                       key={index}
-                      className={`relative h-20 w-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${selectedImage === index ? "border-[#627A64] ring-2 ring-[#627A64]/20" : "border-transparent hover:border-gray-300"
+                      className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl transition-all duration-300 ${selectedImage === index
+                          ? "shadow-2xl scale-105 border-4 border-blue-500"
+                          : "opacity-60 grayscale-[50%] hover:opacity-100 hover:grayscale-0"
                         }`}
                       onClick={() => setSelectedImage(index)}
                     >
                       <Image
                         src={img}
-                        alt={`${flat.flatName} view ${index + 1}`}
+                        alt={`${flat.flatName} preview ${index + 1}`}
                         fill
                         className="object-cover"
                         loading="lazy"

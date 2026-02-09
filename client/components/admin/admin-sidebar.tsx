@@ -97,16 +97,16 @@ export function AdminSidebar() {
 
   }, [])
   return (
-    <aside className="w-64 bg-gradient-to-b from-sage-600 to-sage-700 text-cream h-screen fixed left-0 top-0 shadow-xl flex flex-col">
+    <aside className="w-64 bg-gradient-to-b from-blue-900 to-slate-900 text-white h-screen fixed left-0 top-0 shadow-xl flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-sage-500 shrink-0">
+      <div className="p-6 border-b border-blue-800 shrink-0">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-cream rounded-full flex items-center justify-center">
-            <span className="text-lg font-serif font-bold text-sage-700">ॐ</span>
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <span className="text-lg font-serif font-bold text-blue-900">A</span>
           </div>
           <div>
-            <h1 className="text-lg font-serif font-bold">Himalayan Yogini</h1>
-            <p className="text-xs text-sage-200">Admin</p>
+            <h1 className="text-lg font-serif font-bold">Himalayan Ama</h1>
+            <p className="text-xs text-blue-200">Admin</p>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive ? "bg-cream text-sage-700 font-medium shadow-md" : "text-cream hover:bg-sage-500/50"
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive ? "bg-white text-blue-900 font-medium shadow-md" : "text-white hover:bg-blue-800/50"
                 }`}
             >
               {item.icon}
@@ -130,10 +130,10 @@ export function AdminSidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-sage-500 shrink-0">
+      <div className="p-4 border-t border-blue-800 shrink-0">
         <div
           onClick={handleLogout}
-          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-cream hover:bg-sage-500/50 transition-all duration-200 w-full cursor-pointer"
+          className="flex items-center space-x-3 px-4 py-3 rounded-lg text-white hover:bg-blue-800/50 transition-all duration-200 w-full cursor-pointer"
         >
           <LogOut size={20} />
           <span>Logout</span>

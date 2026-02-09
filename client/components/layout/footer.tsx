@@ -3,131 +3,75 @@ import { Facebook, Instagram, Twitter, Youtube } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-[#4A5D4C] text-white">
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+    <footer className="bg-blue-500 text-white">
+      <div className="container mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* Logo and Description */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Himalayan Yogini</h3>
-            <p className="text-sm text-white/70">Transforming lives through the power of yoga and mindful living.</p>
-            <div className="flex gap-3">
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-              >
-                <Facebook className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-              >
-                <Instagram className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-              >
-                <Twitter className="h-4 w-4" />
-              </Link>
-              <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"
-              >
-                <Youtube className="h-4 w-4" />
-              </Link>
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold tracking-tight">Himalayan Ama</h3>
+            <p className="text-sm text-blue-50 leading-relaxed font-medium">
+              Premium living experiences in the heart of Pokhara. Discover luxury and tranquility with us.
+            </p>
+            <div className="flex gap-4">
+              {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
+                <Link
+                  key={i}
+                  href="#"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10"
+                >
+                  <Icon className="h-5 w-5" />
+                </Link>
+              ))}
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Quick Links</h4>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li>
-                <Link href="/" className="hover:text-white">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-white">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Our Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/reviews" className="hover:text-white">
-                  Reviews
-                </Link>
-              </li>
+            <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Connect</h4>
+            <ul className="space-y-3 text-sm font-medium text-blue-50">
+              <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link href="/apartments" className="hover:text-white transition-colors">Explore Stays</Link></li>
+              <li><Link href="/services" className="hover:text-white transition-colors">Amenities</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link href="/reviews" className="hover:text-white transition-colors">Guest Reviews</Link></li>
             </ul>
           </div>
 
-          {/* Classes */}
+          {/* Locations */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Classes</h4>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Morning Flow
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Evening Relaxation
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Power Yoga
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Yin Yoga
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Prenatal Yoga
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="hover:text-white">
-                  Group Workshops
-                </Link>
-              </li>
+            <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Locations</h4>
+            <ul className="space-y-3 text-sm font-medium text-blue-50">
+              <li>Pokhara Lakeside</li>
+              <li>Pokhara Waterfall</li>
+              <li>Sarangkot View</li>
+              <li>Peace Pagoda Area</li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Newsletter / Contact */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold">Contact</h4>
-            <ul className="space-y-2 text-sm text-white/70">
-              <li>Pokhara, Nepal</li>
-              <li>+977-9816685279 | +977-9816685280</li>
-              <li>himalayanyogini@gmail.com</li>
+            <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Reach Out</h4>
+            <ul className="space-y-4 text-sm font-medium text-blue-50">
+              <li className="flex items-center gap-3">
+                <span className="opacity-70">Address:</span> Pokhara, Nepal
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="opacity-70">Phone:</span> +977-9816685279
+              </li>
+              <li className="flex items-center gap-3">
+                <span className="opacity-70">Email:</span> info@himalayanama.com
+              </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/50 md:flex-row">
-          <p>© 2025 Himalayan Yogini. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link href="/policies" className="hover:text-white">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="hover:text-white">
-              Terms of Service
-            </Link>
+        <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-8 text-xs font-bold uppercase tracking-widest text-blue-100/50 md:flex-row">
+          <p>© 2025 Himalayan Ama. All rights reserved.</p>
+          <div className="flex gap-8">
+            <Link href="/policies" className="hover:text-white transition-colors">Safety Policies</Link>
+            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
