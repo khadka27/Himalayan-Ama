@@ -1,7 +1,7 @@
 "use client";
 
 import Lottie from "lottie-react";
-import animationData from "../util/yoga.json";
+import animationData from "../util/apartment.json";
 
 const Loading = ({ color = "rgba(0, 0, 0, 0.3)" }: { color: string }) => {
   return (

@@ -49,10 +49,6 @@ interface DashboardData {
 
 import Cookies from 'js-cookie';
 
-// ... (imports)
-
-// ... (interfaces)
-
 export default function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);

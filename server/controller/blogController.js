@@ -55,7 +55,7 @@ exports.addBlog = async (req, res) => {
         const blogData = {
             ...req.body,
             postedBy: req.user._id,
-            isActive: req.body.is_active === "true" || req.body.is_active === true
+            isActive: (req.body.isActive === "true" || req.body.isActive === true) || (req.body.is_active === "true" || req.body.is_active === true)
         };
         const result = await blogServices.addBlog(blogData, banner);
 

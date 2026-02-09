@@ -1,27 +1,28 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Calendar, Plus, X, Trash2, Tag, Percent } from "lucide-react"
+import { Calendar, Plus, X, Trash2, Tag, Percent, Sparkles, Clock, AlertCircle } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Cookies from "js-cookie"
+import Loading from "@/components/loading"
+import Swal from "sweetalert2"
 
 interface Service {
-    id: number
+    _id: string
     title: string
     price?: number
 }
 
 interface Offer {
-    id: string
-    service_id: number
-    discount_percentage: number
-    start_date: string
-    end_date: string
+    _id: string
+    service: Service | string
+    discountPercentage: number
+    startDate: string
+    endDate: string
     description?: string
-    is_active: boolean
-    created_at?: string
-    updated_at?: string
+    isActive: boolean
+    createdAt?: string
 }
 
 export default function OffersPage() {
@@ -33,12 +34,12 @@ export default function OffersPage() {
     const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
 
     const [formData, setFormData] = useState({
-        service_id: "",
-        discount_percentage: "",
-        start_date: "",
-        end_date: "",
+        service: "",
+        discountPercentage: "",
+        startDate: "",
+        endDate: "",
         description: "",
-        is_active: true
+        isActive: true
     })
 
     const TOKEN = Cookies.get("auth_token")
@@ -50,29 +51,23 @@ export default function OffersPage() {
 
     const fetchServices = async () => {
         try {
-            const { data } = await axiosInstance.get("/api/services")
-            if (data.status) {
-                setServices(data.data)
+            const { data } = await axiosInstance.get("/api/v1/services/all")
+            if (data.success) {
+                setServices(data.services)
             }
         } catch (err) {
             console.error("Failed to fetch services", err)
-            // fallback if API fails in dev
-            // setServices([{ id: 1, title: "Mock Service", price: 50 }]) 
         }
     }
 
     const fetchOffers = async () => {
         try {
             setIsFetching(true)
-            const { data } = await axiosInstance.get("/api/offers", {
+            const { data } = await axiosInstance.get("/api/v1/offer", {
                 headers: { Authorization: `Bearer ${TOKEN}` }
             })
-            if (data.status) {
-                // Map the API response to match our interface if needed
-                // Assuming API returns data compatible with Offer interface
-                // We might need to map service_title manually if the API doesn't return it
-
-                setOffers(data.data)
+            if (data.success) {
+                setOffers(data.offers)
             }
         } catch (err) {
             console.error("Failed to fetch offers", err)
@@ -85,12 +80,12 @@ export default function OffersPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.service_id || !formData.discount_percentage || !formData.start_date || !formData.end_date) {
+        if (!formData.service || !formData.discountPercentage || !formData.startDate || !formData.endDate) {
             toast.info("Please fill all required fields")
             return
         }
 
-        if (new Date(formData.start_date) > new Date(formData.end_date)) {
+        if (new Date(formData.startDate) > new Date(formData.endDate)) {
             toast.error("End date must be after start date")
             return
         }
@@ -98,34 +93,31 @@ export default function OffersPage() {
         setIsSubmitting(true)
         try {
             const payload = {
-                service_id: parseInt(formData.service_id),
-                discount_percentage: parseFloat(formData.discount_percentage),
-                start_date: formData.start_date,
-                end_date: formData.end_date,
+                service: formData.service,
+                discountPercentage: parseFloat(formData.discountPercentage),
+                startDate: formData.startDate,
+                endDate: formData.endDate,
                 description: formData.description,
-                is_active: formData.is_active
+                isActive: formData.isActive
             }
 
             let response;
-
             if (editingOffer) {
-                response = await axiosInstance.post(`/api/offers/${editingOffer.id}`, payload, {
+                response = await axiosInstance.put(`/api/v1/offer/${editingOffer._id}`, payload, {
                     headers: { Authorization: `Bearer ${TOKEN}` }
                 })
             } else {
-                response = await axiosInstance.post("/api/offers", payload, {
+                response = await axiosInstance.post("/api/v1/offer", payload, {
                     headers: { Authorization: `Bearer ${TOKEN}` }
                 })
             }
 
-            const { data } = response
-
-            if (data.status) {
-                toast.success(editingOffer ? "Offer updated successfully" : "Offer created successfully")
-                fetchOffers() // Refresh list
+            if (response.data.success) {
+                toast.success(editingOffer ? "Offer refined" : "Offer activated")
+                fetchOffers()
                 resetForm()
             } else {
-                toast.error(data.message || "Operation failed")
+                toast.error(response.data.message || "Operation failed")
             }
 
         } catch (err: any) {
@@ -136,22 +128,28 @@ export default function OffersPage() {
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this offer?")) return
+        const result = await Swal.fire({
+            title: "Delete Offer?",
+            text: "This promotion will be permanently removed.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            confirmButtonColor: "#EF4444",
+        });
+
+        if (!result.isConfirmed) return;
 
         setIsSubmitting(true)
         try {
-            const { data } = await axiosInstance.delete(`/api/offers/${id}`, {
+            const { data } = await axiosInstance.delete(`/api/v1/offer/${id}`, {
                 headers: { Authorization: `Bearer ${TOKEN}` }
             })
 
-            if (data.status) {
-                toast.success("Offer deleted successfully")
-                setOffers(offers.filter(o => o.id !== id))
-            } else {
-                toast.error(data.message || "Failed to delete offer")
+            if (data.success) {
+                toast.success("Offer deleted")
+                setOffers(offers.filter(o => o._id !== id))
             }
         } catch (err) {
-            console.error(err)
             toast.error("Failed to delete offer")
         } finally {
             setIsSubmitting(false)
@@ -161,226 +159,248 @@ export default function OffersPage() {
     const handleEdit = (offer: Offer) => {
         setEditingOffer(offer)
         setFormData({
-            service_id: offer.service_id.toString(),
-            discount_percentage: offer.discount_percentage.toString(),
-            start_date: offer.start_date,
-            end_date: offer.end_date,
+            service: typeof offer.service === 'object' ? offer.service._id : offer.service,
+            discountPercentage: offer.discountPercentage.toString(),
+            startDate: offer.startDate.split('T')[0],
+            endDate: offer.endDate.split('T')[0],
             description: offer.description || "",
-            is_active: offer.is_active
+            isActive: offer.isActive
         })
         setShowForm(true)
     }
 
     const resetForm = () => {
         setFormData({
-            service_id: "",
-            discount_percentage: "",
-            start_date: "",
-            end_date: "",
+            service: "",
+            discountPercentage: "",
+            startDate: "",
+            endDate: "",
             description: "",
-            is_active: true
+            isActive: true
         })
         setEditingOffer(null)
         setShowForm(false)
     }
 
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "N/A"
+        return new Date(dateString).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        })
+    }
+
     return (
-        <div className="flex flex-col bg-sage-50 min-h-screen">
-            <div className="bg-white border-b border-sage-200 px-8 py-6 shadow-sm flex justify-between items-center">
+        <div className="space-y-8">
+            {isFetching && <Loading color="rgba(0, 0, 0, 0.3)" />}
+
+            <div className="flex justify-between items-center bg-white p-8 rounded-[40px] shadow-sm border border-slate-50">
                 <div>
-                    <h1 className="text-3xl font-serif font-bold text-sage-900">Service Offers</h1>
-                    <p className="text-sage-600 mt-1">Manage temporary discounts and special offers</p>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                        <Tag className="text-blue-500" />
+                        Campaign Manager
+                    </h2>
+                    <p className="text-slate-400 font-medium text-sm mt-1">Create and manage discounts for your premium services.</p>
                 </div>
                 <button
                     onClick={() => setShowForm(true)}
-                    className="flex items-center gap-2 bg-sage-600 text-white px-4 py-2 rounded-lg hover:bg-sage-700 transition"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 px-6 rounded-2xl shadow-xl shadow-blue-100 transition-all flex items-center gap-2"
                 >
-                    <Plus size={20} /> Add Offer
+                    <Plus size={20} /> Launch Campaign
                 </button>
             </div>
 
-            <div className="flex-1 p-8">
-
-                {/* Form Modal */}
-                {showForm && (
-                    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg w-full max-w-md p-6 relative shadow-xl">
-                            <button onClick={resetForm} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
-                                <X size={20} />
+            {showForm && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+                        <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+                            <h3 className="text-xl font-bold text-slate-900 leading-none">
+                                {editingOffer ? "Adjust Campaign" : "New Promotion"}
+                            </h3>
+                            <button onClick={resetForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
+                                <X size={20} className="text-slate-400" />
                             </button>
+                        </div>
 
-                            <h2 className="text-xl font-bold text-sage-900 mb-4">
-                                {editingOffer ? "Edit Offer" : "Create New Offer"}
-                            </h2>
+                        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Target Service</label>
+                                <select
+                                    value={formData.service}
+                                    onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                                    className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer appearance-none"
+                                >
+                                    <option value="">Select a service...</option>
+                                    {services.map(s => (
+                                        <option key={s._id} value={s._id}>{s.title}</option>
+                                    ))}
+                                </select>
+                            </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-sage-700 mb-1">Select Service *</label>
-                                    <select
-                                        value={formData.service_id}
-                                        onChange={(e) => setFormData({ ...formData, service_id: e.target.value })}
-                                        className="w-full px-3 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Discount Amount (%)</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={formData.discountPercentage}
+                                        onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
+                                        className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all pr-12"
+                                        placeholder="e.g. 25"
                                         required
-                                    >
-                                        <option value="">-- Choose a Service --</option>
-                                        {services.map(s => (
-                                            <option key={s.id} value={s.id}>{s.title} (${s.price})</option>
-                                        ))}
-                                    </select>
+                                    />
+                                    <Percent size={18} className="absolute right-5 top-4 text-slate-400" />
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-sage-700 mb-1">Discount Percentage *</label>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            value={formData.discount_percentage}
-                                            onChange={(e) => setFormData({ ...formData, discount_percentage: e.target.value })}
-                                            className="w-full px-3 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 pr-8"
-                                            placeholder="20"
-                                            required
-                                        />
-                                        <Percent size={16} className="absolute right-3 top-3 text-gray-400" />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-sage-700 mb-1">Start Date *</label>
-                                        <input
-                                            type="date"
-                                            value={formData.start_date}
-                                            onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                                            className="w-full px-3 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-sage-700 mb-1">End Date *</label>
-                                        <input
-                                            type="date"
-                                            value={formData.end_date}
-                                            onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                                            className="w-full px-3 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-sage-700 mb-1">Description (Optional)</label>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Start Date</label>
                                     <input
-                                        type="text"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full px-3 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                                        placeholder="e.g. Summer Solstice Special"
+                                        type="date"
+                                        value={formData.startDate}
+                                        onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                        className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all"
+                                        required
                                     />
                                 </div>
-
-                                <div className="flex items-center gap-2">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">End Date</label>
                                     <input
-                                        type="checkbox"
-                                        id="offer_active"
-                                        checked={formData.is_active}
-                                        onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                        className="rounded border-sage-300 text-sage-600 focus:ring-sage-600"
+                                        type="date"
+                                        value={formData.endDate}
+                                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                        className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all"
+                                        required
                                     />
-                                    <label htmlFor="offer_active" className="text-sm font-medium text-sage-700">
-                                        Mark as Active
-                                    </label>
                                 </div>
+                            </div>
 
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Campaign Note</label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 min-h-[100px] font-medium text-slate-600 transition-all"
+                                    placeholder="Flash sale, summer special, etc."
+                                />
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="w-full bg-sage-600 text-white py-2 rounded-lg hover:bg-sage-700 transition"
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold h-14 rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95"
                                 >
-                                    {isSubmitting ? "Saving..." : editingOffer ? "Update Offer" : "Create Offer"}
+                                    {isSubmitting ? "Syncing..." : editingOffer ? "Update Promotion" : "Launch Now"}
                                 </button>
-                            </form>
-                        </div>
+                                <button
+                                    type="button"
+                                    onClick={resetForm}
+                                    className="h-14 px-8 rounded-2xl font-bold bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )}
+                </div>
+            )}
 
-                {/* Offers List */}
-                <div className="bg-white rounded-lg border border-sage-200 overflow-hidden shadow-sm">
-                    {isFetching ? (
-                        <div className="p-12 flex flex-col items-center justify-center text-center">
-                            <div className="w-8 h-8 border-4 border-sage-200 border-t-sage-600 rounded-full animate-spin mb-4"></div>
-                            <p className="text-sage-500 font-medium">Loading offers...</p>
-                        </div>
-                    ) : offers.length === 0 ? (
-                        <div className="p-8 text-center text-sage-500">
-                            <Tag size={48} className="mx-auto mb-3 opacity-30" />
-                            <p>No active offers found. Create one to get started.</p>
-                        </div>
-                    ) : (
-                        <table className="w-full">
-                            <thead className="bg-sage-50 border-b border-sage-200">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Service</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Discount</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Duration</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Status</th>
-                                    <th className="px-6 py-3 text-right text-sm font-semibold text-sage-900">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {offers.map((offer) => {
-                                    const service = services.find(s => s.id === offer.service_id)
-                                    const title = service?.title || `Service #${offer.service_id}`
+            <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="bg-slate-50/30 border-b border-slate-50">
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Promotion</th>
+                                <th className="px-14 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Discount</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Timeline</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                                <th className="px-10 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {offers.map((offer) => {
+                                const service = services.find(s => s._id === (typeof offer.service === 'object' ? offer.service._id : offer.service))
+                                const title = service?.title || "Unknown Service"
 
-                                    return (
-                                        <tr key={offer.id} className="border-b border-sage-100 last:border-0 hover:bg-sage-50/50">
-                                            <td className="px-6 py-4">
-                                                <div className="font-medium text-sage-900">{title}</div>
-                                                {offer.description && <div className="text-xs text-sage-500">{offer.description}</div>}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                    -{offer.discount_percentage}%
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-sage-600">
-                                                <div className="flex items-center gap-1">
-                                                    <Calendar size={14} />
-                                                    <span>{offer.start_date}</span>
-                                                    <span className="mx-1">to</span>
-                                                    <span>{offer.end_date}</span>
+                                const end = new Date(offer.endDate)
+                                const isExpired = end < new Date()
+
+                                return (
+                                    <tr key={offer._id} className="hover:bg-slate-50/20 transition-colors group">
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center gap-5">
+                                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 border border-blue-100 shadow-sm">
+                                                    <Tag size={18} />
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className={`inline-flex px-2 py-1 text-xs rounded-full font-medium ${offer.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                    {offer.is_active ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
+                                                <div>
+                                                    <p className="text-base font-bold text-slate-900 tracking-tight leading-tight">{title}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{offer.description || 'General Offer'}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-6">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-10 w-24 bg-red-50 rounded-xl flex items-center justify-center border border-red-100">
+                                                    <span className="text-sm font-bold text-red-600 flex items-center gap-1">
+                                                        <Sparkles size={14} /> -{offer.discountPercentage}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-6">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                                                    <Clock size={12} className="text-slate-300" />
+                                                    {formatDate(offer.startDate)} — {formatDate(offer.endDate)}
+                                                </div>
+                                                {isExpired && (
+                                                    <span className="text-[10px] font-bold text-red-400 uppercase tracking-tighter flex items-center gap-1">
+                                                        <AlertCircle size={10} /> Expired
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-10 py-6">
+                                            {offer.isActive && !isExpired ? (
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Live</span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">Inactive</span>
+                                            )}
+                                        </td>
+                                        <td className="px-10 py-6 text-right">
+                                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
                                                 <button
-                                                    onClick={() => handleDelete(offer.id)}
-                                                    className="text-red-500 hover:bg-red-50 p-2 rounded-full transition"
-                                                    title="Delete Offer"
+                                                    onClick={() => handleEdit(offer)}
+                                                    className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm bg-white"
+                                                    title="Edit Campaign"
+                                                >
+                                                    <Calendar size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(offer._id)}
+                                                    className="h-10 w-10 flex items-center justify-center rounded-xl border border-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm bg-white"
+                                                    title="Remove Campaign"
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleEdit(offer)}
-                                                    className="text-sage-600 hover:bg-sage-100 p-2 rounded-full transition"
-                                                    title="Edit Offer"
-                                                >
-                                                    <Tag size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                    {offers.length === 0 && (
+                        <div className="py-20 text-center">
+                            <Tag size={48} className="text-slate-100 mx-auto mb-4" />
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No active campaigns</p>
+                        </div>
                     )}
                 </div>
-
             </div>
         </div>
     )
