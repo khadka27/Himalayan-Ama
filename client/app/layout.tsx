@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Marcellus, Karla } from "next/font/google";
+import { Marcellus, Karla, Playfair_Display } from "next/font/google"; // Updated import
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Providers from "./provider";
@@ -19,6 +19,12 @@ const bodyFont = Karla({
   variable: "--font-body",
 });
 
+const serifFont = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Himalayan Ama | Luxury Apartment Rentals in Pokhara",
   description:
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${bodyFont.variable} ${headingFont.variable} antialiased`}
+        className={`${bodyFont.variable} ${headingFont.variable} ${serifFont.variable} antialiased`}
       >
         <Providers>
           <AppProvider>

@@ -137,13 +137,15 @@ export default function HomePage() {
                 transition={{ delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold text-xs uppercase tracking-[0.3em]"
               >
-                <Sparkles className="h-4 w-4 text-blue-300" />
+                <Sparkles className="h-4 w-4 text-amber-200" />
                 <span>Luxury Rental Collections</span>
               </motion.div>
 
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl">
-                Experience <br />
-                <span className="text-white">Pokhara</span> Refined
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-serif)]">
+                <span className="text-white">Experience</span>
+                <br />
+                <span className="text-amber-100">Pokhara</span> 
+                <span className="text-white"> Refined</span>
               </h1>
             </div>
 
@@ -154,7 +156,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
               <Button
                 size="lg"
-                className="bg-blue-500 text-white hover:bg-blue-600 transition-all font-bold px-12 h-16 text-lg rounded-2xl shadow-2xl shadow-blue-500/20 hover:scale-105"
+                className="bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold px-12 h-16 text-lg rounded-2xl shadow-2xl shadow-blue-500/20 hover:scale-105"
                 onClick={() => router.push("/apartments")}
               >
                 Explore Residences
@@ -405,7 +407,7 @@ export default function HomePage() {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-blue-600/90 mix-blend-multiply" />
+                <div className="absolute inset-0 bg-blue-600/40 mix-blend-multiply" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-20 text-center space-y-12">
                   <div className="space-y-4">
                     <div className="h-20 w-20 rounded-[30px] bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center mx-auto mb-8">

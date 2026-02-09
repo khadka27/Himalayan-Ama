@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
 import { cn } from "@/lib/utils"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Home, Info, Building2, Sparkles, BookOpen, Star, Phone } from "lucide-react"
 
 export function Header() {
   const pathname = usePathname()
@@ -14,13 +14,13 @@ export function Header() {
 
   const { push } = useRouter()
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/apartments", label: "Apartments" },
-    { href: "/services", label: "Amenities" },
-    { href: "/blog", label: "Journal" },
-    { href: "/reviews", label: "Reviews" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: "Home", icon: Home },
+    { href: "/about", label: "About", icon: Info },
+    { href: "/apartments", label: "Apartments", icon: Building2 },
+    { href: "/services", label: "Amenities", icon: Sparkles },
+    { href: "/blog", label: "Journal", icon: BookOpen },
+    { href: "/reviews", label: "Reviews", icon: Star },
+    { href: "/contact", label: "Contact", icon: Phone },
   ]
 
   const isActive = (href: string) => {
@@ -30,29 +30,33 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-6 left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-full border border-white/20 bg-white/80 backdrop-blur-xl shadow-xl transition-all duration-300">
+      <header className="fixed top-6 left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-full border border-white/20 bg-white/60 backdrop-blur-2xl shadow-xl transition-all duration-300">
         <div className="flex h-16 items-center justify-between px-6 md:px-8">
           <Link href="/" className="text-xl font-bold tracking-tighter text-blue-600">
             Himalayan Ama
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-6 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
+                title={link.label}
                 className={cn(
-                  "text-xs font-bold uppercase tracking-widest transition-all relative hover:text-blue-600",
+                  "p-2 rounded-full transition-all relative hover:bg-blue-50/50 group",
                   isActive(link.href)
-                    ? "text-blue-600"
-                    : "text-gray-600",
+                    ? "text-blue-600 bg-blue-50"
+                    : "text-slate-400 hover:text-blue-500",
                 )}
               >
-                {link.label}
+                <link.icon className="h-5 w-5" />
                 {isActive(link.href) && (
-                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600" />
                 )}
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100 pointer-events-none whitespace-nowrap text-slate-600">
+                  {link.label}
+                </span>
               </Link>
             ))}
           </nav>
@@ -92,7 +96,10 @@ export function Header() {
                       : "text-gray-600 hover:bg-gray-50",
                   )}
                 >
-                  <span className="font-bold text-sm tracking-wide">{link.label}</span>
+                  <div className="flex items-center gap-3">
+                    <link.icon className="h-5 w-5" />
+                    <span className="font-bold text-sm tracking-wide">{link.label}</span>
+                  </div>
                   {isActive(link.href) && <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />}
                 </Link>
               ))}
