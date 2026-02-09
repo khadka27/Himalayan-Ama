@@ -1,64 +1,24 @@
 const Review = require("../model/Reviews")
-const crypto = require("crypto");
 
-const generateShortCode = () => {
-    return crypto.randomBytes(4).toString("hex");
-};
+exports.getAllReviews = () => Review.find({}).populate("flat");
 
-exports.getAllReviews = () => Review.find({}).populate("author");
+exports.getPublishedReviews = () => Review.find({ isPublished: true }).populate("flat");
 
-exports.getPublishedReviews = () => Review.find({ isActive: true }).populate("author");
-
-exports.getReview = (slug) => Review.findOne({ slug }).populate("author");
-
-exports.addReview = async (review, banner) => {
+exports.addReview = async (reviewData) => {
     try {
-        review.bannerImageURI = banner;
-
-        // Generate short link for product
-        if (!review.productLink) {
-            const shortCode = generateShortCode();
-            review.productLink = `/s/${shortCode}`;
-        }
-
-        await Review.create(review);
-        return { success: true, message: "Review added" };
+        await Review.create(reviewData);
+        return { success: true, message: "Review added successfully" };
     } catch (err) {
-        console.log(err.message);
+        console.error("Add Review Error:", err.message);
         return { success: false, message: "Error while adding review" };
     }
 }
 
-exports.updateReview = async (review, banner) => {
-    try {
-        const existingReview = await Review.findById(review._id);
-        if (!existingReview) return { success: false, message: "Review doesn't exists" };
-
-        if (review.isActive !== undefined) {
-            review.isActive = review.isActive === 'true' || review.isActive === true;
-        }
-        Object.assign(existingReview, review);
-        if (banner) existingReview.bannerImageURI = banner;
-
-        // Ensure productLink exists if missing
-        if (!existingReview.productLink) {
-            const shortCode = generateShortCode();
-            existingReview.productLink = `/s/${shortCode}`;
-        }
-
-        await existingReview.save();
-        return { success: true, message: "Review updated" };
-    } catch (err) {
-        console.log(err.message);
-        return { success: false, message: "Error while updating review" };
-    }
-}
-
-exports.updateReviewStatus = async (_id, status) => {
+exports.updateReviewStatus = async (_id, isPublished) => {
     try {
         const result = await Review.updateOne(
             { _id },
-            { $set: { isActive: status } }
+            { $set: { isPublished } }
         );
 
         if (result.modifiedCount === 1) {
@@ -67,7 +27,18 @@ exports.updateReviewStatus = async (_id, status) => {
             return { success: false, message: "Status not updated" }
         }
     } catch (err) {
-        console.log(err.message);
+        console.error("Update Status Error:", err.message);
         return { success: false, message: "Error while updating review status" };
     }
 };
+
+exports.deleteReview = async (id) => {
+    try {
+        const result = await Review.findByIdAndDelete(id);
+        if (!result) return { success: false, message: "Review not found" };
+        return { success: true, message: "Review deleted successfully" };
+    } catch (err) {
+        console.error("Delete Review Error:", err.message);
+        return { success: false, message: "Error while deleting review" };
+    }
+}

@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
-import { Trash2, Edit2, Plus, X, GripVertical } from "lucide-react"
+import { Trash2, Edit2, Plus, X, GripVertical, FileText, CheckCircle, Clock, Layout, User, Tag, Calendar } from "lucide-react"
 import { toast } from "sonner"
 import axiosInstance from "@/services/axios-instance"
 import Loading from "../loading"
@@ -31,19 +30,26 @@ interface ContentSection {
   paragraph: string
 }
 
+interface Author {
+  _id: string
+  authorName: string
+}
+
 interface Blog {
-  id: string
+  _id: string
   title: string
   subtitle: string
-  description: string
+  shortDescription: string
   excerpt: string
-  author: string
-  content: ContentSection[]
+  author: Author | string
+  content: ContentSection[] | string
   conclusion: string
-  is_active: boolean
+  isActive: boolean
   slug: string
-  image_url: string
-  created_at: string
+  bannerImageURI: string
+  category: string
+  publishDate: string
+  createdAt: string
 }
 
 interface SortableItemProps {
@@ -64,35 +70,35 @@ function SortableItem({ id, index, section, onUpdate, onRemove }: SortableItemPr
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-sage-50 border border-sage-200 rounded-lg p-4 mb-3">
-      <div className="flex items-start gap-3">
+    <div ref={setNodeRef} style={style} className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-4 shadow-sm group">
+      <div className="flex items-start gap-4">
         <button
           type="button"
-          className="mt-2 cursor-grab active:cursor-grabbing text-sage-400 hover:text-sage-600"
+          className="mt-3 cursor-grab active:cursor-grabbing text-slate-300 hover:text-blue-500 transition-colors"
           {...attributes}
           {...listeners}
         >
           <GripVertical size={20} />
         </button>
-        <div className="flex-1 space-y-3">
+        <div className="flex-1 space-y-4">
           <input
             type="text"
-            placeholder={`Heading ${index + 1}`}
+            placeholder={`Section Heading ${index + 1}`}
             value={section.heading}
             onChange={(e) => onUpdate(index, "heading", e.target.value)}
-            className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
+            className="w-full px-4 py-3 border border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-50 font-bold text-slate-800"
           />
           <textarea
-            placeholder={`Paragraph ${index + 1}`}
+            placeholder={`Detailed paragraph for this section...`}
             value={section.paragraph}
             onChange={(e) => onUpdate(index, "paragraph", e.target.value)}
-            className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 min-h-24"
+            className="w-full px-4 py-3 border border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-50 min-h-[120px] text-slate-600 font-medium leading-relaxed"
           />
         </div>
         <button
           type="button"
           onClick={() => onRemove(index)}
-          className="mt-2 p-2 hover:bg-red-100 rounded-lg transition text-red-500"
+          className="mt-2 p-2.5 hover:bg-red-50 rounded-xl transition-all text-slate-300 hover:text-red-500"
         >
           <Trash2 size={18} />
         </button>
@@ -103,7 +109,7 @@ function SortableItem({ id, index, section, onUpdate, onRemove }: SortableItemPr
 
 export function Blogs() {
   const [blogs, setBlogs] = useState<Blog[]>([])
-
+  const [authors, setAuthors] = useState<Author[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -115,6 +121,8 @@ export function Blogs() {
     description: "",
     excerpt: "",
     author: "",
+    category: "Meditation",
+    publishDate: new Date().toISOString().split('T')[0],
     content: [] as ContentSection[],
     conclusion: "",
     slug: "",
@@ -129,19 +137,38 @@ export function Blogs() {
     }),
   )
 
+  const categories = ["Meditation", "Yoga", "Wellness", "Nature", "Retreat", "Community"]
+
   useEffect(() => {
-    setIsLoading(true)
-    const getBlogs = async () => {
-      const { data } = await axiosInstance.get("/api/blogs")
-      setIsLoading(false)
-
-      if (data.status) {
-        setBlogs(data.data)
-      }
-    }
-
-    getBlogs()
+    fetchBlogs()
+    fetchAuthors()
   }, [])
+
+  const fetchBlogs = async () => {
+    try {
+      setIsLoading(true)
+      const { data } = await axiosInstance.get("/api/v1/blog/getAllBlogs")
+      if (data.success) {
+        setBlogs(data.blogs)
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to load blogs")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchAuthors = async () => {
+    try {
+      const { data } = await axiosInstance.get("/api/v1/author/getAllAuthors")
+      if (data.success) {
+        setAuthors(data.authors)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   const generateSlug = (title: string) => {
     return title
@@ -194,199 +221,99 @@ export function Blogs() {
     }
   }
 
-  const handleAddBlog = async () => {
-    if (
-      !formData.title ||
-      !formData.subtitle ||
-      !formData.excerpt ||
-      !formData.author ||
-      !formData.description ||
-      !formData.conclusion
-    ) {
-      toast.info("Please fill in all required fields")
-      return
-    }
-
-    if (formData.content.length === 0) {
-      toast.info("Please add at least one content section")
-      return
-    }
-
-    if (!imageFile) {
-      toast.info("Please select an image")
+  const handleSaveBlog = async () => {
+    if (!formData.title || !formData.description || !formData.author || !formData.category) {
+      toast.info("Please fill in required fields (Title, Author, Category, Description)")
       return
     }
 
     try {
       setIsLoading(true)
-
       const formDataPayload = new FormData()
       formDataPayload.append("title", formData.title)
       formDataPayload.append("subtitle", formData.subtitle)
-      formDataPayload.append("description", formData.description)
+      formDataPayload.append("shortDescription", formData.description)
       formDataPayload.append("excerpt", formData.excerpt)
       formDataPayload.append("author", formData.author)
+      formDataPayload.append("category", formData.category)
+      formDataPayload.append("publishDate", formData.publishDate)
       formDataPayload.append("content", JSON.stringify(formData.content))
       formDataPayload.append("conclusion", formData.conclusion)
       formDataPayload.append("slug", formData.slug || generateSlug(formData.title))
-      formDataPayload.append("is_active", "true")
-      formDataPayload.append("image", imageFile)
+      formDataPayload.append("isActive", "true")
 
-      const { data } = await axiosInstance.post("/api/blogs", formDataPayload, {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      if (imageFile) formDataPayload.append("bannerImage", imageFile)
 
-      if (data.status) {
-        toast.success(data.message || "Blog added successfully")
-
-        const newBlog: Blog = {
-          id: Date.now().toString(),
-          title: formData.title,
-          subtitle: formData.subtitle,
-          excerpt: formData.excerpt,
-          description: formData.description,
-          author: formData.author,
-          content: formData.content,
-          conclusion: formData.conclusion,
-          slug: formData.slug || generateSlug(formData.title),
-          image_url: imagePreview,
-          created_at: new Date().toISOString().split("T")[0],
-          is_active: true,
-        }
-
-        setBlogs([...blogs, newBlog])
+      let response
+      if (editingBlog) {
+        formDataPayload.append("_id", editingBlog._id)
+        response = await axiosInstance.put("/api/v1/blog/updateBlog", formDataPayload, {
+          headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "multipart/form-data" },
+        })
       } else {
-        toast.info(data.message || "Error while creating blog")
+        response = await axiosInstance.post("/api/v1/blog/addBlog", formDataPayload, {
+          headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "multipart/form-data" },
+        })
       }
-    } catch (err) {
-      toast.error((err as Error).message)
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Blog saved successfully")
+        resetForm()
+        fetchBlogs()
+      } else {
+        toast.error(response.data.message || "Error while saving blog")
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || (err as Error).message)
     } finally {
       setIsLoading(false)
-      resetForm()
     }
   }
 
   const handleEditBlog = (blog: Blog) => {
     setEditingBlog(blog)
+    let contentData: ContentSection[] = []
+    try {
+      contentData = typeof blog.content === 'string' ? JSON.parse(blog.content) : (blog.content || [])
+    } catch (e) {
+      contentData = []
+    }
+
     setFormData({
       title: blog.title,
       subtitle: blog.subtitle || "",
-      description: blog.description,
-      excerpt: blog.excerpt,
-      author: blog.author || "",
-      content: blog.content || [],
+      description: blog.shortDescription || "",
+      excerpt: blog.excerpt || "",
+      author: typeof blog.author === 'object' ? blog.author._id : (blog.author || ""),
+      category: blog.category || "Meditation",
+      publishDate: blog.publishDate ? blog.publishDate.split('T')[0] : new Date().toISOString().split('T')[0],
+      content: contentData,
       conclusion: blog.conclusion || "",
       slug: blog.slug || "",
     })
-    setImagePreview(blog.image_url)
+    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+    setImagePreview(blog.bannerImageURI?.startsWith("http") ? blog.bannerImageURI : `${BACKEND}/images/${blog.bannerImageURI}`)
     setShowForm(true)
-  }
-
-  const handleUpdateBlog = async () => {
-    if (
-      !editingBlog ||
-      !formData.title ||
-      !formData.subtitle ||
-      !formData.excerpt ||
-      !formData.author ||
-      !formData.description ||
-      !formData.conclusion
-    ) {
-      toast.info("Please fill in all required fields")
-      return
-    }
-
-    if (formData.content.length === 0) {
-      toast.info("Please add at least one content section")
-      return
-    }
-
-    try {
-      setIsLoading(true)
-
-      const formDataPayload = new FormData()
-      formDataPayload.append("title", formData.title)
-      formDataPayload.append("subtitle", formData.subtitle)
-      formDataPayload.append("description", formData.description)
-      formDataPayload.append("excerpt", formData.excerpt)
-      formDataPayload.append("author", formData.author)
-      formDataPayload.append("content", JSON.stringify(formData.content))
-      formDataPayload.append("conclusion", formData.conclusion)
-      formDataPayload.append("slug", formData.slug || generateSlug(formData.title))
-
-      if (imageFile) {
-        formDataPayload.append("image", imageFile)
-      }
-
-      const { data } = await axiosInstance.post(`/api/blogs/${editingBlog.id}`, formDataPayload, {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      if (data.status) {
-        toast.success(data.message || "Blog updated successfully")
-
-        setBlogs(
-          blogs.map((blog) =>
-            blog.id === editingBlog.id
-              ? {
-                  ...blog,
-                  title: formData.title,
-                  subtitle: formData.subtitle,
-                  excerpt: formData.excerpt,
-                  description: formData.description,
-                  author: formData.author,
-                  content: formData.content,
-                  conclusion: formData.conclusion,
-                  slug: formData.slug || generateSlug(formData.title),
-                  image: imagePreview || blog.image_url,
-                }
-              : blog,
-          ),
-        )
-      } else {
-        toast.info(data.message || "Error while updating blog")
-      }
-    } catch (err) {
-      toast.error((err as Error).message)
-    } finally {
-      setIsLoading(false)
-      resetForm()
-    }
   }
 
   const handleToggleActive = async (id: string) => {
     try {
       setIsLoading(true)
-      const blogToToggle = blogs.find((blog) => blog.id === id)
-      const newStatus = blogToToggle ? !blogToToggle.is_active : null
+      const blogToToggle = blogs.find((blog) => blog._id === id)
+      const newStatus = blogToToggle ? !blogToToggle.isActive : true
 
-      const { data } = await axiosInstance.post(
-        `/api/blogs/${id}`,
-        {
-          is_active: newStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
-        },
+      const { data } = await axiosInstance.put(
+        `/api/v1/blog/updateBlogStatus`,
+        { _id: id, status: newStatus },
+        { headers: { Authorization: `Bearer ${TOKEN}` } }
       )
 
-      if (data.status) {
-        toast.success(data.message || "Status updated")
-        setBlogs(blogs.map((blog) => (blog.id === id ? { ...blog, is_active: !blog.is_active } : blog)))
-      } else {
-        toast.info(data.message || "Status update failed")
+      if (data.success) {
+        toast.success("Status updated")
+        setBlogs(blogs.map((b) => (b._id === id ? { ...b, isActive: newStatus } : b)))
       }
     } catch (err) {
-      const Err = err as Error
-      toast.error(Err.message)
+      toast.error((err as Error).message)
     } finally {
       setIsLoading(false)
     }
@@ -399,6 +326,8 @@ export function Blogs() {
       description: "",
       excerpt: "",
       author: "",
+      category: "Meditation",
+      publishDate: new Date().toISOString().split('T')[0],
       content: [],
       conclusion: "",
       slug: "",
@@ -411,234 +340,296 @@ export function Blogs() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A"
-
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-GB", {
+    return new Date(dateString).toLocaleDateString("en-GB", {
       day: "2-digit",
-      month: "2-digit",
+      month: "short",
       year: "numeric",
     })
   }
 
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+
   return (
-    <>
+    <div className="space-y-8 pb-20">
       {isLoading && <Loading color="rgba(0, 0, 0, 0.3)" />}
 
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-serif font-bold text-sage-900">Blog Management</h2>
-          <button
-            onClick={() => {
-              setEditingBlog(null)
-              setShowForm(!showForm)
-            }}
-            className="flex items-center gap-2 bg-sage-600 text-white px-4 py-2 rounded-lg hover:bg-sage-700 transition"
-          >
-            <Plus size={20} />
-            New Blog
-          </button>
+      <div className="flex justify-between items-center bg-white p-8 rounded-[40px] shadow-sm border border-slate-50">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+            <FileText className="text-blue-500" />
+            Editorial Hub
+          </h2>
+          <p className="text-slate-400 font-medium text-sm mt-1">Curate and publish stories that inspire your community.</p>
         </div>
+        <button
+          onClick={() => {
+            setEditingBlog(null)
+            setShowForm(true)
+          }}
+          className="bg-slate-900 hover:bg-black text-white font-bold h-12 px-6 rounded-2xl shadow-xl shadow-slate-100 transition-all flex items-center gap-2"
+        >
+          <Plus size={20} />
+          Launch Story
+        </button>
+      </div>
 
-        {showForm && (
-          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-sage-200 px-6 py-4 flex justify-between items-center z-10">
-                <h3 className="text-xl font-semibold text-sage-900">{editingBlog ? "Edit Blog" : "Create New Blog"}</h3>
-                <button onClick={resetForm} className="p-1 hover:bg-sage-100 rounded-lg transition">
-                  <X size={24} className="text-sage-600" />
-                </button>
-              </div>
+      {showForm && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
+          <div className="bg-white rounded-[40px] w-full max-w-5xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in duration-300">
+            <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+              <h3 className="text-xl font-bold text-slate-900 leading-none">
+                {editingBlog ? "Refine Story" : "New Editorial"}
+              </h3>
+              <button onClick={resetForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
+                <X size={20} className="text-slate-400" />
+              </button>
+            </div>
 
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Blog Title *"
-                    value={formData.title}
-                    onChange={(e) => {
-                      setFormData({ ...formData, title: e.target.value, slug: generateSlug(e.target.value) })
-                    }}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Subtitle *"
-                    value={formData.subtitle}
-                    onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Author Name *"
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Slug (auto-generated)"
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 bg-sage-50"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 mb-4">
-                  <textarea
-                    placeholder="Short Description *"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 min-h-20"
-                  />
-                  <textarea
-                    placeholder="Brief Excerpt (for preview) *"
-                    value={formData.excerpt}
-                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    className="px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 min-h-20"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <label className="text-sm font-semibold text-sage-900">Content Sections *</label>
-                    <button
-                      type="button"
-                      onClick={handleAddContentSection}
-                      className="flex items-center gap-2 bg-sage-600 text-white px-3 py-1.5 rounded-lg hover:bg-sage-700 transition text-sm"
-                    >
-                      <Plus size={16} />
-                      Add Section
-                    </button>
+            <div className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Article Headline</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Nature's Whispers..."
+                        value={formData.title}
+                        onChange={(e) => {
+                          setFormData({ ...formData, title: e.target.value, slug: generateSlug(e.target.value) })
+                        }}
+                        className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all"
+                      />
+                      <Layout size={18} className="absolute right-5 top-4 text-slate-300" />
+                    </div>
                   </div>
 
-                  {formData.content.length === 0 ? (
-                    <div className="border-2 border-dashed border-sage-300 rounded-lg p-8 text-center text-sage-500">
-                      No content sections yet. Click "Add Section" to create your first section.
-                    </div>
-                  ) : (
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                      <SortableContext
-                        items={formData.content.map((_, i) => `section-${i}`)}
-                        strategy={verticalListSortingStrategy}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Contributor</label>
+                      <select
+                        value={formData.author}
+                        onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                        className="w-full h-14 px-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer"
                       >
-                        {formData.content.map((section, index) => (
-                          <SortableItem
-                            key={`section-${index}`}
-                            id={`section-${index}`}
-                            index={index}
-                            section={section}
-                            onUpdate={handleUpdateContentSection}
-                            onRemove={handleRemoveContentSection}
-                          />
+                        <option value="">Select Author</option>
+                        {authors.map(a => (
+                          <option key={a._id} value={a._id}>{a.authorName}</option>
                         ))}
-                      </SortableContext>
-                    </DndContext>
-                  )}
-                </div>
-
-                <div className="mb-4">
-                  <textarea
-                    placeholder="Conclusion *"
-                    value={formData.conclusion}
-                    onChange={(e) => setFormData({ ...formData, conclusion: e.target.value })}
-                    className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600 min-h-24"
-                  />
-                </div>
-
-                <div className="border-2 border-dashed border-sage-300 rounded-lg p-4 mb-4">
-                  <label className="block text-sm font-semibold text-sage-900 mb-2">Featured Image *</label>
-                  <input type="file" accept="image/*" onChange={handleImageChange} className="w-full" />
-                  {imagePreview && (
-                    <div className="mt-4">
-                      <p className="text-sm text-sage-600 mb-2">Image Preview:</p>
-                      <img
-                        src={imagePreview || "/placeholder.svg"}
-                        alt="Preview"
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
+                      </select>
                     </div>
-                  )}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Genre</label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        className="w-full h-14 px-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer"
+                      >
+                        {categories.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={editingBlog ? handleUpdateBlog : handleAddBlog}
-                    className="bg-sage-600 text-white px-6 py-2 rounded-lg hover:bg-sage-700 transition"
-                  >
-                    {editingBlog ? "Update Blog" : "Create Blog"}
-                  </button>
-                  <button
-                    onClick={resetForm}
-                    className="bg-sage-200 text-sage-900 px-6 py-2 rounded-lg hover:bg-sage-300 transition"
-                  >
-                    Cancel
-                  </button>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Cover Art</label>
+                  <div className="relative h-[126px] rounded-[32px] overflow-hidden bg-slate-50 border-2 border-dashed border-slate-100 flex flex-col items-center justify-center group cursor-pointer hover:bg-slate-100 transition-all">
+                    {imagePreview ? (
+                      <>
+                        <img src={imagePreview} className="absolute inset-0 w-full h-full object-cover" alt="Preview" />
+                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Plus className="text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center p-6">
+                        <Plus className="h-6 w-6 text-slate-300 mx-auto mb-1" />
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-center">Visual Asset</p>
+                      </div>
+                    )}
+                    <input type="file" accept="image/*" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </div>
                 </div>
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Publish Date</label>
+                  <input
+                    type="date"
+                    value={formData.publishDate}
+                    onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
+                    className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">URL Identifier (Slug)</label>
+                  <input
+                    type="text"
+                    value={formData.slug}
+                    readOnly
+                    className="w-full h-14 px-5 bg-slate-100/50 border-none rounded-2xl font-bold text-slate-400 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Brief Overview</label>
+                <textarea
+                  placeholder="The essence of your story..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 min-h-[80px] font-medium text-slate-600 transition-all"
+                />
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Narrative Flow</label>
+                  <button
+                    type="button"
+                    onClick={handleAddContentSection}
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <Plus size={14} /> Add Block
+                  </button>
+                </div>
+
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext
+                    items={formData.content.map((_, i) => `section-${i}`)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {formData.content.map((section, index) => (
+                      <SortableItem
+                        key={`section-${index}`}
+                        id={`section-${index}`}
+                        index={index}
+                        section={section}
+                        onUpdate={handleUpdateContentSection}
+                        onRemove={handleRemoveContentSection}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+
+                {formData.content.length === 0 && (
+                  <div className="text-center py-12 bg-slate-50/50 rounded-[40px] border border-dashed border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No narrative blocks added</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Epilogue</label>
+                <textarea
+                  placeholder="Final reflections..."
+                  value={formData.conclusion}
+                  onChange={(e) => setFormData({ ...formData, conclusion: e.target.value })}
+                  className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 min-h-[100px] font-medium text-slate-600 transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="px-10 py-8 border-t border-slate-50 flex gap-4 bg-slate-50/30">
+              <button
+                onClick={handleSaveBlog}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold h-14 rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95"
+              >
+                {editingBlog ? "Synchronize" : "Go Live"}
+              </button>
+              <button
+                onClick={resetForm}
+                className="px-10 h-14 rounded-2xl font-bold bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 transition-all"
+              >
+                Discard
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="bg-white rounded-lg border border-sage-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-sage-50 border-b border-sage-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Title</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Author</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Date</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Actions</th>
+            <thead>
+              <tr className="bg-slate-50/30 border-b border-slate-50">
+                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Storytelling</th>
+                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Temporal</th>
+                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Presence</th>
+                <th className="px-10 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {blogs.map((blog, idx) => (
-                <tr key={blog.id} className={idx % 2 === 0 ? "bg-white" : "bg-sage-50"}>
-                  <td className="px-6 py-4 text-sm font-medium text-sage-900">{blog.title}</td>
-                  <td className="px-6 py-4 text-sm text-sage-600">{blog.author || "N/A"}</td>
-                  <td className="px-6 py-4 text-sm text-sage-600">{formatDate(blog.created_at)}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        blog.is_active ? "bg-green-200 text-green-700" : "bg-gray-200 text-gray-600"
-                      }`}
-                    >
-                      {blog.is_active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm flex gap-2 items-center">
-                    {/* Professional Toggle Switch */}
-                    <div className="relative inline-block w-11 h-6">
-                      <input
-                        type="checkbox"
-                        checked={blog.is_active}
-                        onChange={() => handleToggleActive(blog.id)}
-                        className="sr-only peer"
-                        id={`toggle-blog-${blog.id}`}
-                      />
-                      <label
-                        htmlFor={`toggle-blog-${blog.id}`}
-                        className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${blog.is_active ? 'bg-sage-600' : 'bg-gray-300'}`}
-                      >
-                        <span
-                          className={`absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 transition-all duration-300 shadow-sm transform ${blog.is_active ? 'translate-x-5' : ''}`}
+            <tbody className="divide-y divide-slate-50">
+              {blogs.map((blog) => (
+                <tr key={blog._id} className="hover:bg-slate-50/20 transition-colors group">
+                  <td className="px-10 py-6">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden relative border border-slate-50 shadow-sm flex-shrink-0 bg-slate-100">
+                        <img
+                          src={blog.bannerImageURI?.startsWith("http") ? blog.bannerImageURI : `${BACKEND}/images/${blog.bannerImageURI}`}
+                          className="object-cover w-full h-full"
+                          alt=""
                         />
-                      </label>
+                      </div>
+                      <div>
+                        <p className="text-base font-bold text-slate-900 leading-tight mb-1">{blog.title}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-md uppercase tracking-wider">{blog.category}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{typeof blog.author === 'object' ? blog.author.authorName : "Guest"}</span>
+                        </div>
+                      </div>
                     </div>
-                    
-                    <button
-                      onClick={() => handleEditBlog(blog)}
-                      className="p-2 hover:bg-sage-100 rounded-lg transition ml-2"
-                      title="Edit blog"
-                    >
-                      <Edit2 size={16} className="text-sage-600" />
-                    </button>
+                  </td>
+                  <td className="px-10 py-6">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                      <Calendar size={14} className="text-slate-200" />
+                      {formatDate(blog.publishDate)}
+                    </div>
+                  </td>
+                  <td className="px-10 py-6">
+                    {blog.isActive ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
+                        Published
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
+                        Archived
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-10 py-6 text-right">
+                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                      <button
+                        onClick={() => handleToggleActive(blog._id)}
+                        className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all bg-white shadow-sm ${blog.isActive ? 'hover:bg-slate-900 hover:text-white border-slate-100 text-slate-300' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
+                        title={blog.isActive ? "Archived Story" : "Publish Story"}
+                      >
+                        {blog.isActive ? <Clock size={16} /> : <CheckCircle size={16} />}
+                      </button>
+                      <button
+                        onClick={() => handleEditBlog(blog)}
+                        className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-100 text-slate-300 hover:bg-slate-900 hover:text-white transition-all bg-white shadow-sm"
+                        title="Edit Details"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {blogs.length === 0 && (
+            <div className="py-24 text-center">
+              <FileText size={48} className="text-slate-100 mx-auto mb-4" />
+              <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">The archives are currently empty</p>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   )
 }

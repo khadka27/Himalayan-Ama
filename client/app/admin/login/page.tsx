@@ -15,20 +15,22 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter();
-  
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       setLoading(true);
-      const { data } = await axiosInstance.post("/api/auth/login", {
+      const { data } = await axiosInstance.post("/api/v1/auth/login", {
         email,
         password
       });
 
-      if (data.status) {
-        Cookies.set("auth_token" , data.token, {expires: 30})
+      if (data.success || data.status) {
+        if (data.token) {
+          Cookies.set("auth_token", data.token, { expires: 30 })
+        }
         toast.success(data.message || "Logged in")
         router.push("/admin/dashboard");
       } else {
@@ -45,43 +47,43 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-cream via-sage-50 to-terracotta-100 flex items-center justify-center p-4 duration-200">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-200 flex items-center justify-center p-4">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-10 w-72 h-72 bg-sage-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-        <div className="absolute bottom-20 left-10 w-72 h-72 bg-terracotta-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div className="absolute top-20 right-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-slate-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
       </div>
 
       {/* Login card */}
       <div className="relative w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-12 border border-white/50">
           {/* Logo/Branding */}
-          <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl md:text-4xl text-sage-900 mb-2">Himalayan Yogii</h1>
-            {/* <p className="text-sage-600 text-sm">Admin Portal</p> */}
+          <div className="text-center mb-10">
+            <h1 className="font-serif text-3xl md:text-4xl text-slate-900 mb-2 font-bold tracking-tight">Himalayan Ama</h1>
+            <p className="text-slate-500 font-medium uppercase tracking-widest text-xs">Admin Portal</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-sage-900 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-slate-500">
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="admin@himalayanyogii.com"
+                placeholder="admin@himalayanama.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-sage-200 bg-sage-50 text-sage-900 placeholder-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-transparent transition"
+                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
                 required
               />
             </div>
 
             {/* Password field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-sage-900 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-xs font-bold uppercase tracking-widest text-slate-500">
                 Password
               </label>
               <div className="relative">
@@ -91,15 +93,15 @@ export default function AdminLogin() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 rounded-lg border border-sage-200 bg-sage-50 text-sage-900 placeholder-sage-500 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-transparent transition"
+                  className="w-full px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sage-600 duration-2000 hover:text-sage-900 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
                 >
-                  {/* {showPassword ? <EyeOff size={18} /> : <Eye size={18} />} */}
+                  <span className="text-xs font-bold uppercase">Show</span>
                 </button>
               </div>
             </div>
@@ -108,7 +110,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r mt-4 from-sage-600 to-sage-700 text-cream font-medium py-3 rounded-lg hover:from-sage-700 hover:to-sage-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all mt-4 disabled:opacity-50 disabled:cursor-not-allowed text-sm uppercase tracking-widest"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>

@@ -6,7 +6,7 @@ const reviewSchema = new mongoose.Schema({
   flat: { type: mongoose.Schema.Types.ObjectId, ref: "Flat", required: true },
   rating: { type: Number, required: true },
   review: { type: String, required: true },
-  isPulished: { type: Boolean, required: true, default: false }
+  isPublished: { type: Boolean, required: true, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Review", reviewSchema);

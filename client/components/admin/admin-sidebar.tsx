@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { LayoutDashboard, BookOpen, Users, Calendar, FileText, MessageSquare, LogOut, Settings, Star, UserCheck, Megaphone, Home } from "lucide-react"
+import { LayoutDashboard, BookOpen, Users, Calendar, FileText, MessageSquare, LogOut, Settings, Star, UserCheck, Megaphone, Home, Sparkles } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { useRouter } from "next/navigation";
 import { toast } from "sonner"
@@ -36,13 +36,11 @@ export function AdminSidebar() {
         },
       ]
       : []),
-    { name: "Instructors", href: "/admin/dashboard/instructors", icon: <UserCheck size={20} /> },
     { name: "Blogs", href: "/admin/dashboard/blogs", icon: <BookOpen size={20} /> },
     { name: "Apartments", href: "/admin/dashboard/apartments", icon: <Home size={20} /> },
-    { name: "Inquiries", href: "/admin/dashboard/inquiries", icon: <MessageSquare size={20} /> },
+    { name: "Amenities", href: "/admin/dashboard/services", icon: <Sparkles size={20} /> },
     { name: "Bookings", href: "/admin/dashboard/bookings", icon: <FileText size={20} /> },
     { name: "Reviews", href: "/admin/dashboard/reviews", icon: <Star size={20} /> },
-    { name: "Settings", href: "/admin/dashboard/settings", icon: <Settings size={20} /> },
     { name: "Service Offers", href: "/admin/dashboard/offers", icon: <Calendar size={20} /> },
     { name: "Offer Banner", href: "/admin/dashboard/offer-banner", icon: <Megaphone size={20} /> },
   ]

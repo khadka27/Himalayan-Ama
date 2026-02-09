@@ -9,23 +9,24 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Star, Filter, ChevronLeft, ChevronRight, Sparkles, Loader2, Plus, MessageSquare } from "lucide-react"
+import { Star, Filter, ChevronLeft, ChevronRight, Sparkles, Loader2, Plus, MessageSquare, Home } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Header } from "@/components/layout/header"
 import Hero from "@/components/hero"
 
 interface Review {
-  id: string
-  name: string
-  comment?: string
-  review?: string
+  _id: string
+  userName: string
+  userEmail: string
+  review: string
   rating: number
-  service_title?: string
-  created_at?: string
-  avatar_url?: string
+  flat?: {
+    flatName: string
+  }
+  createdAt?: string
 }
 
 export default function ReviewsPage() {
@@ -70,14 +71,14 @@ export default function ReviewsPage() {
       setIsSubmitting(true)
 
       const payload = {
-        name: formData.name,
-        email: formData.email,
+        userName: formData.name,
+        userEmail: formData.email,
         rating: userRating,
         review: formData.review,
-        service_id: formData.service,
+        flat: formData.service,
       }
 
-      const { data } = await axiosInstance.post("/api/reviews", payload)
+      const { data } = await axiosInstance.post("/api/v1/review", payload)
 
       if (data.status || data.success) {
         toast.success(data.message || "Review submitted successfully!")
@@ -109,9 +110,9 @@ export default function ReviewsPage() {
   const fetchReviews = async () => {
     try {
       setIsLoading(true)
-      const { data } = await axiosInstance.get("/api/reviews/publishable")
-      if (data.status) {
-        setReviews(data.data)
+      const { data } = await axiosInstance.get("/api/v1/review/publishable")
+      if (data.status || data.success) {
+        setReviews(data.reviews)
       }
     } catch (err) {
       const error = err as Error
@@ -149,7 +150,7 @@ export default function ReviewsPage() {
   }
 
   const getReviewText = (review: Review) => {
-    return review.comment || review.review || ""
+    return review.review || ""
   }
 
   return (
@@ -164,7 +165,7 @@ export default function ReviewsPage() {
 
       <section className="bg-white/80 backdrop-blur-md py-6 shadow-sm sticky top-20 z-10 border-b border-gray-100">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3 text-gray-500 font-bold uppercase tracking-widest text-xs">
               <Filter className="h-4 w-4 text-blue-500" />
               <span>Filter By Rating</span>
@@ -174,8 +175,8 @@ export default function ReviewsPage() {
                 size="sm"
                 onClick={() => setSelectedRating(null)}
                 className={`rounded-xl px-6 py-5 font-bold transition-all ${selectedRating === null
-                    ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
-                    : "text-gray-500 hover:bg-gray-100"
+                  ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
+                  : "text-gray-500 hover:bg-gray-100"
                   }`}
                 variant={selectedRating === null ? "default" : "ghost"}
               >
@@ -188,8 +189,8 @@ export default function ReviewsPage() {
                   onClick={() => setSelectedRating(val)}
                   variant={selectedRating === val ? "default" : "ghost"}
                   className={`rounded-xl px-6 py-5 font-bold transition-all whitespace-nowrap ${selectedRating === val
-                      ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
-                      : "text-gray-500 hover:bg-gray-100"
+                    ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
+                    : "text-gray-500 hover:bg-gray-100"
                     }`}
                 >
                   <Star className={`mr-2 h-4 w-4 ${selectedRating === val ? 'fill-white' : 'fill-blue-400 text-blue-400'}`} />
@@ -197,9 +198,17 @@ export default function ReviewsPage() {
                 </Button>
               ))}
             </div>
+
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl px-6 py-5 shadow-lg shadow-blue-200 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              <Plus className="h-5 w-5" />
+              Write a Review
+            </Button>
           </div>
         </div>
-      </section>
+      </section >
 
       <section className="py-24">
         <div className="container mx-auto px-6">
@@ -233,7 +242,7 @@ export default function ReviewsPage() {
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
               {filteredReviews.map((review, index) => (
                 <motion.div
-                  key={review.id}
+                  key={review._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -242,15 +251,11 @@ export default function ReviewsPage() {
                   <Card className="p-10 h-full bg-white border-none shadow-xl hover:shadow-2xl transition-all duration-500 rounded-[40px] group flex flex-col">
                     <div className="flex items-start gap-5 mb-8">
                       <div className="h-20 w-20 rounded-[30px] bg-blue-50 flex items-center justify-center ring-8 ring-blue-50/50 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                        {review.avatar_url ? (
-                          <img src={review.avatar_url} alt={review.name} className="w-full h-full object-cover rounded-[30px]" />
-                        ) : (
-                          <span className="text-3xl font-bold text-blue-500">{review.name.charAt(0)}</span>
-                        )}
+                        <span className="text-3xl font-bold text-blue-500">{review.userName.charAt(0)}</span>
                       </div>
                       <div>
-                        <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{review.name}</h3>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{formatDate(review.created_at)}</p>
+                        <h3 className="font-bold text-xl text-gray-900 mb-1 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{review.userName}</h3>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{formatDate(review.createdAt)}</p>
                       </div>
                     </div>
 
@@ -260,11 +265,11 @@ export default function ReviewsPage() {
                       ))}
                     </div>
 
-                    {review.service_title && (
+                    {review.flat?.flatName && (
                       <div className="mb-6">
                         <span className="inline-flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2 text-xs font-bold text-blue-600 border border-blue-50">
                           <Home className="h-3.5 w-3.5" />
-                          {review.service_title}
+                          {review.flat.flatName}
                         </span>
                       </div>
                     )}
@@ -287,7 +292,7 @@ export default function ReviewsPage() {
                 <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="h-7 w-7" />
                 </div>
-                <h3 className="text-3xl font-bold text-gray-900 tracking-tight">Share Your Experience</h3>
+                <DialogTitle className="text-3xl font-bold text-gray-900 tracking-tight">Share Your Experience</DialogTitle>
                 <p className="text-gray-500 font-medium">Your feedback helps us provide better Nepalese hospitality.</p>
               </div>
 
@@ -342,18 +347,9 @@ export default function ReviewsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Floating Add Review Button */}
-      <div className="fixed bottom-10 right-10 z-50">
-        <Button
-          size="lg"
-          onClick={() => setIsModalOpen(true)}
-          className="h-20 w-20 rounded-3xl bg-blue-500 hover:bg-blue-600 text-white shadow-2xl hover:shadow-blue-200 transition-all hover:scale-110 active:scale-95 flex items-center justify-center p-0"
-        >
-          <Plus className="h-10 w-10" />
-        </Button>
-      </div>
+
 
       <Footer />
-    </div>
+    </div >
   )
 }

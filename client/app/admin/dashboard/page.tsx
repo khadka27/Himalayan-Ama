@@ -49,10 +49,6 @@ interface DashboardData {
 
 import Cookies from 'js-cookie';
 
-// ... (imports)
-
-// ... (interfaces)
-
 export default function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +59,7 @@ export default function AdminDashboard() {
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND?.trim();
         const token = Cookies.get("auth_token");
 
-        const response = await fetch(`${backendUrl}/api/main-d`, {
+        const response = await fetch(`${backendUrl}/api/v1/stats`, {
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",

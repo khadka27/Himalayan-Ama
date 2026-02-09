@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Hero({ title, description, isReview, image }: { title?: string, description?: string, isReview?: boolean, image?: string }) {
+export default function Hero({ title, description, isReview, image }: { title?: React.ReactNode, description?: string, isReview?: boolean, image?: string }) {
   return (
     <section
       className="relative h-[450px] overflow-hidden bg-blue-50"
@@ -15,8 +15,8 @@ export default function Hero({ title, description, isReview, image }: { title?: 
       <div className="absolute inset-0 bg-blue-400/20" />
 
       <div className="relative container mx-auto flex h-full flex-col items-center justify-center px-6 text-center">
-        <h1 className="mb-6 text-4xl md:text-5xl font-bold text-white drop-shadow-md tracking-tight">
-          {title}
+        <h1 className="mb-6 text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] drop-shadow-2xl tracking-tighter font-[family-name:var(--font-serif)]">
+          <span className="text-white">{title}</span>
         </h1>
         <p className="max-w-2xl text-lg md:text-xl text-white font-medium drop-shadow-sm">
           {description}

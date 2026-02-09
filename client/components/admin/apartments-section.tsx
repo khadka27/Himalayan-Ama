@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit2, Plus, X, Trash2 } from "lucide-react"
+import { Edit2, Plus, X, Trash2, Home, MapPin, DollarSign, Image as ImageIcon, CheckCircle2, AlertCircle } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
-import Loading from "../loading"
+import Loading from "@/components/loading"
 import Cookies from "js-cookie"
 import Image from "next/image"
+import Swal from "sweetalert2"
 
 interface Flat {
     _id: string
@@ -43,14 +44,14 @@ export function ApartmentsSection() {
         try {
             setIsLoading(true)
             const { data } = await axiosInstance.get("/api/v1/flats/all")
-            setIsLoading(false)
             if (data.success) {
                 setFlats(data.flats)
             }
         } catch (err) {
-            setIsLoading(false)
             console.error(err)
             toast.error("Failed to fetch flats")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -65,22 +66,23 @@ export function ApartmentsSection() {
                 reader.onloadend = () => {
                     newPreviews.push(reader.result as string)
                     if (newPreviews.length === newFiles.length) {
-                        setImagePreviews([...imagePreviews, ...newPreviews])
+                        setImagePreviews(prev => [...prev, ...newPreviews])
                     }
                 }
                 reader.readAsDataURL(file)
             })
 
-            setImageFiles([...imageFiles, ...newFiles])
+            setImageFiles(prev => [...prev, ...newFiles])
         }
     }
 
     const removeImage = (index: number) => {
-        setImagePreviews(imagePreviews.filter((_, i) => i !== index))
-        setImageFiles(imageFiles.filter((_, i) => i !== index))
+        setImagePreviews(prev => prev.filter((_, i) => i !== index))
+        setImageFiles(prev => prev.filter((_, i) => i !== index))
     }
 
-    const handleAddFlat = async () => {
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
         if (!formData.flatName || !formData.location || !formData.price) {
             toast.info("Please fill in all required fields")
             return
@@ -88,36 +90,90 @@ export function ApartmentsSection() {
 
         try {
             setIsLoading(true)
-
             const formDataPayload = new FormData()
             formDataPayload.append("flatName", formData.flatName)
             formDataPayload.append("location", formData.location)
             formDataPayload.append("price", formData.price)
             formDataPayload.append("isActive", formData.isActive.toString())
 
-            // Append all image files
-            imageFiles.forEach((file, index) => {
+            imageFiles.forEach((file) => {
                 formDataPayload.append("images", file)
             })
 
-            const { data } = await axiosInstance.post("/api/v1/flats/create", formDataPayload, {
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`,
-                    'Content-Type': 'multipart/form-data'
-                },
+            let response;
+            if (editingFlat) {
+                response = await axiosInstance.put(`/api/v1/flats/update/${editingFlat._id}`, formDataPayload, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Content-Type': 'multipart/form-data'
+                    },
+                })
+            } else {
+                response = await axiosInstance.post("/api/v1/flats/create", formDataPayload, {
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`,
+                        'Content-Type': 'multipart/form-data'
+                    },
+                })
+            }
+
+            if (response.data.success) {
+                toast.success(response.data.message || (editingFlat ? "Apartment updated" : "Apartment added"))
+                await fetchFlats()
+                resetForm()
+            } else {
+                toast.error(response.data.message || "Failed to save apartment")
+            }
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || "Internal server error")
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleDeleteFlat = async (id: string) => {
+        const result = await Swal.fire({
+            title: "Delete Apartment?",
+            text: "This listing will be permanently removed.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            confirmButtonColor: "#EF4444",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            setIsLoading(true)
+            const { data } = await axiosInstance.delete(`/api/v1/flats/delete/${id}`, {
+                headers: { 'Authorization': `Bearer ${TOKEN}` }
             })
 
             if (data.success) {
+                toast.success("Apartment deleted successfully")
                 await fetchFlats()
-                resetForm()
-                toast.success(data.message || "Flat added successfully")
-            } else {
-                toast.info(data.message || "Error while creating flat")
             }
         } catch (err) {
-            toast.error((err as Error).message)
+            toast.error("Failed to delete flat")
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleToggleActive = async (flatId: string, currentStatus: boolean) => {
+        try {
+            const { data } = await axiosInstance.put(`/api/v1/flats/status/${flatId}`, {
+                status: !currentStatus
+            }, {
+                headers: { 'Authorization': `Bearer ${TOKEN}` }
+            })
+
+            if (data.success) {
+                setFlats(prev => prev.map(f => f._id === flatId ? { ...f, isActive: !currentStatus } : f))
+                toast.success(`Apartment ${!currentStatus ? "activated" : "deactivated"}`)
+            }
+        } catch (err) {
+            toast.error("Failed to toggle status")
         }
     }
 
@@ -129,117 +185,11 @@ export function ApartmentsSection() {
             price: flat.price.toString(),
             isActive: flat.isActive
         })
-
-        // For images, we show existing URLs. 
-        // In this simple implementation, if user uploads new images, we will APPEND them as per backend service logic.
-        // Ideally we should handle delete existing images too, but backend 'updateFlat' appends newImages.
-        // Existing images are in flat.imagesUri
-        // We can show them as previews but maybe distinct from new uploads?
-        // For simplicity, let's just show existing ones as previews.
-        // Note: The backend update logic simply appends new images. It doesn't seem to support removing specific old images easily without more complex logic.
-        // Let's stick to appending new images for now. A more robust solution would be needed for full image management.
-
-        // Construct full URLs if needed, but backend sends relative or absolute? Backend sends filename usually looking at service code.
-        // We might need to prepend backend URL.
         const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
         const existingImages = flat.imagesUri.map(img => img.startsWith("http") ? img : `${BACKEND}/images/${img}`);
-
         setImagePreviews(existingImages)
         setImageFiles([])
         setShowForm(true)
-    }
-
-    const handleUpdateFlat = async () => {
-        if (!editingFlat || !formData.flatName || !formData.location || !formData.price) {
-            toast.info("Please fill in all required fields")
-            return
-        }
-
-        try {
-            setIsLoading(true)
-
-            const formDataPayload = new FormData()
-            formDataPayload.append("flatName", formData.flatName)
-            formDataPayload.append("location", formData.location)
-            formDataPayload.append("price", formData.price)
-            formDataPayload.append("isActive", formData.isActive.toString())
-
-            // Append all new image files
-            if (imageFiles.length > 0) {
-                imageFiles.forEach((file) => {
-                    formDataPayload.append("images", file)
-                })
-            }
-
-            const { data } = await axiosInstance.put(`/api/v1/flats/update/${editingFlat._id}`, formDataPayload, {
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`,
-                    'Content-Type': 'multipart/form-data' // axios usually sets this automatically with boundary if FormData is passed, but safe to specify or let axios handle it. 
-                    // Actually better to let axios handle it to set boundary correctly.
-                },
-            })
-
-
-            if (data.success) {
-                toast.success(data.message || "Flat updated successfully")
-                await fetchFlats()
-                resetForm()
-            } else {
-                toast.error(data.message || "Failed to update flat")
-            }
-        } catch (err) {
-            console.error("Update error:", err)
-            toast.error((err as Error).message);
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const handleDeleteFlat = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this flat?")) return;
-
-        try {
-            setIsLoading(true)
-            const { data } = await axiosInstance.delete(`/api/v1/flats/delete/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`
-                }
-            })
-
-            if (data.success) {
-                toast.success(data.message || "Flat deleted successfully");
-                await fetchFlats();
-            } else {
-                toast.error(data.message || "Failed to delete flat");
-            }
-        } catch (err) {
-            toast.error((err as Error).message);
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    const handleToggleActive = async (flatId: string, currentStatus: boolean) => {
-        try {
-            setIsLoading(true);
-
-            const { data } = await axiosInstance.put(`/api/v1/flats/status/${flatId}`, {
-                status: !currentStatus
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${TOKEN}`
-                }
-            })
-
-            if (data.success) {
-                await fetchFlats()
-                toast.success(data.message || `Flat ${!currentStatus ? "activated" : "deactivated"} successfully`)
-            }
-        } catch (err) {
-            toast.error((err as Error).message)
-        } finally {
-            setIsLoading(false);
-        }
     }
 
     const resetForm = () => {
@@ -258,246 +208,269 @@ export function ApartmentsSection() {
     const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
 
     return (
-        <>
+        <div className="space-y-8 pb-20">
             {isLoading && <Loading color="rgba(0, 0, 0, 0.3)" />}
 
-            <div>
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-serif font-bold text-sage-900">Apartments Management</h2>
-                    <button
-                        onClick={() => {
-                            setEditingFlat(null)
-                            resetForm()
-                            setShowForm(true)
-                        }}
-                        className="flex items-center gap-2 bg-sage-600 text-white px-4 py-2 rounded-lg hover:bg-sage-700 transition"
-                    >
-                        <Plus size={20} />
-                        Add Apartment
-                    </button>
+            <div className="flex justify-between items-center bg-white p-8 rounded-[40px] shadow-sm border border-slate-50">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                        <Home className="text-indigo-500" />
+                        Property Portfolio
+                    </h2>
+                    <p className="text-slate-400 font-medium text-sm mt-1">Manage your premium listings and residential suites.</p>
                 </div>
+                <button
+                    onClick={() => setShowForm(true)}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-12 px-6 rounded-2xl shadow-xl shadow-indigo-100 transition-all flex items-center gap-2 active:scale-95"
+                >
+                    <Plus size={20} /> List Property
+                </button>
+            </div>
 
-                {showForm && (
-                    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                            <div className="sticky top-0 bg-white border-b border-sage-200 px-6 py-4 flex justify-between items-center">
-                                <h3 className="text-xl font-semibold text-sage-900">
-                                    {editingFlat ? "Edit Apartment" : "Create New Apartment"}
-                                </h3>
-                                <button onClick={resetForm} className="p-1 hover:bg-sage-100 rounded-lg transition">
-                                    <X size={24} className="text-sage-600" />
-                                </button>
-                            </div>
+            {showForm && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
+                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+                        <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+                            <h3 className="text-xl font-bold text-slate-900 leading-none">
+                                {editingFlat ? "Refine Property" : "New Listing"}
+                            </h3>
+                            <button onClick={resetForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
+                                <X size={20} className="text-slate-400" />
+                            </button>
+                        </div>
 
-                            <div className="p-6 space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="md:col-span-2">
+                        <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Property Name</label>
+                                    <div className="relative">
                                         <input
                                             type="text"
-                                            placeholder="Apartment Name *"
                                             value={formData.flatName}
                                             onChange={(e) => setFormData({ ...formData, flatName: e.target.value })}
-                                            className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
+                                            className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-indigo-50 font-bold text-slate-800 transition-all"
+                                            placeholder="Emerald Heights Suite"
+                                            required
                                         />
+                                        <Home size={18} className="absolute right-5 top-4 text-slate-300" />
                                     </div>
+                                </div>
 
-                                    <div className="md:col-span-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Location *"
-                                            value={formData.location}
-                                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                            className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
-                                        />
-                                    </div>
-
-                                    <div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Monthly Rental ($)</label>
+                                    <div className="relative">
                                         <input
                                             type="number"
-                                            placeholder="Price ($/Month) *"
                                             value={formData.price}
                                             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                            className="w-full px-4 py-2 border border-sage-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-600"
+                                            className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-indigo-50 font-bold text-slate-800 transition-all"
+                                            placeholder="1200"
+                                            required
                                         />
+                                        <DollarSign size={18} className="absolute right-5 top-4 text-slate-300" />
                                     </div>
-                                </div>
-
-                                {/* Images Section */}
-                                <div className="mb-6">
-                                    <h4 className="text-lg font-semibold text-sage-900 mb-4">Apartment Images</h4>
-                                    <div className="border-2 border-dashed border-sage-300 rounded-lg p-4">
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            multiple
-                                            className="w-full mb-4"
-                                        />
-                                        <p className="text-sm text-sage-600">
-                                            Upload multiple images (Current: {imagePreviews.length} images)
-                                        </p>
-
-                                        {imagePreviews.length > 0 && (
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                                                {imagePreviews.map((preview, index) => (
-                                                    <div key={index} className="relative group">
-                                                        <img
-                                                            src={preview || "/placeholder.svg"}
-                                                            alt={`Preview ${index + 1}`}
-                                                            className="w-full h-32 object-cover rounded-lg"
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeImage(index)}
-                                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <X size={16} />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 pt-2">
-                                    <input
-                                        type="checkbox"
-                                        id="is_active"
-                                        checked={formData.isActive}
-                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                        className="h-5 w-5 text-sage-600 border-sage-300 rounded focus:ring-sage-600"
-                                    />
-                                    <label htmlFor="is_active" className="text-sage-700 font-medium cursor-pointer">
-                                        Apartment is active
-                                    </label>
-                                </div>
-
-                                <div className="flex gap-3">
-                                    <button
-                                        onClick={editingFlat ? handleUpdateFlat : handleAddFlat}
-                                        disabled={isLoading}
-                                        className="bg-sage-600 text-white px-6 py-2 rounded-lg hover:bg-sage-700 transition disabled:opacity-50"
-                                    >
-                                        {isLoading ? "Processing..." : editingFlat ? "Update Apartment" : "Add Apartment"}
-                                    </button>
-                                    <button
-                                        onClick={resetForm}
-                                        className="bg-sage-200 text-sage-900 px-6 py-2 rounded-lg hover:bg-sage-300 transition"
-                                    >
-                                        Cancel
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                )
-                }
 
-                <div className="bg-white rounded-lg border border-sage-200 overflow-hidden shadow-sm">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-sage-50 border-b border-sage-200">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Apartment Details</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Location</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Price</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Images</th>
-                                    <th className="px-6 py-3 text-left text-sm font-semibold text-sage-900">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {flats.map((flat, idx) => (
-                                    <tr key={flat._id} className={idx % 2 === 0 ? "bg-white" : "bg-sage-50"}>
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm font-medium text-sage-900">{flat.flatName}</div>
-                                            <div className="text-xs text-sage-500 mt-1">
-                                                <div>
-                                                    Status:
-                                                    <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${flat.isActive
-                                                        ? "bg-green-100 text-green-700"
-                                                        : "bg-red-100 text-red-700"
-                                                        }`}>
-                                                        {flat.isActive ? "Active" : "Inactive"}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </td>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Location Details</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={formData.location}
+                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                        className="w-full h-14 px-12 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-indigo-50 font-bold text-slate-800 transition-all"
+                                        placeholder="Downtown, Kathmandu"
+                                        required
+                                    />
+                                    <MapPin size={18} className="absolute left-5 top-4 text-slate-400" />
+                                </div>
+                            </div>
 
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm text-sage-900">{flat.location}</div>
-                                        </td>
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Gallery</label>
+                                <div className="border-2 border-dashed border-slate-100 rounded-[32px] p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer relative">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        multiple
+                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                    />
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 mb-2">
+                                            <ImageIcon size={24} />
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-700">Drop images here or click to browse</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Support JPG, PNG (Max 5MB)</p>
+                                    </div>
+                                </div>
 
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm font-medium text-sage-900">${flat.price}</div>
-                                        </td>
-
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                {flat.imagesUri && flat.imagesUri.slice(0, 2).map((img, index) => {
-                                                    const src = img.startsWith("http") ? img : `${BACKEND}/images/${img}`;
-                                                    return (
-                                                        <div key={index} className="w-10 h-10 rounded overflow-hidden border border-sage-200 relative">
-                                                            <Image
-                                                                src={src || "/placeholder.svg"}
-                                                                alt={`Flat ${index + 1}`}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        </div>
-                                                    )
-                                                })}
-                                                {flat.imagesUri && flat.imagesUri.length > 2 && (
-                                                    <div className="w-10 h-10 bg-sage-100 rounded flex items-center justify-center border border-sage-200">
-                                                        <span className="text-xs text-sage-600">+{flat.imagesUri.length - 2}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </td>
-
-                                        <td className="px-6 py-4 text-sm flex gap-2 items-center">
-                                            <button
-                                                onClick={() => handleEditFlat(flat)}
-                                                className="p-2 hover:bg-sage-100 rounded-lg transition"
-                                                title="Edit apartment"
-                                            >
-                                                <Edit2 size={16} className="text-sage-600" />
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleDeleteFlat(flat._id)}
-                                                className="p-2 hover:bg-red-100 rounded-lg transition"
-                                                title="Delete apartment"
-                                            >
-                                                <Trash2 size={16} className="text-red-600" />
-                                            </button>
-
-                                            {/* Active Toggle Switch */}
-                                            <div className="relative inline-block w-11 h-6">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={flat.isActive}
-                                                    onChange={() => handleToggleActive(flat._id, flat.isActive)}
-                                                    className="sr-only peer"
-                                                    id={`toggle-${flat._id}`}
+                                {imagePreviews.length > 0 && (
+                                    <div className="grid grid-cols-4 gap-4">
+                                        {imagePreviews.map((preview, index) => (
+                                            <div key={index} className="relative aspect-square group rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                                                <Image
+                                                    src={preview || "/placeholder.svg"}
+                                                    alt="Preview"
+                                                    fill
+                                                    className="object-cover"
                                                 />
-                                                <label
-                                                    htmlFor={`toggle-${flat._id}`}
-                                                    className={`absolute cursor-pointer top-0 left-0 right-0 bottom-0 rounded-full transition-all duration-300 ${flat.isActive ? 'bg-sage-600' : 'bg-gray-300'}`}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeImage(index)}
+                                                    className="absolute top-2 right-2 h-7 w-7 bg-white/90 backdrop-blur-sm text-red-500 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm"
                                                 >
-                                                    <span
-                                                        className={`absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 transition-all duration-300 shadow-sm transform ${flat.isActive ? 'translate-x-5' : ''}`}
-                                                    />
-                                                </label>
+                                                    <X size={14} />
+                                                </button>
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-3 py-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
+                                    className={`w-12 h-6 rounded-full transition-all relative ${formData.isActive ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                                >
+                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
+                                </button>
+                                <span className="text-sm font-bold text-slate-600">Visible for potential clients</span>
+                            </div>
+
+                            <div className="flex gap-4 pt-4">
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-14 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:bg-slate-200"
+                                >
+                                    {isLoading ? "Synchronizing..." : editingFlat ? "Update Listing" : "Publish Listing"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={resetForm}
+                                    className="h-14 px-8 rounded-2xl font-bold bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            )}
+
+            <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="bg-slate-50/30 border-b border-slate-50">
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Apartment Name</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Neighborhood</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Pricing</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Visuals</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                                <th className="px-10 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {flats.map((flat) => (
+                                <tr key={flat._id} className="hover:bg-slate-50/20 transition-colors group">
+                                    <td className="px-10 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 border border-indigo-100 shadow-sm flex-shrink-0">
+                                                <Home size={18} />
+                                            </div>
+                                            <div>
+                                                <p className="text-base font-bold text-slate-900 tracking-tight leading-tight">{flat.flatName}</p>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Property ID: {flat._id.slice(-6)}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-6">
+                                        <div className="flex items-center gap-2 text-sm font-bold text-slate-600">
+                                            <MapPin size={14} className="text-slate-300" />
+                                            {flat.location}
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-6">
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-base font-black text-slate-900">${flat.price}</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">/mo</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-6">
+                                        <div className="flex -space-x-3 overflow-hidden">
+                                            {flat.imagesUri.slice(0, 3).map((img, idx) => {
+                                                const src = img.startsWith("http") ? img : `${BACKEND}/images/${img}`;
+                                                return (
+                                                    <div key={idx} className="relative h-10 w-10 rounded-xl border-2 border-white overflow-hidden bg-slate-100 shadow-sm">
+                                                        <Image src={src} alt="Property" fill className="object-cover" />
+                                                    </div>
+                                                )
+                                            })}
+                                            {flat.imagesUri.length > 3 && (
+                                                <div className="h-10 w-10 rounded-xl border-2 border-white bg-slate-900 flex items-center justify-center text-[10px] font-bold text-white shadow-sm z-10">
+                                                    +{flat.imagesUri.length - 3}
+                                                </div>
+                                            )}
+                                            {flat.imagesUri.length === 0 && (
+                                                <div className="h-10 w-10 rounded-xl border-2 border-white bg-slate-50 flex items-center justify-center text-slate-300">
+                                                    <ImageIcon size={14} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-10 py-6">
+                                        {flat.isActive ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
+                                                <CheckCircle2 size={10} /> Active
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
+                                                <AlertCircle size={10} /> Hidden
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-10 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                                            <button
+                                                onClick={() => handleToggleActive(flat._id, flat.isActive)}
+                                                className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all shadow-sm bg-white ${flat.isActive ? 'hover:bg-slate-900 hover:text-white border-slate-100 text-slate-400' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
+                                                title={flat.isActive ? "Hide Property" : "Show Property"}
+                                            >
+                                                {flat.isActive ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
+                                            </button>
+                                            <button
+                                                onClick={() => handleEditFlat(flat)}
+                                                className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm bg-white"
+                                                title="Edit Listing"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteFlat(flat._id)}
+                                                className="h-10 w-10 flex items-center justify-center rounded-xl border border-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm bg-white"
+                                                title="Remove Listing"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {flats.length === 0 && (
+                        <div className="py-24 text-center">
+                            <Home size={64} className="text-slate-100 mx-auto mb-4" />
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No properties listed yet</p>
+                            <button onClick={() => setShowForm(true)} className="mt-4 text-indigo-500 font-bold text-sm hover:underline">Start your first listing</button>
+                        </div>
+                    )}
+                </div>
             </div>
-        </>
+        </div>
     )
 }

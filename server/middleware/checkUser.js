@@ -4,13 +4,13 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const User = require("../model/Users")
 
 const authMiddleware = async (req, res, next) => {
-    const token = req.headers['auth'];
+    let token = req.headers['auth'] || req.headers['authorization'];
     if (!token) {
         return res.status(401).json({ success: false, message: 'No token provided' });
     }
 
-    if (!token) {
-        return res.status(401).json({ success: false, message: 'Invalid token format' });
+    if (token.startsWith('Bearer ')) {
+        token = token.slice(7, token.length);
     }
 
     try {
