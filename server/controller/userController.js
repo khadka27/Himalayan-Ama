@@ -1,161 +1,76 @@
-const jwt = require("jsonwebtoken");
-const { tokenExtractor } = require("../util/tokenExtractor.js");
-const User = require("../model/Users.js");
+const userService = require("../service/userService");
 
-exports.getUserDetails = async (req, res) => {
-  try {
-    const token = tokenExtractor(req);
-    if (!token) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: "No users found" });
+        }
+        return res.status(200).json({ success: true, users });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while fetching users: ${err.message}` });
     }
-
-    // DONE: Find expired token here
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
-
-    const existingUser = await User.findById(decode.id);
-    if (!existingUser) {
-      return res.status(404).json({ success: false, message: "User not found" })
-    }
-
-    return res.status(200).json({ success: true, user: existingUser });
-  } catch (err) {
-    console.log(err);
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: true,
-        message: "Token expired. Logged out successfully",
-        redirect: "/",
-      });
-    } else {
-      return res.status(401).json({ success: false, message: "Invalid token" });
-    }
-  }
-};
-
-exports.getRemoteUserDetails = async (req, res) => {
-  try {
-    const token = tokenExtractor(req);    
-    if (!token) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
-    }
-
-    // DONE: Find expired token here
-    const decode = jwt.verify(token, process.env.JWT_SECRET_REMOTE);
-
-    const existingUser = await User.findById(decode.id);
-    if (!existingUser) {
-      return res.status(404).json({ success: false, message: "User not found" })
-    }
-
-    return res.status(200).json({ success: true, user: existingUser });
-  } catch (err) {
-    console.log(err);
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: true,
-        message: "Token expired, try again in the evening",
-        redirect: "/",
-      });
-    } else {
-      return res.status(401).json({ success: false, message: "Invalid token" });
-    }
-  }
-};
-
-exports.getAllUserDetails = async (req, res) => {
-  try {
-    const token = tokenExtractor(req);
-    if (!token) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
-    }
-
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
-    const existingUser = await User.findById(decode.id);
-
-    if (!existingUser) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Users not found" });
-    }
-
-    if (existingUser.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Unauthorized access" })
-    }
-
-    const users = await User.find({ role: "employee" });
-
-    return res.status(200).json({ success: true, users });
-  } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong while fetching user data.",
-    });
-  }
-};
-
-exports.updateUserDepartment = async (req, res) => {
-  const { userId, department } = req.body;
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-    user.department = department;
-    await user.save();
-    return res.status(200).json({ success: true, message: `Department updated for ${user.name}` })
-  } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ success: false, message: "Error while updating department" })
-  }
 }
 
-exports.updateUserPosition = async (req, res) => {
-  const { userId, position } = req.body;
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+exports.getUser = async (req, res) => {
+    try {
+        const user = await userService.getUser(req.query.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        return res.status(200).json({ success: true, user });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while fetching user: ${err.message}` });
     }
-
-    user.position = position;
-    await user.save();
-    return res.status(200).json({ success: true, message: `Employee role updated for ${user.name}` })
-  } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ success: false, message: "Error while updating department" })
-  }
 }
 
-exports.updateTimeEntries = async (req, res) => {
-  try {
-    const { userId, key, value } = req.body;
+exports.addUser = async (req, res) => {
+    try {
+        const result = await userService.addUser(req.body);
 
-    const token = tokenExtractor(req);
-    if (!token) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Unauthorized access" });
+        if (result.success) return res.status(201).json(result || { success: true, message: "User created" });
+        return res.status(400).json(result || { success: false, message: "User not created" });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while creating user: ${err.message}` });
     }
+}
 
-    const existingUser = await User.findById(userId);
-    if (!existingUser) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+exports.updateUser = async (req, res) => {
+    try {
+        const result = await userService.updateUser(req.body);
+
+        if (result.success) return res.status(200).json(result || { success: true, message: "User updated" });
+        return res.status(404).json(result || { success: false, message: "User not updated" });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while updating user: ${err.message}` });
     }
+}
 
-    existingUser.timeEntries[key] = value;
-    await existingUser.save();
-    return res.status(200).json({ success: true, message: "Entires udpated" })
-  } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ success: false, message: "Error while updating time entires" })
-  }
+exports.deleteUser = async (req, res) => {
+    try {
+        const result = await userService.deleteUser(req.query.id || req.body.id);
+
+        if (result.success) return res.status(200).json(result || { success: true, message: "User deleted" });
+        return res.status(404).json(result || { success: false, message: "User not deleted" });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while deleting user: ${err.message}` });
+    }
+}
+
+exports.updateUserStatus = async (req, res) => {
+    try {
+        const { _id, isActive } = req.body;
+        const result = await userService.updateUserStatus(_id, isActive);
+
+        if (result.success) return res.status(200).json(result || { success: true, message: "User status updated" });
+        return res.status(404).json(result || { success: false, message: "User status not updated" });
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ success: false, message: `Error while updating user status: ${err.message}` });
+    }
 }
