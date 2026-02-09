@@ -46,9 +46,36 @@ export default function BlogDetailPage() {
     const fetchBlog = async () => {
       try {
         setIsLoading(true)
-        const { data } = await axiosInstance.get(`/api/blogs/${slug}`)
-        if (data.data && data.data.is_active) {
-          setBlog(data.data)
+        const { data } = await axiosInstance.get(`/api/v1/blog/getBlog?slug=${slug}`)
+        if (data.success && data.blog) {
+          const backendBlog = data.blog;
+          let content = [];
+          try {
+            content = typeof backendBlog.content === 'string'
+              ? JSON.parse(backendBlog.content)
+              : backendBlog.content;
+          } catch (e) {
+            console.error("Failed to parse content", e);
+            content = [];
+          }
+
+          const mappedBlog: Blog = {
+            id: backendBlog._id,
+            title: backendBlog.title,
+            subtitle: backendBlog.subtitle || "",
+            description: backendBlog.description || backendBlog.shortDescription || "",
+            excerpt: backendBlog.shortDescription || backendBlog.excerpt || "",
+            author: backendBlog.author?.authorName || "Guest",
+            content: content,
+            conclusion: backendBlog.conclusion || "",
+            is_active: backendBlog.isActive,
+            slug: backendBlog.slug,
+            image_url: backendBlog.bannerImageURI,
+            category: backendBlog.category,
+            created_at: backendBlog.publishDate || backendBlog.createdAt,
+            read_time: "5 Min Read" // Placeholder
+          };
+          setBlog(mappedBlog)
         }
       } catch (error) {
         console.error("Error fetching blog:", error)
@@ -85,8 +112,9 @@ export default function BlogDetailPage() {
     return `${minutes} Min Read`
   }
 
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
   const blogImage = blog.image_url
-    ? (blog.image_url.startsWith("http") ? blog.image_url : `/${blog.image_url}`)
+    ? (blog.image_url.startsWith("http") ? blog.image_url : `${BACKEND}/images/${blog.image_url}`)
     : "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop";
 
   return (

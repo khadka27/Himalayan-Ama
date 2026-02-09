@@ -45,10 +45,34 @@ export default function BlogPage() {
     const fetchBlogs = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axiosInstance.get("/api/blogs");
-        const activeBlogs = data.data?.filter((blog: Blog) => blog.is_active) || [];
-        setBlogs(activeBlogs);
+        const { data } = await axiosInstance.get("/api/v1/blog/getPublishedBlogs");
+
+        if (data.success && Array.isArray(data.blogs)) {
+          console.log("Fetched blogs:", data.blogs);
+          const mappedBlogs = data.blogs.map((blog: any) => ({
+            id: blog._id,
+            title: blog.title,
+            excerpt: blog.shortDescription || blog.excerpt || "",
+            image_url: blog.bannerImageURI,
+            author: blog.author?.authorName || "Guest",
+            category: blog.category,
+            slug: blog.slug,
+            created_at: blog.publishDate || blog.createdAt,
+            is_active: blog.isActive,
+            // Map other fields as necessary, providing defaults
+            subtitle: blog.subtitle || "",
+            description: blog.description || "",
+            content: blog.content || [],
+            conclusion: blog.conclusion || "",
+            read_time: "5 Min Read" // Placeholder or calculate based on content length
+          }));
+          setBlogs(mappedBlogs);
+        } else {
+          console.error("Failed to fetch blogs or invalid format:", data);
+          setBlogs([]);
+        }
       } catch (error) {
+        console.error("Error fetching blogs:", error);
         toast.info(`Error fetching blogs`);
       } finally {
         setIsLoading(false);
@@ -107,8 +131,9 @@ export default function BlogPage() {
 
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
             {filteredPosts.map((post, index) => {
+              const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
               const blogImage = post.image_url
-                ? (post.image_url.startsWith("http") ? post.image_url : `/${post.image_url}`)
+                ? (post.image_url.startsWith("http") ? post.image_url : `${BACKEND}/images/${post.image_url}`)
                 : "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop";
 
               return (

@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { ArrowLeft, MapPin, DollarSign, Home, Share2, Sparkles, ShieldCheck } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -220,8 +221,8 @@ export default function ApartmentDetailPage() {
                     <button
                       key={index}
                       className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl transition-all duration-300 ${selectedImage === index
-                          ? "shadow-2xl scale-105 border-4 border-blue-500"
-                          : "opacity-60 grayscale-[50%] hover:opacity-100 hover:grayscale-0"
+                        ? "shadow-2xl scale-105 border-4 border-blue-500"
+                        : "opacity-60 grayscale-[50%] hover:opacity-100 hover:grayscale-0"
                         }`}
                       onClick={() => setSelectedImage(index)}
                     >
