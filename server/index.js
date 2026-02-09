@@ -12,6 +12,8 @@ const userRoute = require("./route/v1/userRoute.js");
 const statsRoute = require("./route/v1/statsRoute.js");
 const redirectRoute = require("./route/v1/redirectRoute.js");
 const flatsRouter = require("./route/v1/flatsRoute.js");
+const servicesRouter = require("./route/v1/servicesRoute.js");
+
 
 const PORT = process.env.PORT || 4000;
 const MONGODB_URL = process.env.MONGODB_URL;
@@ -41,7 +43,9 @@ app.use("/api/v1/author", authorRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/stats", statsRoute);
 app.use("/api/v1/flats", flatsRouter);
+app.use("/api/v1/services", servicesRouter);
 app.use("/s", redirectRoute);
+
 
 app.get("/", (req, res) => {
   res.json({ message: "Hie ;)" });

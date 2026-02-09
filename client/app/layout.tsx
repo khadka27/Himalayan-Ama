@@ -5,6 +5,8 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import Providers from "./provider";
 import { AppProvider } from "@/context/AppContext";
+import { OfferBanner } from "@/components/offer-banner";
+import { FloatingActions } from "@/components/layout/floating-actions";
 
 const headingFont = Marcellus({
   subsets: ["latin"],
@@ -12,20 +14,15 @@ const headingFont = Marcellus({
   weight: "400",
 });
 
-import { OfferBanner } from "@/components/offer-banner";
-import { FloatingActions } from "@/components/layout/floating-actions";
-
-
-
 const bodyFont = Karla({
   subsets: ["latin"],
   variable: "--font-body",
 });
 
 export const metadata: Metadata = {
-  title: "Himalayan Yogii - Yoga Studio in Pokhara",
+  title: "Himalayan Ama | Luxury Apartment Rentals in Pokhara",
   description:
-    "Discover transformative yoga practices in the heart of Pokhara. Expert-led classes including Hatha, Vinyasa, Ashtanga, and more. Your journey to inner harmony begins here.",
+    "Experience premium living at Himalayan Ama. We offer luxury apartment rentals in the heart of Pokhara Waterfall, providing comfort, style, and authentic Nepalese hospitality.",
 };
 
 export default function RootLayout({

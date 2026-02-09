@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Calendar, User, Mail, Phone } from "lucide-react"
+import { Loader2, Calendar, Users, MessageSquare, MapPin, Sparkles } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Image from "next/image"
@@ -43,32 +43,24 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
         try {
             setIsSubmitting(true)
 
-            // We can use the existing /api/bookings endpoint if we adapt the data, 
-            // or /api/inquiries if valid. 
-            // Let's assume we use /api/bookings but with a specific note or type.
-            // Or better, just send an inquiry since real booking might need availability check.
-            // The user wants "rent apartment". 
-            // Let's try to hit /api/bookings with mapped fields.
-
             const bookingData = {
                 userName: formData.name,
                 userEmail: formData.email,
                 phone: formData.phone,
-                service_id: flat._id, // Using Flat ID as service ID
+                service_id: flat._id,
                 fromDate: formData.checkInDate,
                 toDate: formData.checkOutDate,
                 participants: parseInt(formData.guests),
-                price: flat.price, // Monthly price? Or calculated? Let's just pass base price.
+                price: flat.price,
                 status: "pending",
-                paymentType: "inquiry", // Mark as inquiry
-                // Add apartment specific metadata if possible, or just put in notes/message
+                paymentType: "inquiry",
                 pricing_tier_description: `Apartment Inquiry for ${flat.flatName}. Message: ${formData.message}`
             }
 
             const { data } = await axiosInstance.post("/api/bookings", bookingData)
 
             if (data.status || data.success) {
-                toast.success("Booking inquiry sent successfully! We will contact you shortly.")
+                toast.success("Booking inquiry sent successfully!")
                 onOpenChange(false)
                 setFormData({
                     name: "",
@@ -95,120 +87,122 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
     const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
     const imageSrc = flat.imagesUri && flat.imagesUri.length > 0
         ? (flat.imagesUri[0].startsWith("http") ? flat.imagesUri[0] : `${BACKEND}/images/${flat.imagesUri[0]}`)
-        : "/placeholder.svg";
+        : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop";
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-serif text-[#4A5D4C]">
-                        Book {flat.flatName}
-                    </DialogTitle>
-                </DialogHeader>
-
-                <div className="flex gap-4 mb-4 border-b pb-4">
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image src={imageSrc} alt={flat.flatName} fill className="object-cover" />
+            <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-none rounded-[40px] shadow-2xl">
+                <div className="grid grid-cols-1 md:grid-cols-5 h-full">
+                    {/* Sidebar Image */}
+                    <div className="hidden md:block md:col-span-2 relative">
+                        <Image
+                            src={imageSrc}
+                            alt={flat.flatName}
+                            fill
+                            className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-blue-500/10 mix-blend-overlay" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-8">
+                            <div className="text-white space-y-2">
+                                <h3 className="text-2xl font-bold leading-tight">{flat.flatName}</h3>
+                                <div className="flex items-center gap-2 text-xs font-bold text-white/80 uppercase tracking-widest">
+                                    <MapPin className="h-3 w-3" />
+                                    <span>{flat.location}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h4 className="font-semibold">{flat.flatName}</h4>
-                        <p className="text-sm text-gray-500">{flat.location}</p>
-                        <p className="font-bold text-[#627A64] mt-1">${flat.price} <span className="text-xs font-normal text-gray-500">/ month</span></p>
+
+                    {/* Form Section */}
+                    <div className="md:col-span-3 p-8 sm:p-10 bg-white">
+                        <DialogHeader className="mb-8">
+                            <DialogTitle className="text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+                                <Sparkles className="h-6 w-6 text-blue-500" />
+                                <span>Inquire Now</span>
+                            </DialogTitle>
+                            <p className="text-gray-500 font-medium text-sm mt-2">Perfect for long-term comfort in Pokhara.</p>
+                        </DialogHeader>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Full Name</Label>
+                                    <Input
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="Jane Doe"
+                                        className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Phone</Label>
+                                    <Input
+                                        required
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="+977"
+                                        className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Email Address</Label>
+                                <Input
+                                    type="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="jane@example.com"
+                                    className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Check-in</Label>
+                                    <div className="relative">
+                                        <Input
+                                            type="date"
+                                            required
+                                            value={formData.checkInDate}
+                                            onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
+                                            className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium appearance-none"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Guests</Label>
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        required
+                                        value={formData.guests}
+                                        onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
+                                        className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Message</Label>
+                                <Input
+                                    value={formData.message}
+                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                    placeholder="Your requirements..."
+                                    className="h-12 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                                />
+                            </div>
+
+                            <div className="pt-4">
+                                <Button type="submit" className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-100 transition-all text-lg" disabled={isSubmitting}>
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Request Reservation"}
+                                </Button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Full Name *</Label>
-                            <Input
-                                id="name"
-                                required
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="John Doe"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone *</Label>
-                            <Input
-                                id="phone"
-                                required
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                placeholder="(123) 456-7890"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder="john@example.com"
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="checkIn">Check-in *</Label>
-                            <Input
-                                id="checkIn"
-                                type="date"
-                                required
-                                value={formData.checkInDate}
-                                onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="checkOut">Check-out *</Label>
-                            <Input
-                                id="checkOut"
-                                type="date"
-                                required
-                                value={formData.checkOutDate}
-                                onChange={(e) => setFormData({ ...formData, checkOutDate: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="guests">Guests</Label>
-                        <Input
-                            id="guests"
-                            type="number"
-                            min="1"
-                            required
-                            value={formData.guests}
-                            onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="message">Message (Optional)</Label>
-                        <Input
-                            id="message"
-                            value={formData.message}
-                            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                            placeholder="Any special requests?"
-                        />
-                    </div>
-
-                    <Button type="submit" className="w-full bg-[#627A64] hover:bg-[#4A5D4C] text-white" disabled={isSubmitting}>
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Sending Inquiry...
-                            </>
-                        ) : (
-                            "Send Inquiry"
-                        )}
-                    </Button>
-                </form>
             </DialogContent>
         </Dialog>
     )

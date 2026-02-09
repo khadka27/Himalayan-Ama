@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence, useInView } from "framer-motion"
-import { Play, Pause, Volume2, VolumeX, Maximize, Sparkles, Check } from "lucide-react"
+import { Play, Pause, Volume2, VolumeX, Maximize, Sparkles, Check, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function VideoSection() {
@@ -19,11 +19,7 @@ export function VideoSection() {
 
     useEffect(() => {
         if (videoRef.current) {
-            if (isInView) {
-                // We don't necessarily want to autoplay if that's not desired, 
-                // but often for these cinematic sections we do.
-                // For performance, we only load/play when in view.
-            } else {
+            if (!isInView) {
                 videoRef.current.pause()
                 setIsPlaying(false)
             }
@@ -81,78 +77,79 @@ export function VideoSection() {
     return (
         <section
             ref={containerRef}
-            className="py-24 bg-gradient-to-b from-white to-[#FAF8F3] overflow-hidden"
+            className="py-32 bg-white overflow-hidden"
         >
             <div className="container mx-auto px-6">
-                <div className="flex flex-col lg:flex-row items-center gap-16">
+                <div className="flex flex-col lg:flex-row items-center gap-10 md:gap-24">
                     {/* Left Side: Content */}
                     <motion.div
-                        className="flex-1 space-y-8"
+                        className="flex-1 space-y-10"
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        transition={{ duration: 1, ease: "easeOut" }}
                     >
-                        <div className="flex items-center gap-2 text-[#8C9E8B] text-sm font-medium">
-                            <Sparkles className="h-4 w-4" />
-                            Experience Harmony
+                        <div className="space-y-4">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs uppercase tracking-widest border border-blue-100">
+                                <Sparkles className="h-4 w-4" />
+                                <span>Curated Residences</span>
+                            </div>
+                            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight">
+                                Live Where Luxury <br />
+                                <span className="text-blue-500">Meets Serenity</span>
+                            </h2>
                         </div>
 
-                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-[1.1]">
-                            Himalayan Yoga for <br />
-                            <span className="text-[#6B8E6A]">Modern Life</span>
-                        </h2>
-
-                        <p className="text-lg text-gray-600 leading-relaxed max-w-xl">
-                            Yoga at Himalayan Yogini combines traditional asana, pranayama, meditation, and conscious living. Our approach reflects the essence of Himalayan yoga, focusing on awareness rather than performance while supporting the natural connection between yoga and exercise.
+                        <p className="text-xl text-gray-500 leading-relaxed font-medium max-w-xl">
+                            Discover the essence of Nepalese hospitality in our premium apartments. Located in the most tranquil areas of Pokhara, we offer more than just a place to stay—we provide a lifestyle defined by peace and comfort.
                         </p>
 
-                        <div className="space-y-3 pt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
                             {[
-                                "Small group yoga classes in Nepal",
-                                "Supportive yoga studio",
-                                "Suitable for yoga beginners",
-                                "Experienced yoga instructors",
+                                "Scenic Mountain Views",
+                                "Fully Furnished Interiors",
+                                "24/7 Dedicated Concierge",
+                                "Modern Amenities",
                             ].map((item, index) => (
-                                <div key={index} className="flex items-center gap-3">
-                                    <div className="h-6 w-6 rounded-full bg-[#FAF8F3] flex items-center justify-center border border-[#6B8E6A]/20">
-                                        <Check className="h-3.5 w-3.5 text-[#6B8E6A]" />
+                                <div key={index} className="flex items-center gap-4 group">
+                                    <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 border border-blue-100 group-hover:scale-110 transition-transform">
+                                        <Check className="h-5 w-5" />
                                     </div>
-                                    <span className="text-gray-700 font-medium">{item}</span>
+                                    <span className="text-gray-900 font-bold text-lg">{item}</span>
                                 </div>
                             ))}
                         </div>
 
-                        {/* <Button
-                            className="bg-[#6B8E6A] text-white hover:bg-[#5A7A59] transition-all px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1"
-                            onClick={() => router.push("/services")}
-                        >
-                            Explore Our Program
-                        </Button> */}
+                        <div className="pt-6">
+                            <Button
+                                className="bg-blue-500 text-white hover:bg-blue-600 transition-all px-12 py-8 text-lg font-bold rounded-[20px] shadow-2xl shadow-blue-100 hover:scale-105 active:scale-95"
+                                onClick={() => router.push("/apartments")}
+                            >
+                                <Home className="mr-3 h-5 w-5" />
+                                Find Your Suite
+                            </Button>
+                        </div>
                     </motion.div>
 
                     {/* Right Side: Video Player */}
                     <motion.div
-                        className="flex-1 relative w-full max-w-[360px] lg:max-w-[400px] aspect-[9/16] perspective-1000 mx-auto"
-                        initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
-                        whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                        className="flex-1 relative w-full max-w-[450px] aspect-[9/16] mx-auto"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1, ease: "easeOut" }}
+                        transition={{ duration: 1 }}
                     >
-                        {/* Decorative Glow */}
-                        <div className="absolute -inset-4 bg-gradient-to-tr from-[#6B8E6A]/20 to-transparent blur-3xl opacity-50 rounded-[40px] -z-10" />
+                        <div className="absolute -inset-10 bg-blue-500/5 blur-[100px] rounded-full" />
 
                         <div
                             ref={playerRef}
-                            className="group relative w-full h-full rounded-[32px] overflow-hidden shadow-2xl border-[8px] border-white bg-black video-container-fullscreen"
+                            className="group relative w-full h-full rounded-[60px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(30,58,138,0.2)] border-[12px] border-white bg-slate-100"
                             onMouseEnter={() => setShowControls(true)}
                             onMouseLeave={() => isPlaying && setShowControls(false)}
                         >
-                            {/* The Video Element */}
                             <video
                                 ref={videoRef}
                                 className="w-full h-full object-cover"
-                                // poster="https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
                                 onTimeUpdate={handleTimeUpdate}
                                 onClick={togglePlay}
                                 playsInline
@@ -161,52 +158,45 @@ export function VideoSection() {
                                 preload="auto"
                                 onPlay={() => setIsPlaying(true)}
                                 onPause={() => setIsPlaying(false)}
-                                onError={(e) => console.error("Video error:", e)}
                             >
                                 <source src="/intro.mp4" type="video/mp4" />
-                                Your browser does not support the video tag.
                             </video>
 
-                            {/* Permanent Softening Overlay */}
-                            <div className="absolute inset-0 bg-black/30 pointer-events-none z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
 
-                            {/* Overlay Controls */}
                             <AnimatePresence>
                                 {showControls && (
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 flex flex-col justify-between p-6 z-20"
+                                        className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col justify-between p-10"
                                     >
-                                        {/* Top Bar */}
-                                        <div className="flex justify-start">
+                                        <div className="flex justify-end">
                                             <button
                                                 onClick={toggleMute}
-                                                className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all relative z-10"
+                                                className="h-14 w-14 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 text-white flex items-center justify-center hover:bg-white/40 transition-all"
                                             >
-                                                {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                                                {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
                                             </button>
                                         </div>
 
-                                        {/* Play Button (Center) */}
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                                             <motion.button
-                                                whileHover={{ scale: 1.1 }}
+                                                whileHover={{ scale: 1.15 }}
                                                 whileTap={{ scale: 0.9 }}
                                                 onClick={togglePlay}
-                                                className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white shadow-2xl"
+                                                className="h-24 w-24 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-2xl relative"
                                             >
-                                                {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-1" />}
+                                                <div className="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-20" />
+                                                {isPlaying ? <Pause size={36} fill="currentColor" /> : <Play size={36} className="ml-1" fill="currentColor" />}
                                             </motion.button>
                                         </div>
 
-                                        {/* Bottom Controls */}
-                                        <div className="space-y-4">
-                                            {/* Progress Bar */}
-                                            <div className="relative h-1.5 w-full bg-white/20 rounded-full overflow-hidden group/progress cursor-pointer">
+                                        <div className="space-y-6">
+                                            <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden cursor-pointer relative group/progress">
                                                 <motion.div
-                                                    className="absolute h-full bg-[#6B8E6A]"
+                                                    className="absolute h-full bg-blue-400 group-hover/progress:bg-white transition-colors"
                                                     style={{ width: `${progress}%` }}
                                                 />
                                                 <input
@@ -219,54 +209,27 @@ export function VideoSection() {
                                                 />
                                             </div>
 
-                                            <div className="flex items-center justify-between text-white text-sm font-medium">
-                                                <div className="flex items-center gap-4">
-                                                    <span className="bg-white/10 px-2 py-0.5 rounded border border-white/10 backdrop-blur-sm">
-                                                        4K Portrait
-                                                    </span>
-                                                </div>
-                                                <button
-                                                    onClick={handleFullscreen}
-                                                    className="hover:text-[#6B8E6A] transition-colors"
-                                                >
-                                                    <Maximize size={18} />
+                                            <div className="flex items-center justify-between text-white/70 text-xs font-bold uppercase tracking-widest">
+                                                <span>Cinema View</span>
+                                                <button onClick={handleFullscreen} className="hover:text-white transition-colors">
+                                                    <Maximize size={20} />
                                                 </button>
                                             </div>
                                         </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
-
-                            {/* Status Indicator (only show when playing and controls hidden) */}
-                            {!showControls && isPlaying && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="absolute bottom-6 right-6 p-2 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-white/70"
-                                >
-                                    <div className="flex gap-1">
-                                        {[1, 2, 3].map(i => (
-                                            <motion.div
-                                                key={i}
-                                                animate={{ height: [4, 12, 4] }}
-                                                transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
-                                                className="w-0.5 bg-[#6B8E6A]"
-                                            />
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
                         </div>
 
-                        {/* Float Elements */}
+                        {/* Floating Badge */}
                         <motion.div
-                            className="absolute -top-6 -right-6 w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center border border-gray-100 hidden md:flex"
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute -top-10 -right-10 h-32 w-32 bg-white rounded-[40px] shadow-2xl flex items-center justify-center border border-blue-50"
+                            animate={{ y: [0, -15, 0] }}
+                            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                         >
                             <div className="text-center">
-                                <span className="block text-xl font-bold text-[#6B8E6A]">Live</span>
-                                <span className="text-[10px] uppercase tracking-tighter text-gray-400">Recording</span>
+                                <span className="block text-3xl font-bold text-blue-500 leading-none mb-1">Live</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tour</span>
                             </div>
                         </motion.div>
                     </motion.div>
