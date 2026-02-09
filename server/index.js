@@ -54,7 +54,7 @@ app.use("/s", redirectRoute);
 
 
 app.get("/", (req, res) => {
-  res.json({ message: "Hie ;)" });
+  res.json({ message: "Hie ;), serving to Himalayan AMA" });
 });
 
 mongoose.connect(MONGODB_URL)
