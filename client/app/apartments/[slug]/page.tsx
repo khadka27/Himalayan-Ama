@@ -32,7 +32,7 @@ export default function ApartmentDetailPage() {
   const params = useParams()
   const slug = params.slug as string
 
-  const { flats, isLoadingFlats } = useApp()
+  const { flats, offers, isLoadingFlats } = useApp()
 
   const [flat, setFlat] = useState<Flat | null>(null)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
@@ -45,7 +45,7 @@ export default function ApartmentDetailPage() {
     const fetchSpecificFlat = async (id: string) => {
       try {
         const { data } = await axiosInstance.get(`/api/v1/flats/${id}`);
-        if (data.success) {
+        if (data.success && data.flat.isActive) {
           setFlat(data.flat);
         } else {
           toast.error("Apartment not found");
@@ -119,6 +119,13 @@ export default function ApartmentDetailPage() {
     ? flat.imagesUri.map(uri => uri.startsWith("http") ? uri : `${BACKEND}/images/${uri}`)
     : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop"];
 
+  const activeOffer = offers.find(o =>
+    (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+  );
+  const discountedPrice = activeOffer
+    ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+    : flat.price;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header />
@@ -146,12 +153,19 @@ export default function ApartmentDetailPage() {
 
             <div className="space-y-10">
               <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 rounded-2xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 shadow-sm border border-blue-100 uppercase tracking-widest">
-                  <Sparkles className="h-4 w-4" />
-                  Premium Residence
-                </div>
+                {activeOffer ? (
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 text-xs font-black text-red-600 shadow-sm border border-red-100 uppercase tracking-widest animate-pulse">
+                    <Sparkles className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    Limited Time Special: {activeOffer.discountPercentage}% OFF
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 shadow-sm border border-blue-100 uppercase tracking-widest">
+                    <Sparkles className="h-4 w-4" />
+                    Premium Residence
+                  </div>
+                )}
 
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{flat.flatName}</h1>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{flat.flatName}</h1>
 
                 <div className="flex flex-wrap gap-8 items-center text-gray-500 font-bold uppercase tracking-widest text-[10px]">
                   <div className="flex items-center gap-2">
@@ -161,16 +175,19 @@ export default function ApartmentDetailPage() {
                 </div>
               </div>
 
-              <Card className="p-10 bg-white border-none shadow-2xl rounded-[40px] border border-gray-50">
+              <Card className="p-10 bg-white border-none shadow-2xl rounded-3xl border border-gray-50">
                 <div className="flex items-center justify-between mb-8">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Monthly Rate</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold text-gray-900">${flat.price}</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl lg:text-4xl font-black text-gray-900">${discountedPrice}</span>
+                      {activeOffer && (
+                        <span className="text-sm font-bold text-gray-400 line-through">${flat.price}</span>
+                      )}
                       <span className="text-sm font-bold text-gray-400">/ USD</span>
                     </div>
                   </div>
-                  <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                  <div className="h-14 w-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
                     <DollarSign className="h-7 w-7" />
                   </div>
                 </div>
@@ -180,24 +197,24 @@ export default function ApartmentDetailPage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl">
+                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl">
                     <ShieldCheck className="h-6 w-6 text-green-500" />
                     <span className="font-bold text-gray-900 text-sm">Verified Listing</span>
                   </div>
-                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl">
+                  <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-xl">
                     <Sparkles className="h-6 w-6 text-blue-500" />
                     <span className="font-bold text-gray-900 text-sm">Fully Furnished</span>
                   </div>
                 </div>
 
-                <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold h-16 rounded-2xl shadow-xl shadow-blue-100 transition-all text-lg" onClick={toggleBooking}>
+                <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold h-16 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg" onClick={toggleBooking}>
                   Inquire Availability
                 </Button>
               </Card>
             </div>
 
             <div className="space-y-6 lg:sticky lg:top-40">
-              <div className="relative h-[450px] md:h-[600px] overflow-hidden rounded-[40px] shadow-2xl border-8 border-white bg-white group">
+              <div className="relative h-[450px] md:h-[600px] overflow-hidden rounded-3xl shadow-2xl border-4 md:border-8 border-white bg-white group">
                 <Image
                   src={images[selectedImage]}
                   alt={flat.flatName}
@@ -220,7 +237,7 @@ export default function ApartmentDetailPage() {
                   {images.map((img, index) => (
                     <button
                       key={index}
-                      className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl transition-all duration-300 ${selectedImage === index
+                      className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-300 ${selectedImage === index
                         ? "shadow-2xl scale-105 border-4 border-blue-500"
                         : "opacity-60 grayscale-[50%] hover:opacity-100 hover:grayscale-0"
                         }`}

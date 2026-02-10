@@ -45,7 +45,7 @@ function AnimatedSection({ children, className, id }: { children: React.ReactNod
 
 export default function HomePage() {
   const router = useRouter()
-  const { flats, isLoadingFlats } = useApp()
+  const { flats, offers, isLoadingFlats } = useApp()
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
@@ -71,7 +71,7 @@ export default function HomePage() {
     router.push(`/apartments/${flatId}`)
   }
 
-  const displayedFlats = flats.slice(0, 6)
+  const displayedFlats = flats.filter(f => f.isActive).slice(0, 6)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,9 +82,9 @@ export default function HomePage() {
 
     try {
       setIsSubmitting(true)
-      const payload = { ...formData, service: "General Inquiry" }
+      const payload = { ...formData, flat: "General Inquiry" }
 
-      const { data } = await axiosInstance.post("/api/inquiries", payload)
+      const { data } = await axiosInstance.post("/api/v1/inquiry", payload)
 
       if (data.status || data.success) {
         toast.success("Inquiry sent successfully!")
@@ -141,22 +141,22 @@ export default function HomePage() {
                 <span>Luxury Rental Collections</span>
               </motion.div>
 
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-serif)]">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-serif)]">
                 <span className="text-white">Experience</span>
                 <br />
-                <span className="text-blue-200">Pokhara</span> 
+                <span className="text-blue-200">Pokhara</span>
                 <span className="text-white"> Refined</span>
               </h1>
             </div>
 
-            <p className="text-xl md:text-2xl text-white/90 leading-relaxed font-medium max-w-2xl mx-auto text-balance drop-shadow-lg">
+            <p className="text-lg md:text-xl lg:text-2xl text-white/90 leading-relaxed font-medium max-w-2xl mx-auto text-balance drop-shadow-lg">
               Indulge in carefully curated apartments where modern luxury meets the timeless serenity of the Himalayas.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center pt-6">
               <Button
                 size="lg"
-                className="bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold px-12 h-16 text-lg rounded-2xl shadow-2xl shadow-blue-500/20 hover:scale-105"
+                className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold px-8 md:px-12 h-14 md:h-16 text-base md:text-lg rounded-xl shadow-2xl shadow-blue-500/20 hover:scale-105"
                 onClick={() => router.push("/apartments")}
               >
                 Explore Residences
@@ -164,7 +164,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all font-bold px-12 h-16 text-lg rounded-2xl backdrop-blur-md bg-white/5"
+                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all font-bold px-8 md:px-12 h-14 md:h-16 text-base md:text-lg rounded-xl backdrop-blur-md bg-white/5"
                 onClick={() => {
                   document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })
                 }}
@@ -187,22 +187,22 @@ export default function HomePage() {
       </section>
 
       {/* Featured Apartments */}
-      <AnimatedSection id="featured" className="py-32 bg-slate-50">
+      <AnimatedSection id="featured" className="py-16 md:py-32 bg-slate-50">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-20 gap-8">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 md:mb-20 gap-8">
             <div className="space-y-4 max-w-2xl">
               <div className="inline-flex items-center gap-2 text-blue-500 text-xs font-bold uppercase tracking-[0.2em]">
                 <Home className="h-4 w-4" />
                 <span>Selected Collection</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">Handpicked <span className="text-blue-500">Sanctuaries</span></h2>
-              <p className="text-lg text-gray-500 font-medium">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">Handpicked <span className="text-blue-500">Sanctuaries</span></h2>
+              <p className="text-base md:text-lg text-gray-500 font-medium">
                 Each residence is chosen for its unique character, premium amenities, and breathtaking mountain vistas.
               </p>
             </div>
             <Button
               variant="ghost"
-              className="text-blue-500 font-bold text-lg hover:bg-blue-50 rounded-2xl p-6"
+              className="text-blue-500 font-bold text-base md:text-lg hover:bg-blue-50 rounded-xl p-4 md:p-6"
               onClick={() => router.push("/apartments")}
             >
               View Catalog <ArrowRight className="ml-2 h-5 w-5" />
@@ -218,6 +218,13 @@ export default function HomePage() {
                   ? (flat.imagesUri[0].startsWith("http") ? flat.imagesUri[0] : `${BACKEND}/images/${flat.imagesUri[0]}`)
                   : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop";
 
+                const activeOffer = offers.find(o =>
+                  (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+                );
+                const discountedPrice = activeOffer
+                  ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+                  : flat.price;
+
                 return (
                   <motion.div
                     key={flat._id}
@@ -227,10 +234,10 @@ export default function HomePage() {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
                     <Card
-                      className="group overflow-hidden border-none bg-white rounded-[40px] shadow-xl hover:shadow-2xl transition-all duration-500 h-full flex flex-col cursor-pointer"
+                      className="group overflow-hidden border-none bg-white rounded-2xl md:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 h-full flex flex-col cursor-pointer"
                       onClick={() => handleDetails(flat._id)}
                     >
-                      <div className="relative h-72 overflow-hidden">
+                      <div className="relative h-64 md:h-72 overflow-hidden">
                         <Image
                           src={imageSrc}
                           alt={flat.flatName}
@@ -239,22 +246,37 @@ export default function HomePage() {
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md text-gray-900 px-5 py-2 rounded-2xl text-base font-bold shadow-xl border border-white/50">
-                          ${flat.price} <span className="text-xs font-medium text-gray-500">/mo</span>
+
+                        {activeOffer && (
+                          <div className="absolute top-4 md:top-6 left-4 md:left-6 bg-red-600 text-white px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-1.5 animate-pulse z-10 transition-transform group-hover:scale-110">
+                            <Sparkles className="h-3 w-3 text-yellow-300 fill-yellow-300" />
+                            {activeOffer.discountPercentage}% OFF
+                          </div>
+                        )}
+
+                        <div className="absolute top-4 md:top-6 right-4 md:right-6 bg-white/95 backdrop-blur-md text-gray-900 px-4 md:px-5 py-1.5 md:py-2 rounded-xl text-sm md:text-base font-bold shadow-xl border border-white/50">
+                          {activeOffer ? (
+                            <div className="flex flex-col items-end leading-tight">
+                              <span className="text-[10px] line-through opacity-40 font-medium">${flat.price}</span>
+                              <span>${discountedPrice} <span className="text-xs font-medium text-gray-400">/mo</span></span>
+                            </div>
+                          ) : (
+                            <span>${flat.price} <span className="text-xs font-medium text-gray-500">/mo</span></span>
+                          )}
                         </div>
                       </div>
 
-                      <div className="p-10 flex flex-col flex-1">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{flat.flatName}</h3>
+                      <div className="p-6 md:p-10 flex flex-col flex-1">
+                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{flat.flatName}</h3>
 
-                        <div className="flex items-center gap-2 text-gray-400 mb-8 text-sm font-bold uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-gray-400 mb-6 md:mb-8 text-xs md:text-sm font-bold uppercase tracking-widest">
                           <MapPin className="h-4 w-4 text-blue-400" />
                           <span>{flat.location}</span>
                         </div>
 
                         <div className="mt-auto flex items-center gap-4">
                           <Button
-                            className="flex-1 h-14 rounded-2xl bg-blue-500 text-white font-bold hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all"
+                            className="flex-1 h-12 md:h-14 rounded-xl bg-blue-500 text-white font-bold hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleBookNow(flat);
@@ -272,7 +294,7 @@ export default function HomePage() {
           )}
 
           {!isLoadingFlats && displayedFlats.length === 0 && (
-            <div className="text-center py-20 bg-white rounded-[40px] border border-gray-100">
+            <div className="text-center py-20 bg-white rounded-3xl border border-gray-100">
               <p className="text-xl text-gray-400 font-bold uppercase tracking-widest">Finding Listings...</p>
             </div>
           )}
@@ -280,11 +302,11 @@ export default function HomePage() {
       </AnimatedSection>
 
       {/* Why Choose Us */}
-      <AnimatedSection className="py-32 bg-white">
+      <AnimatedSection className="py-16 md:py-32 bg-white">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
             <motion.div
-              className="space-y-10"
+              className="space-y-8 md:space-y-10"
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -295,10 +317,10 @@ export default function HomePage() {
                   <Sparkles className="h-4 w-4" />
                   <span>Unmatched Quality</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight tracking-tight">Redefining the <br /><span className="text-blue-500">Rental Experience</span></h2>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">Redefining the <br /><span className="text-blue-500">Rental Experience</span></h2>
               </div>
 
-              <p className="text-xl text-gray-500 font-medium leading-relaxed">
+              <p className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
                 We believe that luxury is not just about aesthetics, but about the feeling of complete peace and seamless living.
               </p>
 
@@ -324,7 +346,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <div className="relative h-[600px] rounded-[60px] overflow-hidden shadow-2xl border-8 border-white group">
+              <div className="relative h-[400px] md:h-[600px] rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white group">
                 <Image
                   src="https://images.unsplash.com/photo-1512918760532-3ed46b2b73b5?q=80&w=2000&auto=format&fit=crop"
                   alt="Modern Interior"
@@ -350,14 +372,14 @@ export default function HomePage() {
       </AnimatedSection>
 
       {/* Contact Section */}
-      <AnimatedSection className="py-32 bg-slate-50">
+      <AnimatedSection className="py-16 md:py-32 bg-slate-50">
         <div className="container mx-auto px-6">
-          <div className="max-w-6xl mx-auto bg-white rounded-[60px] overflow-hidden shadow-2xl border-none relative">
+          <div className="max-w-6xl mx-auto bg-white rounded-[40px] overflow-hidden shadow-2xl border-none relative">
             <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-12 md:p-20 space-y-10">
+              <div className="p-8 md:p-12 lg:p-20 space-y-10">
                 <div className="space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">Need a <span className="text-blue-500">Consultation?</span></h2>
-                  <p className="text-lg text-gray-500 font-medium leading-relaxed">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">Need a <span className="text-blue-500">Consultation?</span></h2>
+                  <p className="text-base md:text-lg text-gray-500 font-medium leading-relaxed">
                     Our team is here to assist you in selecting the perfect residence for your stay.
                   </p>
                 </div>

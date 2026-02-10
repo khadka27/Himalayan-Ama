@@ -16,6 +16,7 @@ const servicesRouter = require("./route/v1/servicesRoute.js");
 const bookingRouter = require("./route/v1/bookingRoute.js");
 const bannerRouter = require("./route/v1/bannerRoute.js");
 const offerRouter = require("./route/v1/offerRoute.js");
+const inquiryRouter = require("./route/v1/inquiryRoute.js");
 
 
 const PORT = process.env.PORT || 4000;
@@ -50,6 +51,7 @@ app.use("/api/v1/services", servicesRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/banner", bannerRouter);
 app.use("/api/v1/offer", offerRouter);
+app.use("/api/v1/inquiry", inquiryRouter);
 app.use("/s", redirectRoute);
 
 

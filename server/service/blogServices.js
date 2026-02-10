@@ -1,10 +1,10 @@
 const Blog = require("../model/Blogs")
 
-exports.getAllBlogs = () => Blog.find({}).populate("author");
+exports.getAllBlogs = () => Blog.find({});
 
-exports.getPublishedBlogs = () => Blog.find({ isActive: true }).populate("author");
+exports.getPublishedBlogs = () => Blog.find({ isActive: true });
 
-exports.getBlog = (slug) => Blog.findOne({ slug }).populate("author");
+exports.getBlog = (slug) => Blog.findOne({ slug });
 
 exports.addBlog = async (blog, banner) => {
     try {

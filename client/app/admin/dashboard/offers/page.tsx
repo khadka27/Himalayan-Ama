@@ -8,15 +8,15 @@ import Cookies from "js-cookie"
 import Loading from "@/components/loading"
 import Swal from "sweetalert2"
 
-interface Service {
+interface Flat {
     _id: string
-    title: string
+    flatName: string
     price?: number
 }
 
 interface Offer {
     _id: string
-    service: Service | string
+    flat: Flat | string
     discountPercentage: number
     startDate: string
     endDate: string
@@ -29,12 +29,12 @@ export default function OffersPage() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isFetching, setIsFetching] = useState(true)
     const [offers, setOffers] = useState<Offer[]>([])
-    const [services, setServices] = useState<Service[]>([])
+    const [flats, setFlats] = useState<Flat[]>([])
     const [showForm, setShowForm] = useState(false)
     const [editingOffer, setEditingOffer] = useState<Offer | null>(null)
 
     const [formData, setFormData] = useState({
-        service: "",
+        flat: "",
         discountPercentage: "",
         startDate: "",
         endDate: "",
@@ -45,18 +45,18 @@ export default function OffersPage() {
     const TOKEN = Cookies.get("auth_token")
 
     useEffect(() => {
-        fetchServices()
+        fetchFlats()
         fetchOffers()
     }, [])
 
-    const fetchServices = async () => {
+    const fetchFlats = async () => {
         try {
-            const { data } = await axiosInstance.get("/api/v1/services/all")
+            const { data } = await axiosInstance.get("/api/v1/flats/all")
             if (data.success) {
-                setServices(data.services)
+                setFlats(data.flats)
             }
         } catch (err) {
-            console.error("Failed to fetch services", err)
+            console.error("Failed to fetch apartments", err)
         }
     }
 
@@ -80,7 +80,7 @@ export default function OffersPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.service || !formData.discountPercentage || !formData.startDate || !formData.endDate) {
+        if (!formData.flat || !formData.discountPercentage || !formData.startDate || !formData.endDate) {
             toast.info("Please fill all required fields")
             return
         }
@@ -93,7 +93,7 @@ export default function OffersPage() {
         setIsSubmitting(true)
         try {
             const payload = {
-                service: formData.service,
+                flat: formData.flat,
                 discountPercentage: parseFloat(formData.discountPercentage),
                 startDate: formData.startDate,
                 endDate: formData.endDate,
@@ -159,7 +159,7 @@ export default function OffersPage() {
     const handleEdit = (offer: Offer) => {
         setEditingOffer(offer)
         setFormData({
-            service: typeof offer.service === 'object' ? offer.service._id : offer.service,
+            flat: typeof offer.flat === 'object' ? offer.flat._id : offer.flat,
             discountPercentage: offer.discountPercentage.toString(),
             startDate: offer.startDate.split('T')[0],
             endDate: offer.endDate.split('T')[0],
@@ -171,7 +171,7 @@ export default function OffersPage() {
 
     const resetForm = () => {
         setFormData({
-            service: "",
+            flat: "",
             discountPercentage: "",
             startDate: "",
             endDate: "",
@@ -225,15 +225,15 @@ export default function OffersPage() {
 
                         <form onSubmit={handleSubmit} className="p-10 space-y-8">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Target Service</label>
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Target Apartment</label>
                                 <select
-                                    value={formData.service}
-                                    onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                                    value={formData.flat}
+                                    onChange={(e) => setFormData({ ...formData, flat: e.target.value })}
                                     className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer appearance-none"
                                 >
-                                    <option value="">Select a service...</option>
-                                    {services.map(s => (
-                                        <option key={s._id} value={s._id}>{s.title}</option>
+                                    <option value="">Select an apartment...</option>
+                                    {flats.map(f => (
+                                        <option key={f._id} value={f._id}>{f.flatName}</option>
                                     ))}
                                 </select>
                             </div>
@@ -323,8 +323,8 @@ export default function OffersPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {offers.map((offer) => {
-                                const service = services.find(s => s._id === (typeof offer.service === 'object' ? offer.service._id : offer.service))
-                                const title = service?.title || "Unknown Service"
+                                const flat = flats.find(f => f._id === (typeof offer.flat === 'object' ? offer.flat._id : offer.flat))
+                                const title = flat?.flatName || "Unknown Apartment"
 
                                 const end = new Date(offer.endDate)
                                 const isExpired = end < new Date()

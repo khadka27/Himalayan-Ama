@@ -9,6 +9,7 @@ import { Loader2, Calendar, Users, MessageSquare, MapPin, Sparkles } from "lucid
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Image from "next/image"
+import { useApp } from "@/context/AppContext"
 
 interface Flat {
     _id: string
@@ -25,6 +26,7 @@ interface ApartmentBookingModalProps {
 }
 
 export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBookingModalProps) {
+    const { offers } = useApp()
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -86,6 +88,13 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
         ? (flat.imagesUri[0].startsWith("http") ? flat.imagesUri[0] : `${BACKEND}/images/${flat.imagesUri[0]}`)
         : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop";
 
+    const activeOffer = offers.find(o =>
+        (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+    );
+    const discountedPrice = activeOffer
+        ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+        : flat.price;
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-none rounded-[40px] shadow-2xl">
@@ -102,9 +111,18 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-8">
                             <div className="text-white space-y-2">
                                 <h3 className="text-2xl font-bold leading-tight">{flat.flatName}</h3>
-                                <div className="flex items-center gap-2 text-xs font-bold text-white/80 uppercase tracking-widest">
-                                    <MapPin className="h-3 w-3" />
-                                    <span>{flat.location}</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-xl font-black">${discountedPrice}</span>
+                                        {activeOffer && (
+                                            <span className="text-[10px] line-through opacity-60">Was ${flat.price}</span>
+                                        )}
+                                    </div>
+                                    <div className="h-8 w-[1px] bg-white/20" />
+                                    <div className="flex items-center gap-2 text-[10px] font-bold text-white/80 uppercase tracking-widest">
+                                        <MapPin className="h-3 w-3" />
+                                        <span>{flat.location}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

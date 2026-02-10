@@ -2,7 +2,7 @@ const ServiceOffer = require("../model/ServiceOffer");
 
 exports.getAllOffers = async () => {
     try {
-        const offers = await ServiceOffer.find().populate("service");
+        const offers = await ServiceOffer.find().populate("flat");
         return { success: true, offers };
     } catch (err) {
         return { success: false, message: err.message };
@@ -16,7 +16,7 @@ exports.getActiveOffers = async () => {
             isActive: true,
             startDate: { $lte: now },
             endDate: { $gte: now }
-        }).populate("service");
+        }).populate("flat");
         return { success: true, offers };
     } catch (err) {
         return { success: false, message: err.message };
@@ -34,7 +34,7 @@ exports.addOffer = async (offerData) => {
 
 exports.updateOffer = async (id, offerData) => {
     try {
-        const offer = await ServiceOffer.findByIdAndUpdate(id, offerData, { new: true });
+        const offer = await ServiceOffer.findByIdAndUpdate(id, { $set: offerData }, { new: true, runValidators: true });
         if (!offer) return { success: false, message: "Offer not found" };
         return { success: true, message: "Offer updated", offer };
     } catch (err) {
