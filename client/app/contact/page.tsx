@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { MapPin, Phone, Mail, Loader2, Plus, Minus, Send, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useApp } from "@/context/AppContext";
 import axiosInstance from "@/services/axios-instance";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,31 +29,9 @@ export default function ContactPage() {
     service: "general",
     message: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [flats, setFlats] = useState<any[]>([]);
 
-  // Fetch flats for the dropdown
-  useEffect(() => {
-    const fetchFlats = async () => {
-      try {
-        setIsLoading(true);
-        const { data } = await axiosInstance.get("/api/v1/flats");
-        if (data.success) {
-          setFlats(data.flats);
-        } else {
-          toast.error("Failed to fetch apartments");
-        }
-      } catch (err) {
-        const error = err as Error;
-        toast.error(error.message || "Failed to load apartments");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFlats();
-  }, []);
+  const { flats, isLoadingFlats } = useApp();
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email || !formData.message) {
@@ -139,7 +118,7 @@ export default function ContactPage() {
                 ))}
               </div>
 
-              <div className="h-96 w-full rounded-[40px] overflow-hidden shadow-2xl border-8 border-white bg-gray-100">
+              <div className="h-96 w-full rounded-3xl overflow-hidden shadow-2xl border-4 md:border-8 border-white bg-gray-100">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e0!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp" width="100%"
                   height="100%"
@@ -153,7 +132,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="bg-white p-12 rounded-[40px] shadow-2xl border border-gray-100">
+            <div className="bg-white p-12 rounded-3xl shadow-2xl border border-gray-100">
               <div className="mb-10 text-center">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Send a Message</h2>
                 <p className="text-gray-500 font-medium">We'll get back to you within 24 hours.</p>
@@ -167,7 +146,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Jane Doe"
-                      className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                      className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
                     />
                   </div>
                   <div className="space-y-2">
@@ -177,7 +156,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="jane@example.com"
-                      className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                      className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
                     />
                   </div>
                 </div>
@@ -188,26 +167,26 @@ export default function ContactPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+977-9800000000"
-                    className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
+                    className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-xs font-bold uppercase tracking-widest text-gray-400">Interested In</Label>
-                  {isLoading ? (
-                    <Skeleton className="h-14 w-full rounded-2xl" />
+                  {isLoadingFlats ? (
+                    <Skeleton className="h-14 w-full rounded-xl" />
                   ) : (
                     <Select
                       value={formData.service}
                       onValueChange={(value) => setFormData({ ...formData, service: value })}
                     >
-                      <SelectTrigger className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium">
+                      <SelectTrigger className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium">
                         <SelectValue placeholder="Which apartment are you interested in?" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-2xl border-none shadow-2xl">
-                        <SelectItem value="general" className="rounded-xl py-3 font-medium">General Inquiry</SelectItem>
+                      <SelectContent className="rounded-xl border-none shadow-2xl">
+                        <SelectItem value="general" className="rounded-lg py-3 font-medium">General Inquiry</SelectItem>
                         {flats.map((flat) => (
-                          <SelectItem key={flat._id} value={flat.flatName} className="rounded-xl py-3 font-medium">
+                          <SelectItem key={flat._id} value={flat.flatName} className="rounded-lg py-3 font-medium">
                             {flat.flatName}
                           </SelectItem>
                         ))}
@@ -222,12 +201,12 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Tell us what you're looking for..."
-                    className="min-h-[150px] rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium p-6"
+                    className="min-h-[150px] rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium p-6"
                   />
                 </div>
 
                 <Button
-                  className="w-full h-16 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-100 transition-all text-lg group"
+                  className="w-full h-16 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl shadow-xl shadow-blue-100 transition-all text-lg group"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                 >
@@ -282,14 +261,14 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`rounded-3xl border transition-all duration-500 ${isOpen ? 'bg-blue-50/50 border-blue-200' : 'bg-white border-gray-100 hover:border-blue-100'}`}>
+    <div className={`rounded-2xl border transition-all duration-500 ${isOpen ? 'bg-blue-50/50 border-blue-200' : 'bg-white border-gray-100 hover:border-blue-100'}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-8 text-left focus:outline-none group"
       >
         <span className="font-bold text-gray-900 text-xl tracking-tight leading-tight">{question}</span>
         <div
-          className={`shrink-0 ml-4 w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isOpen ? "bg-blue-500 text-white shadow-lg shadow-blue-200" : "bg-gray-50 text-gray-400"
+          className={`shrink-0 ml-4 w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isOpen ? "bg-blue-500 text-white shadow-lg shadow-blue-200" : "bg-gray-50 text-gray-400"
             }`}
         >
           {isOpen ? <Minus size={20} /> : <Plus size={20} />}

@@ -30,9 +30,9 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-6 left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-full border border-white/20 bg-white/60 backdrop-blur-2xl shadow-xl transition-all duration-300">
-        <div className="flex h-16 items-center justify-between px-6 md:px-8">
-          <Link href="/" className="text-xl font-bold tracking-tighter text-blue-600">
+      <header className="fixed top-2 md:top-6 left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-3xl md:rounded-full border border-white/20 bg-white/60 backdrop-blur-2xl shadow-xl transition-all duration-300">
+        <div className="flex h-14 md:h-16 items-center justify-between px-4 md:px-8">
+          <Link href="/" className="text-lg md:text-xl font-bold tracking-tighter text-blue-600">
             Himalayan Ama
           </Link>
 
@@ -61,10 +61,10 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Button
               onClick={() => push("/apartments")}
-              className="hidden sm:inline-flex bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full h-10 px-6 shadow-lg shadow-blue-200 transition-all hover:scale-105 active:scale-95"
+              className="hidden xs:inline-flex bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full h-9 md:h-10 px-4 md:px-6 shadow-lg shadow-blue-200 transition-all hover:scale-105 active:scale-95 text-xs md:text-sm"
             >
               Book Now
             </Button>
@@ -72,10 +72,10 @@ export function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-gray-900 h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="md:hidden text-gray-900 h-9 w-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
           </div>
         </div>

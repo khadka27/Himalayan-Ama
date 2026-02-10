@@ -43,9 +43,6 @@ export function Footer() {
             <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Locations</h4>
             <ul className="space-y-3 text-sm font-medium text-blue-50">
               <li>Pokhara Lakeside</li>
-              <li>Pokhara Waterfall</li>
-              <li>Sarangkot View</li>
-              <li>Peace Pagoda Area</li>
             </ul>
           </div>
 

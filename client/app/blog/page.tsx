@@ -239,7 +239,7 @@ export default function BlogPage() {
         image="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=2070&auto=format&fit=crop"
       />
 
-      <section className="bg-white/80 backdrop-blur-md py-10 sticky top-20 z-10 shadow-sm border-b border-gray-100">
+      <section className="bg-white/80 backdrop-blur-md py-10 shadow-sm border-b border-gray-100">
         <div className="container mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-10 items-center justify-between">
             <div className="w-full lg:max-w-xl group">

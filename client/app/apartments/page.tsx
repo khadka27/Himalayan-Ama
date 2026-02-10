@@ -83,7 +83,7 @@ export default function ApartmentsPage() {
           return (
             <Card
               key={flat._id}
-              className="group overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col rounded-3xl"
+              className="group overflow-hidden border border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col rounded-2xl"
             >
               <div className="relative h-72 cursor-pointer overflow-hidden" onClick={() => handleDetails(flat._id)}>
                 <Image
@@ -93,11 +93,11 @@ export default function ApartmentsPage() {
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
                 />
-                <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl text-xs font-bold text-gray-900 shadow-xl flex items-center gap-2">
+                <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg text-xs font-bold text-gray-900 shadow-xl flex items-center gap-2">
                   <Home className="w-4 h-4 text-blue-500" />
                   STAY
                 </div>
-                <div className="absolute bottom-6 right-6 bg-blue-500 text-white px-5 py-2 rounded-2xl text-base font-bold shadow-xl border border-white/20">
+                <div className="absolute bottom-6 right-6 bg-blue-500 text-white px-5 py-2 rounded-xl text-base font-bold shadow-xl border border-white/20">
                   ${flat.price} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span>
                 </div>
               </div>
@@ -113,13 +113,13 @@ export default function ApartmentsPage() {
                 <div className="mt-auto grid grid-cols-2 gap-4">
                   <Button
                     variant="outline"
-                    className="h-12 rounded-2xl border-gray-200 hover:bg-gray-50 text-gray-700 font-bold transition-all"
+                    className="h-12 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-700 font-bold transition-all"
                     onClick={() => handleDetails(flat._id)}
                   >
                     View Details
                   </Button>
                   <Button
-                    className="h-12 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg shadow-blue-100 transition-all"
+                    className="h-12 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg shadow-blue-100 transition-all"
                     onClick={() => handleBookNow(flat)}
                   >
                     Inquire
@@ -143,7 +143,7 @@ export default function ApartmentsPage() {
         image="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070&auto=format&fit=crop"
       />
 
-      <section className="bg-white/80 backdrop-blur-md py-8 sticky top-28 z-10 shadow-sm border-b border-gray-100">
+      <section className="bg-white/80 backdrop-blur-md py-6 md:py-8 shadow-sm border-b border-gray-100">
         <div className="container mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
             <div className="relative w-full lg:w-1/2 group">
@@ -152,16 +152,16 @@ export default function ApartmentsPage() {
                 placeholder="Search by name or location..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-14 rounded-2xl border border-gray-100 bg-gray-50 px-6 py-2.5 focus:bg-white focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 pl-12 transition-all font-medium text-gray-900"
+                className="w-full h-12 md:h-14 rounded-xl border border-gray-100 bg-gray-50 px-5 md:px-6 py-2.5 focus:bg-white focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 pl-10 md:pl-12 transition-all font-medium text-gray-900"
               />
-              <Search className="absolute left-4 top-4.5 h-6 w-6 text-gray-400 transition-colors group-focus-within:text-blue-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 md:h-6 md:w-6 text-gray-400 transition-colors group-focus-within:text-blue-500" />
             </div>
 
             <div className="flex gap-3 overflow-x-auto pb-2 md:pb-0 w-full lg:w-auto scrollbar-hide">
               <Button
                 size="sm"
                 variant={selectedLocation === "all" ? "default" : "ghost"}
-                className={`rounded-xl px-6 py-5 font-bold transition-all ${selectedLocation === "all"
+                className={`rounded-lg px-6 py-5 font-bold transition-all ${selectedLocation === "all"
                   ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
                   : "text-gray-500 hover:bg-gray-100"
                   }`}
@@ -174,7 +174,7 @@ export default function ApartmentsPage() {
                   key={loc}
                   size="sm"
                   variant={selectedLocation === loc ? "default" : "ghost"}
-                  className={`rounded-xl px-6 py-5 font-bold transition-all whitespace-nowrap ${selectedLocation === loc
+                  className={`rounded-lg px-6 py-5 font-bold transition-all whitespace-nowrap ${selectedLocation === loc
                     ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-100"
                     : "text-gray-500 hover:bg-gray-100"
                     }`}
@@ -188,12 +188,12 @@ export default function ApartmentsPage() {
         </div>
       </section>
 
-      <section className="py-20 pb-32">
+      <section className="py-12 md:py-20 pb-20 md:pb-32">
         <div className="container mx-auto px-6">
-          <div className="mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Available Residences</h2>
-            <div className="h-1.5 w-20 bg-blue-500 rounded-full mb-6" />
-            <p className="text-lg text-gray-500 max-w-2xl font-medium">Explore our premium selection of fully furnished apartments designed for comfort and peace.</p>
+          <div className="mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Available Residences</h2>
+            <div className="h-1 w-16 md:h-1.5 md:w-20 bg-blue-500 rounded-full mb-6" />
+            <p className="text-base md:text-lg text-gray-500 max-w-2xl font-medium">Explore our premium selection of fully furnished apartments designed for comfort and peace.</p>
           </div>
           {renderFlats()}
         </div>

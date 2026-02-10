@@ -147,7 +147,7 @@ export default function AdminDashboard() {
         font: {
           family: 'serif',
           size: 16,
-          weight: 'bold'
+          weight: 'bold' as const
         }
       },
     },
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
         font: {
           family: 'serif',
           size: 16,
-          weight: 'bold'
+          weight: 'bold' as const
         }
       },
     },
@@ -258,7 +258,7 @@ export default function AdminDashboard() {
         font: {
           family: 'serif',
           size: 16,
-          weight: 'bold'
+          weight: 'bold' as const
         }
       },
     }
@@ -270,15 +270,15 @@ export default function AdminDashboard() {
     <>
       <div className="flex flex-col bg-sage-50 min-h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-sage-200 px-8 py-6 shadow-sm">
-          <h1 className="text-3xl font-serif font-bold text-sage-900">Dashboard</h1>
-          <p className="text-sage-600 mt-1">Welcome to Himalayan Yogii Admin</p>
+        <div className="bg-white border-b border-sage-200 px-4 md:px-8 py-4 md:py-6 shadow-sm">
+          <h1 className="text-2xl md:text-3xl font-serif font-bold text-sage-900">Dashboard</h1>
+          <p className="text-sage-600 mt-1 text-sm md:text-base">Welcome to Himalayan Yogii Admin</p>
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
             {[
               { label: "Total Blogs", value: dashboardData?.data?.total_blogs ?? 0, change: "All time" },
               { label: "Total Bookings", value: dashboardData?.data?.total_bookings ?? 0, change: "All time" },
@@ -290,9 +290,9 @@ export default function AdminDashboard() {
                 className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm hover:shadow-md transition-shadow"
               >
 
-                <p className="text-sage-600 text-sm font-medium">{stat.label}</p>
-                <p className="text-3xl font-serif font-bold text-sage-900 mt-2">{stat.value}</p>
-                <p className="text-xs text-terracotta-600 mt-2">{stat.change}</p>
+                <p className="text-sage-600 text-xs md:text-sm font-medium">{stat.label}</p>
+                <p className="text-2xl md:text-3xl font-serif font-bold text-sage-900 mt-1 md:mt-2">{stat.value}</p>
+                <p className="text-[10px] md:text-xs text-terracotta-600 mt-1 md:mt-2">{stat.change}</p>
               </div>
             ))}
           </div>
@@ -300,16 +300,16 @@ export default function AdminDashboard() {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Revenue Chart */}
-            <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-              <div className="h-80">
-                <Line data={revenueData} />
+            <div className="bg-white rounded-lg border border-sage-200 p-4 md:p-6 shadow-sm">
+              <div className="h-64 md:h-80">
+                <Line data={revenueData} options={revenueChartOptions} />
               </div>
             </div>
 
             {/* Activity Chart */}
-            <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm">
-              <div className="h-80">
-                <Bar data={activityData} />
+            <div className="bg-white rounded-lg border border-sage-200 p-4 md:p-6 shadow-sm">
+              <div className="h-64 md:h-80">
+                <Bar data={activityData} options={activityChartOptions} />
               </div>
             </div>
           </div>
@@ -343,24 +343,24 @@ export default function AdminDashboard() {
             </div>
 
             {/* Quick Stats */}
-            <div className="bg-white rounded-lg border border-sage-200 p-6 shadow-sm lg:col-span-2">
-              <h2 className="text-xl font-serif font-bold text-sage-900 mb-4">Quick Stats</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-sage-50 rounded-lg p-4 text-center">
-                  <p className="text-sage-600 text-sm">Blogs</p>
-                  <p className="text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_blogs ?? 0}</p>
+            <div className="bg-white rounded-lg border border-sage-200 p-4 md:p-6 shadow-sm lg:col-span-2">
+              <h2 className="text-lg md:text-xl font-serif font-bold text-sage-900 mb-4">Quick Stats</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div className="bg-sage-50 rounded-lg p-3 md:p-4 text-center">
+                  <p className="text-sage-600 text-xs md:text-sm">Blogs</p>
+                  <p className="text-xl md:text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_blogs ?? 0}</p>
                 </div>
-                <div className="bg-sage-50 rounded-lg p-4 text-center">
-                  <p className="text-sage-600 text-sm">Services</p>
-                  <p className="text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_services ?? 0}</p>
+                <div className="bg-sage-50 rounded-lg p-3 md:p-4 text-center">
+                  <p className="text-sage-600 text-xs md:text-sm">Services</p>
+                  <p className="text-xl md:text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_services ?? 0}</p>
                 </div>
-                <div className="bg-sage-50 rounded-lg p-4 text-center">
-                  <p className="text-sage-600 text-sm">Inquiries</p>
-                  <p className="text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_inquiries ?? 0}</p>
+                <div className="bg-sage-50 rounded-lg p-3 md:p-4 text-center">
+                  <p className="text-sage-600 text-xs md:text-sm">Inquiries</p>
+                  <p className="text-xl md:text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_inquiries ?? 0}</p>
                 </div>
-                <div className="bg-sage-50 rounded-lg p-4 text-center">
-                  <p className="text-sage-600 text-sm">Bookings</p>
-                  <p className="text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_bookings ?? 0}</p>
+                <div className="bg-sage-50 rounded-lg p-3 md:p-4 text-center">
+                  <p className="text-sage-600 text-xs md:text-sm">Bookings</p>
+                  <p className="text-xl md:text-2xl font-bold text-sage-900 mt-1">{dashboardData?.data?.total_bookings ?? 0}</p>
                 </div>
               </div>
               <div className="mt-6">
