@@ -120,13 +120,13 @@ export default function ContactPage() {
 
               <div className="h-96 w-full rounded-3xl overflow-hidden shadow-2xl border-4 md:border-8 border-white bg-gray-100">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e0!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp" width="100%"
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e0!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp&maptype=satellite" width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  className="h-full w-full grayscale contrast-125"
+                  className="h-full w-full"
                   title="Apartment Location"
                 />
               </div>

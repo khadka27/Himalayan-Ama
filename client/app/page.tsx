@@ -282,7 +282,7 @@ export default function HomePage() {
                               handleBookNow(flat);
                             }}
                           >
-                            Inquire Now
+                            Book Now
                           </Button>
                         </div>
                       </div>
