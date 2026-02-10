@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { MapPin, Search, Home } from "lucide-react"
+import { MapPin, Search, Home, Sparkles } from "lucide-react"
 import Image from "next/image"
 import { ApartmentBookingModal } from "@/components/apartment-booking-modal"
 import { ServiceGridSkeleton } from "@/components/skeletons/service-card-skeleton"
@@ -31,15 +31,16 @@ export default function ApartmentsPage() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const [selectedFlat, setSelectedFlat] = useState<Flat | null>(null)
 
-  const { flats, isLoadingFlats } = useApp()
+  const { flats, offers, isLoadingFlats } = useApp()
 
   const locations = ["all", ...Array.from(new Set(flats.map(f => f.location)))]
 
   // Filter flats based on search and location
   const filteredFlats = flats.filter((flat) => {
     const matchesSearch =
-      flat.flatName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      flat.location.toLowerCase().includes(searchQuery.toLowerCase())
+      (flat.flatName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        flat.location.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      flat.isActive
 
     if (selectedLocation === "all") return matchesSearch
 
@@ -80,6 +81,13 @@ export default function ApartmentsPage() {
             ? (flat.imagesUri[0].startsWith("http") ? flat.imagesUri[0] : `${BACKEND}/images/${flat.imagesUri[0]}`)
             : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop";
 
+          const activeOffer = offers.find(o =>
+            (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+          );
+          const discountedPrice = activeOffer
+            ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+            : flat.price;
+
           return (
             <Card
               key={flat._id}
@@ -97,8 +105,21 @@ export default function ApartmentsPage() {
                   <Home className="w-4 h-4 text-blue-500" />
                   STAY
                 </div>
-                <div className="absolute bottom-6 right-6 bg-blue-500 text-white px-5 py-2 rounded-xl text-base font-bold shadow-xl border border-white/20">
-                  ${flat.price} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span>
+                {activeOffer && (
+                  <div className="absolute top-6 right-6 bg-red-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center gap-1.5 animate-pulse z-10">
+                    <Sparkles className="w-3 h-3 text-yellow-300 fill-yellow-300" />
+                    {activeOffer.discountPercentage}% OFF
+                  </div>
+                )}
+                <div className="absolute bottom-6 right-6 bg-blue-600 text-white px-5 py-2 rounded-xl text-base font-bold shadow-xl border border-white/20">
+                  {activeOffer ? (
+                    <div className="flex flex-col items-end leading-tight">
+                      <span className="text-[10px] line-through opacity-60 font-medium">${flat.price}</span>
+                      <span>${discountedPrice} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span></span>
+                    </div>
+                  ) : (
+                    <span>${flat.price} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span></span>
+                  )}
                 </div>
               </div>
 

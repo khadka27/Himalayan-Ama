@@ -2,14 +2,24 @@ const Service = require("../model/Services");
 
 exports.createService = async (serviceData, image) => {
     try {
+        const features = serviceData.features ?
+            (typeof serviceData.features === 'string' ? JSON.parse(serviceData.features) : serviceData.features)
+            : [];
+
         const newService = new Service({
-            ...serviceData,
+            title: serviceData.title,
+            description: serviceData.description,
+            icon: serviceData.icon || 'Sparkles',
             image,
-            features: serviceData.features ? JSON.parse(serviceData.features) : []
+            features,
+            isActive: serviceData.isActive === 'true' || serviceData.isActive === true,
+            order: serviceData.order ? Number(serviceData.order) : 0
         });
+
         const savedService = await newService.save();
         return { success: true, message: "Service created successfully", service: savedService };
     } catch (err) {
+        console.error("Create Service Error:", err.message);
         return { success: false, message: err.message };
     }
 };
@@ -44,14 +54,39 @@ exports.getServiceById = async (id) => {
 
 exports.updateService = async (id, serviceData, image) => {
     try {
-        const update = { ...serviceData };
+        const update = {};
+        if (serviceData.title) update.title = serviceData.title;
+        if (serviceData.description) update.description = serviceData.description;
+        if (serviceData.icon) update.icon = serviceData.icon;
         if (image) update.image = image;
-        if (serviceData.features) update.features = JSON.parse(serviceData.features);
 
-        const updatedService = await Service.findByIdAndUpdate(id, update, { new: true });
+        if (serviceData.isActive !== undefined) {
+            update.isActive = serviceData.isActive === 'true' || serviceData.isActive === true;
+        }
+
+        if (serviceData.order !== undefined) {
+            update.order = Number(serviceData.order);
+        }
+
+        if (serviceData.features) {
+            try {
+                update.features = typeof serviceData.features === 'string'
+                    ? JSON.parse(serviceData.features)
+                    : serviceData.features;
+            } catch (e) {
+                console.error("Error parsing features:", e.message);
+                // If it's a comma separated string but not JSON
+                if (typeof serviceData.features === 'string') {
+                    update.features = serviceData.features.split(',').map(f => f.trim());
+                }
+            }
+        }
+
+        const updatedService = await Service.findByIdAndUpdate(id, { $set: update }, { new: true, runValidators: true });
         if (!updatedService) return { success: false, message: "Service not found" };
         return { success: true, message: "Service updated successfully", service: updatedService };
     } catch (err) {
+        console.error("Update Service Error:", err.message);
         return { success: false, message: err.message };
     }
 };

@@ -35,7 +35,7 @@ export default function AdminLayout({
           <span className="ml-4 font-serif font-bold text-sage-900">Admin Panel</span>
         </header>
 
-        <main className="flex-1 md:ml-64 w-full">
+        <main className="flex-1 w-full">
           {children}
         </main>
       </div>

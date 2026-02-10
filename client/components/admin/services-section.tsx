@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit2, Plus, X, Trash2, Sparkles, Layout, List, Heart, Layers, CheckCircle2 } from "lucide-react"
+import { Edit2, Plus, X, Trash2, Sparkles, Layout, List, Heart, Layers, CheckCircle2, Activity, Cloud, Sun, Moon, Zap } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Loading from "@/components/loading"
@@ -91,16 +91,16 @@ export function ServicesSection() {
       formDataPayload.append("features", JSON.stringify(featuresArray))
 
       if (imageFile) {
-        formDataPayload.append("images", imageFile)
+        formDataPayload.append("image", imageFile)
       }
 
       let response;
       if (editingService) {
-        response = await axiosInstance.put(`/api/v1/services/${editingService._id}`, formDataPayload, {
+        response = await axiosInstance.put(`/api/v1/services/update/${editingService._id}`, formDataPayload, {
           headers: { 'Authorization': `Bearer ${TOKEN}` }
         })
       } else {
-        response = await axiosInstance.post("/api/v1/services", formDataPayload, {
+        response = await axiosInstance.post("/api/v1/services/create", formDataPayload, {
           headers: { 'Authorization': `Bearer ${TOKEN}` }
         })
       }
@@ -131,7 +131,7 @@ export function ServicesSection() {
 
     try {
       setIsLoading(true)
-      const { data } = await axiosInstance.delete(`/api/v1/services/${id}`, {
+      const { data } = await axiosInstance.delete(`/api/v1/services/delete/${id}`, {
         headers: { 'Authorization': `Bearer ${TOKEN}` }
       })
       if (data.success) {
@@ -239,16 +239,23 @@ export function ServicesSection() {
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Icon Style</label>
                 <div className="flex flex-wrap gap-3">
-                  {icons.map(icon => (
-                    <button
-                      key={icon}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, icon })}
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all border ${formData.icon === icon ? 'bg-amber-500 text-white border-amber-600 shadow-lg shadow-amber-100' : 'bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100'}`}
-                    >
-                      <Sparkles size={18} />
-                    </button>
-                  ))}
+                  {icons.map((iconName) => {
+                    const iconMap: Record<string, any> = {
+                      Sparkles, Heart, Layout, List, Layers, Activity, Cloud, Sun, Moon, Zap
+                    }
+                    const IconComponent = iconMap[iconName] || Sparkles;
+                    return (
+                      <button
+                        key={iconName}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, icon: iconName })}
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all border ${formData.icon === iconName ? 'bg-amber-500 text-white border-amber-600 shadow-lg shadow-amber-100' : 'bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100'}`}
+                        title={iconName}
+                      >
+                        <IconComponent size={18} />
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
@@ -296,6 +303,17 @@ export function ServicesSection() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              <div className="flex items-center gap-3 py-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
+                  className={`w-12 h-6 rounded-full transition-all relative ${formData.isActive ? 'bg-amber-500' : 'bg-slate-200'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
+                </button>
+                <span className="text-sm font-bold text-slate-600">Visible for potential clients</span>
               </div>
 
               <div className="flex gap-4 pt-4">

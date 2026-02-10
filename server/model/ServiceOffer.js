@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const serviceOfferSchema = new mongoose.Schema({
-    service: {
+    flat: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Service",
+        ref: "Flat",
         required: true
     },
     discountPercentage: {

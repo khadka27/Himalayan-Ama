@@ -45,7 +45,7 @@ function AnimatedSection({ children, className, id }: { children: React.ReactNod
 
 export default function HomePage() {
   const router = useRouter()
-  const { flats, isLoadingFlats } = useApp()
+  const { flats, offers, isLoadingFlats } = useApp()
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
@@ -71,7 +71,7 @@ export default function HomePage() {
     router.push(`/apartments/${flatId}`)
   }
 
-  const displayedFlats = flats.slice(0, 6)
+  const displayedFlats = flats.filter(f => f.isActive).slice(0, 6)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,9 +82,9 @@ export default function HomePage() {
 
     try {
       setIsSubmitting(true)
-      const payload = { ...formData, service: "General Inquiry" }
+      const payload = { ...formData, flat: "General Inquiry" }
 
-      const { data } = await axiosInstance.post("/api/inquiries", payload)
+      const { data } = await axiosInstance.post("/api/v1/inquiry", payload)
 
       if (data.status || data.success) {
         toast.success("Inquiry sent successfully!")
@@ -218,6 +218,13 @@ export default function HomePage() {
                   ? (flat.imagesUri[0].startsWith("http") ? flat.imagesUri[0] : `${BACKEND}/images/${flat.imagesUri[0]}`)
                   : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop";
 
+                const activeOffer = offers.find(o =>
+                  (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+                );
+                const discountedPrice = activeOffer
+                  ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+                  : flat.price;
+
                 return (
                   <motion.div
                     key={flat._id}
@@ -239,8 +246,23 @@ export default function HomePage() {
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute top-4 md:top-6 right-4 md:right-6 bg-white/90 backdrop-blur-md text-gray-900 px-4 md:px-5 py-1.5 md:py-2 rounded-xl text-sm md:text-base font-bold shadow-xl border border-white/50">
-                          ${flat.price} <span className="text-xs font-medium text-gray-500">/mo</span>
+
+                        {activeOffer && (
+                          <div className="absolute top-4 md:top-6 left-4 md:left-6 bg-red-600 text-white px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-1.5 animate-pulse z-10 transition-transform group-hover:scale-110">
+                            <Sparkles className="h-3 w-3 text-yellow-300 fill-yellow-300" />
+                            {activeOffer.discountPercentage}% OFF
+                          </div>
+                        )}
+
+                        <div className="absolute top-4 md:top-6 right-4 md:right-6 bg-white/95 backdrop-blur-md text-gray-900 px-4 md:px-5 py-1.5 md:py-2 rounded-xl text-sm md:text-base font-bold shadow-xl border border-white/50">
+                          {activeOffer ? (
+                            <div className="flex flex-col items-end leading-tight">
+                              <span className="text-[10px] line-through opacity-40 font-medium">${flat.price}</span>
+                              <span>${discountedPrice} <span className="text-xs font-medium text-gray-400">/mo</span></span>
+                            </div>
+                          ) : (
+                            <span>${flat.price} <span className="text-xs font-medium text-gray-500">/mo</span></span>
+                          )}
                         </div>
                       </div>
 

@@ -23,6 +23,16 @@ export interface Flat {
   updatedAt?: string
 }
 
+export interface Offer {
+  _id: string
+  flat: string | Flat
+  discountPercentage: number
+  startDate: string
+  endDate: string
+  description?: string
+  isActive: boolean
+}
+
 export interface Instructor {
   id: number | string
   name: string
@@ -51,13 +61,16 @@ interface Review {
 
 interface AppContextType {
   flats: Flat[]
+  offers: Offer[]
   instructors: Instructor[]
   reviews: Review[]
   isLoadingFlats: boolean
+  isLoadingOffers: boolean
   isLoadingInstructors: boolean
   isLoadingReviews: boolean
   isInitialLoading: boolean
   refetchFlats: () => Promise<void>
+  refetchOffers: () => Promise<void>
   refetchInstructors: () => Promise<void>
   refetchReviews: () => Promise<void>
 }
@@ -67,9 +80,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined)
 export function AppProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [flats, setFlats] = useState<Flat[]>([])
+  const [offers, setOffers] = useState<Offer[]>([])
   const [instructors, setInstructors] = useState<Instructor[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
   const [isLoadingFlats, setIsLoadingFlats] = useState(true)
+  const [isLoadingOffers, setIsLoadingOffers] = useState(true)
   const [isLoadingInstructors, setIsLoadingInstructors] = useState(true)
   const [isLoadingReviews, setIsLoadingReviews] = useState(true)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
@@ -77,7 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const fetchFlats = async () => {
     try {
       setIsLoadingFlats(true)
-      const { data } = await axiosInstance.get("/api/v1/flats/all")
+      const { data } = await axiosInstance.get("/api/v1/flats/published")
       if (data?.success && data?.flats) {
         setFlats(data.flats)
       }
@@ -85,6 +100,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.error("Error fetching flats:", err)
     } finally {
       setIsLoadingFlats(false)
+    }
+  }
+
+  const fetchOffers = async () => {
+    try {
+      setIsLoadingOffers(true)
+      const { data } = await axiosInstance.get("/api/v1/offer/active")
+      if (data?.success && data?.offers) {
+        setOffers(data.offers)
+      }
+    } catch (err) {
+      console.error("Error fetching offers:", err)
+    } finally {
+      setIsLoadingOffers(false)
     }
   }
 
@@ -127,7 +156,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      await Promise.all([fetchFlats(), fetchInstructors(), fetchReviews()])
+      await Promise.all([fetchFlats(), fetchOffers(), fetchInstructors(), fetchReviews()])
       setIsInitialLoading(false)
     }
 
@@ -136,13 +165,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value: AppContextType = {
     flats,
+    offers,
     instructors,
     reviews,
     isLoadingFlats,
+    isLoadingOffers,
     isLoadingInstructors,
     isLoadingReviews,
     isInitialLoading,
     refetchFlats: fetchFlats,
+    refetchOffers: fetchOffers,
     refetchInstructors: fetchInstructors,
     refetchReviews: fetchReviews,
   }

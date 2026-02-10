@@ -45,7 +45,14 @@ export default function RootLayout({
           <AppProvider>
             <OfferBanner />
             <FloatingActions />
-            {children}
+            <main
+              style={{
+                paddingTop: "var(--banner-height, 0px)",
+                transition: "padding-top 0.5s ease"
+              }}
+            >
+              {children}
+            </main>
           </AppProvider>
         </Providers>
         <Analytics />

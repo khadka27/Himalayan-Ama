@@ -32,7 +32,7 @@ export default function ApartmentDetailPage() {
   const params = useParams()
   const slug = params.slug as string
 
-  const { flats, isLoadingFlats } = useApp()
+  const { flats, offers, isLoadingFlats } = useApp()
 
   const [flat, setFlat] = useState<Flat | null>(null)
   const [isBookingOpen, setIsBookingOpen] = useState(false)
@@ -45,7 +45,7 @@ export default function ApartmentDetailPage() {
     const fetchSpecificFlat = async (id: string) => {
       try {
         const { data } = await axiosInstance.get(`/api/v1/flats/${id}`);
-        if (data.success) {
+        if (data.success && data.flat.isActive) {
           setFlat(data.flat);
         } else {
           toast.error("Apartment not found");
@@ -119,6 +119,13 @@ export default function ApartmentDetailPage() {
     ? flat.imagesUri.map(uri => uri.startsWith("http") ? uri : `${BACKEND}/images/${uri}`)
     : ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=2138&auto=format&fit=crop"];
 
+  const activeOffer = offers.find(o =>
+    (typeof o.flat === 'string' ? o.flat === flat._id : o.flat?._id === flat._id)
+  );
+  const discountedPrice = activeOffer
+    ? Math.round(flat.price * (1 - activeOffer.discountPercentage / 100))
+    : flat.price;
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Header />
@@ -146,10 +153,17 @@ export default function ApartmentDetailPage() {
 
             <div className="space-y-10">
               <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 shadow-sm border border-blue-100 uppercase tracking-widest">
-                  <Sparkles className="h-4 w-4" />
-                  Premium Residence
-                </div>
+                {activeOffer ? (
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 text-xs font-black text-red-600 shadow-sm border border-red-100 uppercase tracking-widest animate-pulse">
+                    <Sparkles className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                    Limited Time Special: {activeOffer.discountPercentage}% OFF
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 shadow-sm border border-blue-100 uppercase tracking-widest">
+                    <Sparkles className="h-4 w-4" />
+                    Premium Residence
+                  </div>
+                )}
 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{flat.flatName}</h1>
 
@@ -165,8 +179,11 @@ export default function ApartmentDetailPage() {
                 <div className="flex items-center justify-between mb-8">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Monthly Rate</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl lg:text-4xl font-bold text-gray-900">${flat.price}</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl lg:text-4xl font-black text-gray-900">${discountedPrice}</span>
+                      {activeOffer && (
+                        <span className="text-sm font-bold text-gray-400 line-through">${flat.price}</span>
+                      )}
                       <span className="text-sm font-bold text-gray-400">/ USD</span>
                     </div>
                   </div>

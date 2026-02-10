@@ -48,6 +48,7 @@ export function AdminSidebar({ isOpen, closeSidebar }: AdminSidebarProps) {
     { name: "Reviews", href: "/admin/dashboard/reviews", icon: <Star size={20} /> },
     { name: "Service Offers", href: "/admin/dashboard/offers", icon: <Calendar size={20} /> },
     { name: "Offer Banner", href: "/admin/dashboard/offer-banner", icon: <Megaphone size={20} /> },
+    { name: "Inquiries", href: "/admin/dashboard/inquiries", icon: <MessageSquare size={20} /> },
   ]
 
 
@@ -100,7 +101,7 @@ export function AdminSidebar({ isOpen, closeSidebar }: AdminSidebarProps) {
 
   }, [])
   return (
-    <aside className={`w-64 bg-gradient-to-b from-blue-900 to-slate-900 text-white h-screen fixed left-0 top-0 shadow-xl flex flex-col z-50 transition-transform duration-300 md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+    <aside className={`w-64 shrink-0 bg-gradient-to-b from-blue-900 to-slate-900 text-white h-screen flex flex-col z-50 transition-transform duration-300 fixed md:sticky top-0 ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
       {/* Logo */}
       <div className="p-6 border-b border-blue-800 shrink-0 flex items-center justify-between">
         <div className="flex items-center space-x-3">

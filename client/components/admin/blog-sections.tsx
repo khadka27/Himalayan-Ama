@@ -30,18 +30,13 @@ interface ContentSection {
   paragraph: string
 }
 
-interface Author {
-  _id: string
-  authorName: string
-}
-
 interface Blog {
   _id: string
   title: string
   subtitle: string
   shortDescription: string
   excerpt: string
-  author: Author | string
+  author: string
   content: ContentSection[] | string
   conclusion: string
   isActive: boolean
@@ -109,7 +104,6 @@ function SortableItem({ id, index, section, onUpdate, onRemove }: SortableItemPr
 
 export function Blogs() {
   const [blogs, setBlogs] = useState<Blog[]>([])
-  const [authors, setAuthors] = useState<Author[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -137,11 +131,11 @@ export function Blogs() {
     }),
   )
 
-  const categories = ["Meditation", "Yoga", "Wellness", "Nature", "Retreat", "Community"]
+  // TODO: Add categories here
+  const categories = ["Meditation", "Yoga", "Wellness", "Nature", "Retreat", "Community", "General"]
 
   useEffect(() => {
     fetchBlogs()
-    fetchAuthors()
   }, [])
 
   const fetchBlogs = async () => {
@@ -156,17 +150,6 @@ export function Blogs() {
       toast.error("Failed to load blogs")
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const fetchAuthors = async () => {
-    try {
-      const { data } = await axiosInstance.get("/api/v1/author/getAllAuthors")
-      if (data.success) {
-        setAuthors(data.authors)
-      }
-    } catch (err) {
-      console.error(err)
     }
   }
 
@@ -284,7 +267,7 @@ export function Blogs() {
       subtitle: blog.subtitle || "",
       description: blog.shortDescription || "",
       excerpt: blog.excerpt || "",
-      author: typeof blog.author === 'object' ? blog.author._id : (blog.author || ""),
+      author: blog.author || "",
       category: blog.category || "Meditation",
       publishDate: blog.publishDate ? blog.publishDate.split('T')[0] : new Date().toISOString().split('T')[0],
       content: contentData,
@@ -406,24 +389,25 @@ export function Blogs() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Contributor</label>
-                      <select
-                        value={formData.author}
-                        onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                        className="w-full h-14 px-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer"
-                      >
-                        <option value="">Select Author</option>
-                        {authors.map(a => (
-                          <option key={a._id} value={a._id}>{a.authorName}</option>
-                        ))}
-                      </select>
+                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Author Name</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Author Name"
+                          value={formData.author}
+                          onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                          className="w-full h-14 px-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all pl-12"
+                          required
+                        />
+                        <User size={18} className="absolute left-4 top-4 text-slate-300" />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Genre</label>
                       <select
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full h-14 px-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer"
+                        className="w-full h-14 px-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all cursor-pointer appearance-none"
                       >
                         {categories.map(c => (
                           <option key={c} value={c}>{c}</option>
@@ -578,7 +562,7 @@ export function Blogs() {
                         <p className="text-base font-bold text-slate-900 leading-tight mb-1">{blog.title}</p>
                         <div className="flex items-center gap-2">
                           <span className="text-[9px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-md uppercase tracking-wider">{blog.category}</span>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{typeof blog.author === 'object' ? blog.author.authorName : "Guest"}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{blog.author || "Guest"}</span>
                         </div>
                       </div>
                     </div>

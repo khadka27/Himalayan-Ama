@@ -30,7 +30,12 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-2 md:top-6 left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-3xl md:rounded-full border border-white/20 bg-white/60 backdrop-blur-2xl shadow-xl transition-all duration-300">
+      <header
+        className="fixed left-0 right-0 z-50 mx-auto w-[95%] max-w-6xl rounded-3xl md:rounded-full border border-white/20 bg-white/60 backdrop-blur-2xl shadow-xl transition-all duration-300"
+        style={{
+          top: `calc(var(--banner-height, 0px) + ${pathname === "/" ? "16px" : "8px"})`,
+        }}
+      >
         <div className="flex h-14 md:h-16 items-center justify-between px-4 md:px-8">
           <Link href="/" className="text-lg md:text-xl font-bold tracking-tighter text-blue-600">
             Himalayan Ama

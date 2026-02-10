@@ -16,6 +16,12 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/
 import { Label } from "@/components/ui/label"
 import { Header } from "@/components/layout/header"
 import Hero from "@/components/hero"
+import { useApp } from "@/context/AppContext"
+
+interface Flat {
+  _id: string
+  flatName: string
+}
 
 interface Review {
   _id: string
@@ -30,12 +36,13 @@ interface Review {
 }
 
 export default function ReviewsPage() {
+  const { flats, isLoadingFlats } = useApp()
+
   const [selectedRating, setSelectedRating] = useState<number | null>(null)
   const [userRating, setUserRating] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [reviews, setReviews] = useState<Review[]>([])
-  const [allFlats, setAllFlats] = useState<{ id: string; title: string }[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Form state
@@ -45,6 +52,11 @@ export default function ReviewsPage() {
     service: "",
     review: "",
   })
+
+  const allFlats = flats.map((flat: Flat) => ({
+    id: flat._id,
+    title: flat.flatName
+  }))
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -104,7 +116,6 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     fetchReviews()
-    fetchFlats()
   }, [])
 
   const fetchReviews = async () => {
@@ -119,21 +130,6 @@ export default function ReviewsPage() {
       toast.error(error.message || "Failed to load reviews")
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const fetchFlats = async () => {
-    try {
-      const { data } = await axiosInstance.get("/api/v1/flats")
-      if (data.success) {
-        const flatsList = data.flats.map((flat: any) => ({
-          id: flat._id,
-          title: flat.flatName,
-        }))
-        setAllFlats(flatsList)
-      }
-    } catch (err) {
-      console.error("Failed to fetch apartments:", err)
     }
   }
 
@@ -300,22 +296,22 @@ export default function ReviewsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-xs font-bold uppercase tracking-widest text-gray-400">Your Full Name</Label>
-                    <Input name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium" required />
+                    <Input name="name" value={formData.name} onChange={handleChange} placeholder="Your Name" className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium" required />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-bold uppercase tracking-widest text-gray-400">Email Address</Label>
-                    <Input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="john@example.com" className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium" required />
+                    <Input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="example@gmail.com" className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium" required />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-xs font-bold uppercase tracking-widest text-gray-400">Which Apartment?</Label>
                   <Select name="service" value={formData.service} onValueChange={(value) => setFormData({ ...formData, service: value })} required>
-                    <SelectTrigger className="h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium">
+                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium">
                       <SelectValue placeholder="Select your stay" />
                     </SelectTrigger>
                     <SelectContent className="rounded-2xl border-none shadow-2xl">
-                      {allFlats.map((flat) => (
+                      {allFlats.map((flat: { id: string; title: string }) => (
                         <SelectItem key={flat.id} value={flat.id} className="rounded-xl py-3 font-medium">{flat.title}</SelectItem>
                       ))}
                     </SelectContent>

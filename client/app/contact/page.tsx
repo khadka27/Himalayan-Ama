@@ -52,10 +52,10 @@ export default function ContactPage() {
         email: formData.email,
         message: formData.message,
         phone: formData.phone || undefined,
-        service: formData.service === "general" ? "General Inquiry" : `Apartment Inquiry: ${formData.service}`,
+        flat: formData.service === "general" ? "General Inquiry" : `Apartment Inquiry: ${formData.service}`,
       };
 
-      const { data } = await axiosInstance.post("/api/inquiries", payload);
+      const { data } = await axiosInstance.post("/api/v1/inquiry", payload);
 
       if (data.status || data.success) {
         toast.success(data.message || "Message sent successfully!");
@@ -145,7 +145,7 @@ export default function ContactPage() {
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Jane Doe"
+                      placeholder="Full Name"
                       className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
                     />
                   </div>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="jane@example.com"
+                      placeholder="example@gmail.com"
                       className="h-14 rounded-xl bg-gray-50 border-none focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all font-medium"
                     />
                   </div>
