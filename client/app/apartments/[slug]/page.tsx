@@ -130,7 +130,7 @@ export default function ApartmentDetailPage() {
     <div className="min-h-screen bg-slate-50">
       <Header />
 
-      <div className="bg-white/80 backdrop-blur-md py-4 border-b border-gray-100 sticky top-20 z-10">
+      <div className="bg-white/80 backdrop-blur-md pt-28 pb-6 border-b border-gray-100">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <Link
             href="/apartments"
@@ -208,7 +208,7 @@ export default function ApartmentDetailPage() {
                 </div>
 
                 <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold h-16 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg" onClick={toggleBooking}>
-                  Inquire Availability
+                  Book Now
                 </Button>
               </Card>
             </div>
@@ -233,7 +233,7 @@ export default function ApartmentDetailPage() {
               </div>
 
               {images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide px-2">
+                <div className="flex gap-3 overflow-x-auto pt-6 pb-4 scrollbar-hide px-2">
                   {images.map((img, index) => (
                     <button
                       key={index}

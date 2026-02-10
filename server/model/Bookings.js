@@ -2,10 +2,13 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema({
   userName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  isVerified: {type: Boolean, required: true, default: false},
-  startDate: {type: Date, required: true},
-  endDate: {type: Date, required: true},
+  email: { type: String, required: true },
+  phone: { type: String },
+  isVerified: { type: Boolean, required: true, default: false },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  participants: { type: Number, default: 1 },
+  message: { type: String },
   flat: { type: mongoose.Schema.Types.ObjectId, ref: "Flat", required: true },
 }, { timestamps: true });
 

@@ -143,7 +143,7 @@ export default function ApartmentsPage() {
                     className="h-12 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-lg shadow-blue-100 transition-all"
                     onClick={() => handleBookNow(flat)}
                   >
-                    Inquire
+                    Book Now
                   </Button>
                 </div>
               </div>

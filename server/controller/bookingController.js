@@ -10,6 +10,17 @@ exports.getAllBookings = async (req, res) => {
     }
 }
 
+exports.getBookingsByFlat = async (req, res) => {
+    try {
+        const { flatId } = req.params;
+        const bookings = await bookingServices.getBookingsByFlat(flatId);
+        return res.status(200).json({ success: true, bookings: bookings || [] })
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).json({ success: false, message: `Error while fetching bookings for flat: ${err.message}` })
+    }
+}
+
 exports.addBooking = async (req, res) => {
     try {
         const result = await bookingServices.addBooking(req.body);
