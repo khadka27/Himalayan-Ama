@@ -5,6 +5,7 @@ const bookingSchema = new mongoose.Schema({
   email: { type: String, required: true },
   phone: { type: String },
   isVerified: { type: Boolean, required: true, default: false },
+  status: { type: String, default: "pending", enum: ["pending", "confirmed", "overlap", "rejected"] },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   participants: { type: Number, default: 1 },

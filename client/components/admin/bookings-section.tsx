@@ -19,6 +19,7 @@ interface Booking {
   startDate: string
   endDate: string
   isVerified: boolean
+  status?: string
   createdAt: string
   // For backward compatibility or extra info
   participants?: number
@@ -66,9 +67,14 @@ export function Bookings() {
         })
 
       if (data.success) {
-        toast.success("Booking confirmed")
+        if (data.status === "overlap") {
+          toast.info("Overlap detected. Booking marked as 'overlap' and user notified.")
+        } else {
+          toast.success("Booking confirmed")
+        }
+
         setBookings(bookings.map((booking) =>
-          booking._id === id ? { ...booking, isVerified: true } : booking
+          booking._id === id ? { ...booking, isVerified: data.status === "confirmed", status: data.status } : booking
         ))
       }
     } catch (error) {
@@ -241,7 +247,9 @@ export function Bookings() {
                     </div>
                   </td>
                   <td className="px-8 py-6 whitespace-nowrap">
-                    {booking.isVerified ? (
+                    {booking.status === "overlap" ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-700 border-red-100 uppercase tracking-wider">Overlap</span>
+                    ) : booking.isVerified ? (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">Confirmed</span>
                     ) : (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">Pending</span>
@@ -249,7 +257,7 @@ export function Bookings() {
                   </td>
                   <td className="px-8 py-6 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {!booking.isVerified && (
+                      {!booking.isVerified && booking.status !== "overlap" && (
                         <button
                           onClick={() => handleConfirm(booking._id)}
                           className="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all p-2.5 rounded-xl border border-emerald-100"

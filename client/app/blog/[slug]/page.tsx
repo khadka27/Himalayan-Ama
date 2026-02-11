@@ -147,7 +147,7 @@ export default function BlogDetailPage() {
                     {blog.category}
                   </span>
                 )}
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight">{blog.title}</h1>
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight font-[family-name:var(--font-playful)]">{blog.title}</h1>
               </div>
 
               <div className="flex flex-wrap items-center gap-8 text-white/80 font-bold uppercase tracking-widest text-[10px]">
