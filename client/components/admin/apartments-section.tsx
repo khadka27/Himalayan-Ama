@@ -162,6 +162,7 @@ export function ApartmentsSection() {
 
     const handleToggleActive = async (flatId: string, currentStatus: boolean) => {
         try {
+            setIsLoading(true)
             const { data } = await axiosInstance.put(`/api/v1/flats/status/${flatId}`, {
                 status: !currentStatus
             }, {
@@ -174,6 +175,8 @@ export function ApartmentsSection() {
             }
         } catch (err) {
             toast.error("Failed to toggle status")
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -185,7 +188,7 @@ export function ApartmentsSection() {
             price: flat.price.toString(),
             isActive: flat.isActive
         })
-        const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+        const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
         const existingImages = flat.imagesUri.map(img => img.startsWith("http") ? img : `${BACKEND}/images/${img}`);
         setImagePreviews(existingImages)
         setImageFiles([])
@@ -205,7 +208,7 @@ export function ApartmentsSection() {
         setEditingFlat(null)
     }
 
-    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
 
     return (
         <div className="space-y-8 pb-20">

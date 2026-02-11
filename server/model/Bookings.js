@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema({
   userName: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: false },
   phone: { type: String },
   isVerified: { type: Boolean, required: true, default: false },
   status: { type: String, default: "pending", enum: ["pending", "confirmed", "overlap", "rejected"] },

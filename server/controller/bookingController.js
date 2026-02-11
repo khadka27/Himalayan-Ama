@@ -51,11 +51,11 @@ exports.updateBookingStatus = async (req, res) => {
 exports.deleteBooking = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await bookingServices.deleteBooking(id);
+        const result = await bookingServices.rejectBooking(id);
         if (result.success) return res.status(200).json(result)
         return res.status(404).json(result)
     } catch (err) {
         console.error(err.message);
-        return res.status(500).json({ success: false, message: `Error while deleting booking: ${err.message}` })
+        return res.status(500).json({ success: false, message: `Error while rejecting booking: ${err.message}` })
     }
 }

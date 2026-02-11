@@ -159,7 +159,7 @@ export default function OffersPage() {
     const handleEdit = (offer: Offer) => {
         setEditingOffer(offer)
         setFormData({
-            flat: typeof offer.flat === 'object' ? offer.flat._id : offer.flat,
+            flat: (offer.flat && typeof offer.flat === 'object') ? offer.flat._id : (offer.flat || ""),
             discountPercentage: offer.discountPercentage.toString(),
             startDate: offer.startDate.split('T')[0],
             endDate: offer.endDate.split('T')[0],
@@ -323,7 +323,8 @@ export default function OffersPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {offers.map((offer) => {
-                                const flat = flats.find(f => f._id === (typeof offer.flat === 'object' ? offer.flat._id : offer.flat))
+                                const flatId = (offer.flat && typeof offer.flat === 'object') ? offer.flat._id : offer.flat
+                                const flat = flats.find(f => f._id === flatId)
                                 const title = flat?.flatName || "Unknown Apartment"
 
                                 const end = new Date(offer.endDate)

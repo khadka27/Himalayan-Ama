@@ -141,6 +141,13 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
 
             if (data.status || data.success) {
                 toast.success("Booking inquiry sent successfully!")
+
+                // WhatsApp Redirection
+                const phoneNumber = "9779816685279";
+                const message = `Namaste! I just submitted a booking inquiry for *${flat.flatName}*.%0A%0ADates: ${format(dateRange.from, "PPP")} - ${format(dateRange.to, "PPP")}%0AGuests: ${formData.guests}%0AName: ${formData.name}%0A%0APlease confirm my stay. Thank you!`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+
                 onOpenChange(false)
                 setFormData({
                     name: "",
@@ -283,7 +290,7 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
                                                     <p className="text-[8px] font-black text-blue-400 uppercase tracking-[0.2em]">Total Estimate</p>
                                                     <p className="text-xs font-bold text-blue-900">{numberOfNights} {numberOfNights === 1 ? 'night' : 'nights'} selected</p>
                                                 </div>
-                                                <p className="text-2xl font-black text-blue-600">${totalPrice}</p>
+                                                <p className="text-2xl font-black text-blue-600">Rs. {totalPrice}</p>
                                             </div>
                                         )}
                                     </div>
@@ -412,9 +419,9 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-300 mb-1">Price per stay</span>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-black">${discountedPrice}</span>
+                                            <span className="text-4xl font-black">Rs. {discountedPrice}</span>
                                             {activeOffer && (
-                                                <span className="text-sm line-through opacity-60 font-bold">Was ${flat.price}</span>
+                                                <span className="text-sm line-through opacity-60 font-bold">Was Rs. {flat.price}</span>
                                             )}
                                         </div>
                                     </div>
@@ -422,7 +429,7 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
                                         <div className="flex flex-col animate-in fade-in zoom-in-95 duration-500">
                                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-300 mb-1">Total stay cost</span>
                                             <div className="flex items-baseline gap-2">
-                                                <span className="text-4xl font-black text-blue-400">${totalPrice}</span>
+                                                <span className="text-4xl font-black text-blue-400">Rs. {totalPrice}</span>
                                                 <span className="text-xs font-bold opacity-60">for {numberOfNights} nights</span>
                                             </div>
                                         </div>

@@ -14,9 +14,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 innerColor="color-mix(in oklch, var(--cream) 85%, transparent)"
                 shadowColor="color-mix(in oklch, var(--foreground) 40%, transparent)"
                 trailCount={5}
-                sizes={[40, 65, 50]}
-                innerSizes={[12, 20, 15]}
-                opacities={[0.55, 0.4, 0.25]}
+                sizes={[40, 65, 50, 40, 30]}
+                innerSizes={[12, 20, 15, 12, 10]}
+                opacities={[0.55, 0.4, 0.25, 0.15, 0.1]}
                 shadowBlur={10}
                 shadowOffsetX={4}
                 shadowOffsetY={4}

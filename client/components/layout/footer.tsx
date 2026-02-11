@@ -54,10 +54,16 @@ export function Footer() {
                 <span className="opacity-70">Address:</span> Pokhara, Nepal
               </li>
               <li className="flex items-center gap-3">
-                <span className="opacity-70">Phone:</span> +977-9816685279
+                <span className="opacity-70">Phone:</span>
+                <a href="https://wa.me/9779816685279" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  +977-9816685279
+                </a>
               </li>
               <li className="flex items-center gap-3">
-                <span className="opacity-70">Email:</span> info@himalayanama.com
+                <span className="opacity-70">Email:</span>
+                <a href="mailto:info@himalayanama.com" className="hover:text-white transition-colors">
+                  info@himalayanama.com
+                </a>
               </li>
             </ul>
           </div>
@@ -68,6 +74,7 @@ export function Footer() {
           <p>© 2025 Himalayan Ama. All rights reserved.</p>
           <div className="flex gap-8">
             <Link href="/policies" className="hover:text-white transition-colors">Safety Policies</Link>
+            <Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
             <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>

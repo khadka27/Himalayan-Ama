@@ -97,11 +97,17 @@ export function ServicesSection() {
       let response;
       if (editingService) {
         response = await axiosInstance.put(`/api/v1/services/update/${editingService._id}`, formDataPayload, {
-          headers: { 'Authorization': `Bearer ${TOKEN}` }
+          headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
         })
       } else {
         response = await axiosInstance.post("/api/v1/services/create", formDataPayload, {
-          headers: { 'Authorization': `Bearer ${TOKEN}` }
+          headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
         })
       }
 
@@ -155,7 +161,7 @@ export function ServicesSection() {
       isActive: service.isActive,
       order: service.order || 0
     })
-    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
     setImagePreview(service.image ? (service.image.startsWith("http") ? service.image : `${BACKEND}/images/${service.image}`) : null)
     setImageFile(null)
     setShowForm(true)
@@ -176,7 +182,7 @@ export function ServicesSection() {
     setEditingService(null)
   }
 
-  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
 
   return (
     <div className="space-y-8 pb-20">

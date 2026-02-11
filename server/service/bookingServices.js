@@ -3,7 +3,7 @@ const Booking = require("../model/Bookings")
 exports.getAllBookings = () => Booking.find({}).populate("flat");
 exports.getBookingsByFlat = (flatId) => Booking.find({ flat: flatId });
 
-const { sendOverlapNotification } = require("../util/mail")
+const { sendOverlapNotification, sendBookingConfirmation, sendAdminNotification, sendBookingInquiry, sendBookingRejection } = require("../util/mail")
 const Flat = require("../model/Flats") // Assuming there's a Flats model
 
 exports.addBooking = async (bookingData) => {
@@ -41,6 +41,31 @@ exports.addBooking = async (bookingData) => {
         }
 
         await Booking.create({ ...bookingData, status: "pending" });
+
+        // Fetch flat name for the emails
+        const flat = await Flat.findById(bookingData.flat);
+        const flatName = flat ? flat.flatName : "the apartment";
+
+        // Send notification to admin
+        await sendAdminNotification(
+            bookingData.userName,
+            bookingData.email,
+            bookingData.phone,
+            flatName,
+            new Date(bookingData.startDate).toLocaleDateString(),
+            new Date(bookingData.endDate).toLocaleDateString(),
+            bookingData.message || ""
+        );
+
+        // Send confirmation to user
+        await sendBookingInquiry(
+            bookingData.email,
+            bookingData.userName,
+            flatName,
+            new Date(bookingData.startDate).toLocaleDateString(),
+            new Date(bookingData.endDate).toLocaleDateString()
+        );
+
         return { success: true, message: "Booking inquiry sent successfully" };
     } catch (err) {
         console.error("Add Booking Error:", err.message);
@@ -104,6 +129,17 @@ exports.updateBookingStatus = async (_id, isVerified) => {
         );
 
         if (result.matchedCount === 1) {
+            if (isVerified) {
+                const flat = await Flat.findById(currentBooking.flat);
+                const flatName = flat ? flat.flatName : "the apartment";
+                await sendBookingConfirmation(
+                    currentBooking.email,
+                    currentBooking.userName,
+                    flatName,
+                    new Date(currentBooking.startDate).toLocaleDateString(),
+                    new Date(currentBooking.endDate).toLocaleDateString()
+                );
+            }
             return {
                 success: true,
                 message: isVerified ? "Booking confirmed" : "Booking moved to pending",
@@ -118,13 +154,29 @@ exports.updateBookingStatus = async (_id, isVerified) => {
     }
 };
 
-exports.deleteBooking = async (id) => {
+exports.rejectBooking = async (id) => {
     try {
-        const result = await Booking.findByIdAndDelete(id);
-        if (!result) return { success: false, message: "Booking not found" };
-        return { success: true, message: "Booking deleted successfully" };
+        const booking = await Booking.findById(id);
+        if (!booking) return { success: false, message: "Booking not found" };
+
+        await Booking.findByIdAndUpdate(id, { status: "rejected", isVerified: false });
+
+        // Fetch flat name for the email
+        const flat = await Flat.findById(booking.flat);
+        const flatName = flat ? flat.flatName : "the apartment";
+
+        // Send rejection email
+        await sendBookingRejection(
+            booking.email,
+            booking.userName,
+            flatName,
+            new Date(booking.startDate).toLocaleDateString(),
+            new Date(booking.endDate).toLocaleDateString()
+        );
+
+        return { success: true, message: "Booking rejected successfully" };
     } catch (err) {
-        console.error("Delete Booking Error:", err.message);
-        return { success: false, message: "Error while deleting booking" };
+        console.error("Reject Booking Error:", err.message);
+        return { success: false, message: "Error while rejecting booking" };
     }
 }
