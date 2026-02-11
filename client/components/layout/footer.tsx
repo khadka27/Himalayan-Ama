@@ -74,6 +74,7 @@ export function Footer() {
           <p>© 2025 Himalayan Ama. All rights reserved.</p>
           <div className="flex gap-8">
             <Link href="/policies" className="hover:text-white transition-colors">Safety Policies</Link>
+            <Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
             <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
