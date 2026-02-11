@@ -40,7 +40,7 @@ exports.addBooking = async (bookingData) => {
             };
         }
 
-        await Booking.create(bookingData);
+        await Booking.create({ ...bookingData, status: "pending" });
         return { success: true, message: "Booking inquiry sent successfully" };
     } catch (err) {
         console.error("Add Booking Error:", err.message);
@@ -50,12 +50,12 @@ exports.addBooking = async (bookingData) => {
 
 exports.updateBookingStatus = async (_id, isVerified) => {
     try {
-        if (isVerified) {
-            const currentBooking = await Booking.findById(_id);
-            if (!currentBooking) {
-                return { success: false, message: "Booking not found" };
-            }
+        const currentBooking = await Booking.findById(_id);
+        if (!currentBooking) {
+            return { success: false, message: "Booking not found" };
+        }
 
+        if (isVerified) {
             // Check for overlaps with other verified bookings for the same flat
             const overlapping = await Booking.findOne({
                 flat: currentBooking.flat,
@@ -70,23 +70,51 @@ exports.updateBookingStatus = async (_id, isVerified) => {
             });
 
             if (overlapping) {
-                return { success: false, message: "This booking conflicts with another already accepted booking for the same dates." };
+                // Update status to overlap
+                await Booking.updateOne(
+                    { _id },
+                    { $set: { status: "overlap", isVerified: false } }
+                );
+
+                // Fetch flat name for the email
+                const flat = await Flat.findById(currentBooking.flat);
+                const flatName = flat ? flat.flatName : "the apartment";
+
+                // Send notification email
+                await sendOverlapNotification(
+                    currentBooking.email,
+                    currentBooking.userName,
+                    flatName,
+                    new Date(currentBooking.startDate).toLocaleDateString(),
+                    new Date(currentBooking.endDate).toLocaleDateString()
+                );
+
+                return {
+                    success: true,
+                    message: "Booking dates overlap with an existing confirmed booking. Status changed to 'overlap' and user notified.",
+                    status: "overlap"
+                };
             }
         }
 
+        const newStatus = isVerified ? "confirmed" : "pending";
         const result = await Booking.updateOne(
             { _id },
-            { $set: { isVerified } }
+            { $set: { isVerified, status: newStatus } }
         );
 
-        if (result.modifiedCount === 1) {
-            return { success: true, message: isVerified ? "Booking confirmed" : "Booking unverified" }
+        if (result.matchedCount === 1) {
+            return {
+                success: true,
+                message: isVerified ? "Booking confirmed" : "Booking moved to pending",
+                status: newStatus
+            }
         } else {
             return { success: false, message: "Booking status not updated" }
         }
     } catch (err) {
         console.error("Update Booking Status Error:", err.message);
-        return { success: false, message: "Error while updating booking status" };
+        return { success: false, message: `Error while updating booking status: ${err.message}` };
     }
 };
 

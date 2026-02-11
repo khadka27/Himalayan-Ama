@@ -15,7 +15,7 @@ export default function Hero({ title, description, isReview, image }: { title?: 
       <div className="absolute inset-0 bg-blue-400/20" />
 
       <div className="relative container mx-auto flex h-full flex-col items-center justify-center px-6 text-center">
-        <h1 className="mb-4 md:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] drop-shadow-2xl tracking-tighter font-[family-name:var(--font-serif)]">
+        <h1 className="mb-4 md:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] drop-shadow-2xl tracking-tighter font-[family-name:var(--font-playful)]">
           <span className="text-white">{title}</span>
         </h1>
         <p className="max-w-2xl text-base md:text-lg lg:text-xl text-white font-medium drop-shadow-sm">

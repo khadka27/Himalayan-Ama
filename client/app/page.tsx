@@ -141,7 +141,7 @@ export default function HomePage() {
                 <span>Luxury Rental Collections</span>
               </motion.div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-serif)]">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-playful)]">
                 <span className="text-white">Experience</span>
                 <br />
                 <span className="text-blue-200">Pokhara</span>

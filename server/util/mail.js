@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
 
 exports.sendOverlapNotification = async (recipientEmail, userName, flatName, startDate, endDate) => {
     try {
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        if (!process.env.EMAIL || !process.env.EMAIL_PASSWORD) {
             console.log("Email credentials not found. Skipping email notification.");
             return;
         }
