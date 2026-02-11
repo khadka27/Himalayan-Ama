@@ -155,7 +155,7 @@ export function ServicesSection() {
       isActive: service.isActive,
       order: service.order || 0
     })
-    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
     setImagePreview(service.image ? (service.image.startsWith("http") ? service.image : `${BACKEND}/images/${service.image}`) : null)
     setImageFile(null)
     setShowForm(true)
@@ -176,7 +176,7 @@ export function ServicesSection() {
     setEditingService(null)
   }
 
-  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
 
   return (
     <div className="space-y-8 pb-20">

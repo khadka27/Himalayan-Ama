@@ -102,9 +102,9 @@ export default function ContactPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[
-                  { icon: MapPin, title: "Location", val: "Lakeside, Pokhara", color: "bg-blue-50 text-blue-500" },
-                  { icon: Phone, title: "Phone", val: "+977 9816685279", color: "bg-blue-50 text-blue-500" },
-                  { icon: Mail, title: "Email", val: "info@himalayanama.com", color: "bg-blue-50 text-blue-500" }
+                  { icon: MapPin, title: "Location", val: "Lakeside, Pokhara", color: "bg-blue-50 text-blue-500", link: null },
+                  { icon: Phone, title: "Phone", val: "+977 9816685279", color: "bg-blue-50 text-blue-500", link: "https://wa.me/9779816685279" },
+                  { icon: Mail, title: "Email", val: "info@himalayanama.com", color: "bg-blue-50 text-blue-500", link: "mailto:info@himalayanama.com" }
                 ].map((item, i) => (
                   <div key={i} className="flex flex-col gap-4">
                     <div className={`h-12 w-12 rounded-2xl ${item.color} flex items-center justify-center shadow-lg shadow-blue-50`}>
@@ -112,7 +112,18 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-bold text-gray-900 uppercase tracking-widest text-[10px] opacity-40 mb-1">{item.title}</p>
-                      <p className="font-bold text-gray-900">{item.val}</p>
+                      {item.link ? (
+                        <a
+                          href={item.link}
+                          target={item.link.startsWith('http') ? '_blank' : undefined}
+                          rel={item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="font-bold text-gray-900 hover:text-blue-500 transition-colors"
+                        >
+                          {item.val}
+                        </a>
+                      ) : (
+                        <p className="font-bold text-gray-900">{item.val}</p>
+                      )}
                     </div>
                   </div>
                 ))}

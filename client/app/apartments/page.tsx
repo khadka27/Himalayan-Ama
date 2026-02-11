@@ -56,7 +56,7 @@ export default function ApartmentsPage() {
     router.push(`/apartments/${flatId}`)
   }
 
-  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
 
   const renderFlats = () => {
     if (isLoadingFlats) {
@@ -114,11 +114,11 @@ export default function ApartmentsPage() {
                 <div className="absolute bottom-6 right-6 bg-blue-600 text-white px-5 py-2 rounded-xl text-base font-bold shadow-xl border border-white/20">
                   {activeOffer ? (
                     <div className="flex flex-col items-end leading-tight">
-                      <span className="text-[10px] line-through opacity-60 font-medium">${flat.price}</span>
-                      <span>${discountedPrice} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span></span>
+                      <span className="text-[10px] line-through opacity-60 font-medium">Rs. {flat.price}</span>
+                      <span>Rs. {discountedPrice} <span className="text-xs font-medium opacity-80 decoration-transparent">/day</span></span>
                     </div>
                   ) : (
-                    <span>${flat.price} <span className="text-xs font-medium opacity-80 decoration-transparent">/mo</span></span>
+                    <span>Rs. {flat.price} <span className="text-xs font-medium opacity-80 decoration-transparent">/day</span></span>
                   )}
                 </div>
               </div>

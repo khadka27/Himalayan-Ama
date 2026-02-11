@@ -80,7 +80,7 @@ export default function ServicesPage() {
         fetchAmenities()
     }, [])
 
-    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000"
+    const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000"
 
     return (
         <div className="min-h-screen bg-white">
@@ -103,9 +103,9 @@ export default function ServicesPage() {
                         <div className="space-y-32">
                             {amenities.map((item, index) => {
                                 const Icon = iconsMap[item.icon] || Sparkles
-                                const imageSrc = item._id
-                                    ? `${BACKEND}/images/${item.image}`
-                                    : item.image
+                                const imageSrc = item.image
+                                    ? (item.image.startsWith("http") ? item.image : `${BACKEND}/images/${item.image}`)
+                                    : "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"
 
                                 return (
                                     <motion.div
@@ -129,7 +129,7 @@ export default function ServicesPage() {
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {item.features.map((feature: string) => (
+                                                {item.features?.map((feature: string) => (
                                                     <div key={feature} className="flex items-center gap-3">
                                                         <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
                                                             <Check className="h-3.5 w-3.5" />

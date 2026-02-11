@@ -119,35 +119,41 @@ export default function BlobCursor({
         className="absolute inset-0 overflow-hidden select-none"
         style={{ filter: useFilter ? `url(#${filterId})` : undefined }}
       >
-        {Array.from({ length: trailCount }).map((_, i) => (
-          <div
-            key={i}
-            ref={(el) => {
-              blobsRef.current[i] = el;
-            }}
-            className="absolute will-change-transform -translate-x-1/2 -translate-y-1/2"
-            style={{
-              width: sizes[i],
-              height: sizes[i],
-              borderRadius: blobType === "circle" ? "50%" : "0",
-              backgroundColor: fillColor,
-              opacity: opacities[i],
-              boxShadow: `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor}`,
-            }}
-          >
+        {Array.from({ length: trailCount }).map((_, i) => {
+          const currentSize = sizes[i] ?? sizes[sizes.length - 1] ?? 40;
+          const currentInnerSize = innerSizes[i] ?? innerSizes[innerSizes.length - 1] ?? 12;
+          const currentOpacity = opacities[i] ?? opacities[opacities.length - 1] ?? 0.55;
+
+          return (
             <div
-              className="absolute"
-              style={{
-                width: innerSizes[i],
-                height: innerSizes[i],
-                top: (sizes[i] - innerSizes[i]) / 2,
-                left: (sizes[i] - innerSizes[i]) / 2,
-                backgroundColor: innerColor,
-                borderRadius: blobType === "circle" ? "50%" : "0",
+              key={i}
+              ref={(el) => {
+                blobsRef.current[i] = el;
               }}
-            />
-          </div>
-        ))}
+              className="absolute will-change-transform -translate-x-1/2 -translate-y-1/2"
+              style={{
+                width: currentSize,
+                height: currentSize,
+                borderRadius: blobType === "circle" ? "50%" : "0",
+                backgroundColor: fillColor,
+                opacity: currentOpacity,
+                boxShadow: `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor}`,
+              }}
+            >
+              <div
+                className="absolute"
+                style={{
+                  width: currentInnerSize,
+                  height: currentInnerSize,
+                  top: (currentSize - currentInnerSize) / 2,
+                  left: (currentSize - currentInnerSize) / 2,
+                  backgroundColor: innerColor,
+                  borderRadius: blobType === "circle" ? "50%" : "0",
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

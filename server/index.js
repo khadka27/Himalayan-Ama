@@ -7,7 +7,6 @@ const cookieParser = require("cookie-parser");
 const reviewRouter = require("./route/v1/reviewRoute.js");
 const blogRouter = require("./route/v1/blogRoute.js");
 const authRouter = require("./route/v1/authRoute.js");
-const authorRoute = require("./route/v1/authorRoute.js");
 const userRoute = require("./route/v1/userRoute.js");
 const statsRoute = require("./route/v1/statsRoute.js");
 const redirectRoute = require("./route/v1/redirectRoute.js");
@@ -17,6 +16,7 @@ const bookingRouter = require("./route/v1/bookingRoute.js");
 const bannerRouter = require("./route/v1/bannerRoute.js");
 const offerRouter = require("./route/v1/offerRoute.js");
 const inquiryRouter = require("./route/v1/inquiryRoute.js");
+const hostRouter = require("./route/v1/hostRoute.js");
 
 
 const PORT = process.env.PORT || 4000;
@@ -43,7 +43,6 @@ app.use("/images", express.static("images"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/review", reviewRouter);
 app.use("/api/v1/blog", blogRouter);
-app.use("/api/v1/author", authorRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/stats", statsRoute);
 app.use("/api/v1/flats", flatsRouter);
@@ -52,6 +51,7 @@ app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/banner", bannerRouter);
 app.use("/api/v1/offer", offerRouter);
 app.use("/api/v1/inquiry", inquiryRouter);
+app.use("/api/v1/host", hostRouter);
 app.use("/s", redirectRoute);
 
 

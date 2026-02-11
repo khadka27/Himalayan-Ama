@@ -257,11 +257,11 @@ export default function HomePage() {
                         <div className="absolute top-4 md:top-6 right-4 md:right-6 bg-white/95 backdrop-blur-md text-gray-900 px-4 md:px-5 py-1.5 md:py-2 rounded-xl text-sm md:text-base font-bold shadow-xl border border-white/50">
                           {activeOffer ? (
                             <div className="flex flex-col items-end leading-tight">
-                              <span className="text-[10px] line-through opacity-40 font-medium">${flat.price}</span>
-                              <span>${discountedPrice} <span className="text-xs font-medium text-gray-400">/mo</span></span>
+                              <span className="text-[10px] line-through opacity-40 font-medium">Rs. {flat.price}</span>
+                              <span>Rs. {discountedPrice} <span className="text-xs font-medium text-gray-400">/day</span></span>
                             </div>
                           ) : (
-                            <span>${flat.price} <span className="text-xs font-medium text-gray-500">/mo</span></span>
+                            <span>Rs. {flat.price} <span className="text-xs font-medium text-gray-500">/day</span></span>
                           )}
                         </div>
                       </div>
@@ -348,7 +348,7 @@ export default function HomePage() {
             >
               <div className="relative h-[400px] md:h-[600px] rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white group">
                 <Image
-                  src="https://images.unsplash.com/photo-1512918760532-3ed46b2b73b5?q=80&w=2000&auto=format&fit=crop"
+                  src="https://th.bing.com/th/id/R.9e139e0c7d53acb285ed8ef79f85c52d?rik=T25LCCDq2zHR4A&riu=http%3a%2f%2fmedia.architecturaldigest.com%2fphotos%2f571e97c5741fcddb16b559c9%2fmaster%2fpass%2fmodernist-decor-inspiration-01.jpg&ehk=pbdpec5%2fi5AFiSpBstLEsKwOxf%2bSMz8P8KieTkvPvP4%3d&risl=1&pid=ImgRaw&r=0"
                   alt="Modern Interior"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -440,7 +440,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-8 w-full max-w-sm">
-                    <div className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform">
+                    <a
+                      href="https://wa.me/9779816685279"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform decoration-transparent"
+                    >
                       <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
                         <Phone className="h-5 w-5" />
                       </div>
@@ -448,8 +453,11 @@ export default function HomePage() {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-blue-200">Call Us</p>
                         <p className="text-lg font-bold">+977 9816685279</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform">
+                    </a>
+                    <a
+                      href="mailto:info@himalayanama.com"
+                      className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform decoration-transparent"
+                    >
                       <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
                         <Mail className="h-5 w-5" />
                       </div>
@@ -457,7 +465,7 @@ export default function HomePage() {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-blue-200">Email Us</p>
                         <p className="text-lg font-bold">info@himalayanama.com</p>
                       </div>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </div>

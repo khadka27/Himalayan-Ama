@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, MapPin, DollarSign, Home, Share2, Sparkles, ShieldCheck } from "lucide-react"
+import { ArrowLeft, MapPin, Banknote, Home, Share2, Sparkles, ShieldCheck } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { ApartmentBookingModal } from "@/components/apartment-booking-modal"
@@ -178,17 +178,17 @@ export default function ApartmentDetailPage() {
               <Card className="p-10 bg-white border-none shadow-2xl rounded-3xl border border-gray-50">
                 <div className="flex items-center justify-between mb-8">
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Monthly Rate</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Daily Rate</span>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl lg:text-4xl font-black text-gray-900">${discountedPrice}</span>
+                      <span className="text-3xl lg:text-4xl font-black text-gray-900">Rs. {discountedPrice}</span>
                       {activeOffer && (
-                        <span className="text-sm font-bold text-gray-400 line-through">${flat.price}</span>
+                        <span className="text-sm font-bold text-gray-400 line-through">Rs. {flat.price}</span>
                       )}
-                      <span className="text-sm font-bold text-gray-400">/ USD</span>
+                      <span className="text-sm font-bold text-gray-400">/ Day</span>
                     </div>
                   </div>
                   <div className="h-14 w-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                    <DollarSign className="h-7 w-7" />
+                    <Banknote className="h-7 w-7" />
                   </div>
                 </div>
 

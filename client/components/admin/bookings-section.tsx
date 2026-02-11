@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CheckCircle, Clock, Mail, Users, Calendar, DollarSign, Trash2 } from "lucide-react"
+import { CheckCircle, Clock, Mail, Users, Calendar, Banknote, Trash2 } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import Swal from "sweetalert2"
 import Loading from "../loading"
@@ -125,11 +125,9 @@ export function Bookings() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'NPR',
+    return `Rs. ${new Intl.NumberFormat('en-IN', {
       minimumFractionDigits: 0
-    }).format(amount)
+    }).format(amount)}`
   }
 
   const calculateDuration = (start: string, end: string) => {
@@ -146,10 +144,12 @@ export function Bookings() {
 
   const pendingCount = bookings.filter(b => !b.isVerified).length
   const confirmedCount = bookings.filter(b => b.isVerified).length
-  const totalRevenue = bookings.reduce((acc, b) => {
-    const days = calculateDuration(b.startDate, b.endDate)
-    return acc + (b.flat?.price || 0) * days
-  }, 0)
+  const totalRevenue = bookings
+    .filter(b => b.isVerified)
+    .reduce((acc, b) => {
+      const days = calculateDuration(b.startDate, b.endDate)
+      return acc + (b.flat?.price || 0) * days
+    }, 0)
 
   return (
     <div className="space-y-8">
@@ -183,7 +183,7 @@ export function Bookings() {
           <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Est. Revenue</p>
           <div className="flex items-end gap-2">
             <p className="text-2xl font-bold text-slate-900">{formatCurrency(totalRevenue)}</p>
-            <DollarSign size={16} className="text-blue-300 mb-2" />
+            <Banknote size={16} className="text-blue-300 mb-2" />
           </div>
         </div>
       </div>
@@ -266,13 +266,15 @@ export function Bookings() {
                           <CheckCircle size={18} />
                         </button>
                       )}
-                      <button
-                        onClick={() => handleDelete(booking._id)}
-                        className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all p-2.5 rounded-xl border border-red-100"
-                        title="Delete inquiry"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {!booking.isVerified && (
+                        <button
+                          onClick={() => handleDelete(booking._id)}
+                          className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all p-2.5 rounded-xl border border-red-100"
+                          title="Delete inquiry"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

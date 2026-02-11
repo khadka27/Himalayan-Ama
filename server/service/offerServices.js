@@ -1,4 +1,4 @@
-const ServiceOffer = require("../model/ServiceOffer");
+const ServiceOffer = require("../model/ServiceOffers");
 
 exports.getAllOffers = async () => {
     try {

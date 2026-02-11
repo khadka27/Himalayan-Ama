@@ -4,14 +4,6 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from "
 import { usePathname } from "next/navigation"
 import axiosInstance from "@/services/axios-instance"
 
-interface ClassScheduleItem {
-  day: string
-  time: string
-  duration?: number
-}
-
-type ClassScheduleInput = string | string[] | ClassScheduleItem | ClassScheduleItem[]
-
 export interface Flat {
   _id: string
   flatName: string
@@ -33,20 +25,15 @@ export interface Offer {
   isActive: boolean
 }
 
-export interface Instructor {
-  id: number | string
-  name: string
-  role?: string
+export interface Host {
+  _id: string
+  hostName: string
+  imageUri: string
   profession?: string
-  experience: number | string
-  bio: string
-  specialities?: string
-  specialties?: string[]
-  certifications?: string[]
-  image: string
-  image_url?: string
-  created_at?: string
-  updated_at?: string
+  bio?: string
+  isActive: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 interface Review {
@@ -62,16 +49,16 @@ interface Review {
 interface AppContextType {
   flats: Flat[]
   offers: Offer[]
-  instructors: Instructor[]
+  hosts: Host[]
   reviews: Review[]
   isLoadingFlats: boolean
   isLoadingOffers: boolean
-  isLoadingInstructors: boolean
+  isLoadingHosts: boolean
   isLoadingReviews: boolean
   isInitialLoading: boolean
   refetchFlats: () => Promise<void>
   refetchOffers: () => Promise<void>
-  refetchInstructors: () => Promise<void>
+  refetchHosts: () => Promise<void>
   refetchReviews: () => Promise<void>
 }
 
@@ -81,11 +68,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [flats, setFlats] = useState<Flat[]>([])
   const [offers, setOffers] = useState<Offer[]>([])
-  const [instructors, setInstructors] = useState<Instructor[]>([])
+  const [hosts, setHosts] = useState<Host[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
   const [isLoadingFlats, setIsLoadingFlats] = useState(true)
   const [isLoadingOffers, setIsLoadingOffers] = useState(true)
-  const [isLoadingInstructors, setIsLoadingInstructors] = useState(true)
+  const [isLoadingHosts, setIsLoadingHosts] = useState(true)
   const [isLoadingReviews, setIsLoadingReviews] = useState(true)
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
@@ -117,17 +104,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const fetchInstructors = async () => {
+  const fetchHosts = async () => {
     try {
-      setIsLoadingInstructors(true)
-      const { data } = await axiosInstance.get("/api/instructors")
-      if (data?.status && data?.data) {
-        setInstructors(data.data)
+      setIsLoadingHosts(true)
+      const { data } = await axiosInstance.get("/api/v1/host/getActiveHosts")
+      if (data?.success && data?.hosts) {
+        setHosts(data.hosts)
       }
     } catch (err) {
-      console.error("Error fetching instructors:", err)
+      console.error("Error fetching hosts:", err)
     } finally {
-      setIsLoadingInstructors(false)
+      setIsLoadingHosts(false)
     }
   }
 
@@ -151,12 +138,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (pathname?.startsWith("/admin")) {
         setIsInitialLoading(false)
         setIsLoadingFlats(false)
-        setIsLoadingInstructors(false)
+        setIsLoadingHosts(false)
         setIsLoadingReviews(false)
         return
       }
 
-      await Promise.all([fetchFlats(), fetchOffers(), fetchInstructors(), fetchReviews()])
+      await Promise.all([fetchFlats(), fetchOffers(), fetchHosts(), fetchReviews()])
       setIsInitialLoading(false)
     }
 
@@ -166,16 +153,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const value: AppContextType = {
     flats,
     offers,
-    instructors,
+    hosts,
     reviews,
     isLoadingFlats,
     isLoadingOffers,
-    isLoadingInstructors,
+    isLoadingHosts,
     isLoadingReviews,
     isInitialLoading,
     refetchFlats: fetchFlats,
     refetchOffers: fetchOffers,
-    refetchInstructors: fetchInstructors,
+    refetchHosts: fetchHosts,
     refetchReviews: fetchReviews,
   }
 

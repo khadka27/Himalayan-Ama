@@ -1,10 +1,10 @@
 const Review = require("../model/Reviews");
 const User = require("../model/Users");
-const Author = require("../model/Authors");
 const Blog = require("../model/Blogs");
 const Service = require("../model/Services");
 const Booking = require("../model/Bookings");
 const Flat = require("../model/Flats");
+const Host = require("../model/Hosts");
 
 const getStats = async (req, res) => {
     try {
@@ -17,6 +17,7 @@ const getStats = async (req, res) => {
         const totalServices = await Service.countDocuments();
         const totalBookings = await Booking.countDocuments();
         const totalUsers = await User.countDocuments();
+        const totalHosts = await Host.countDocuments();
 
         // Inquiries - Placeholder until Inquiry model exists
         const totalInquiries = 0;
@@ -54,7 +55,8 @@ const getStats = async (req, res) => {
                 // Keep original fields for backward compatibility if needed
                 totalReviews,
                 activeReviews,
-                totalUsers
+                totalUsers,
+                total_hosts: totalHosts
             }
         });
     } catch (error) {

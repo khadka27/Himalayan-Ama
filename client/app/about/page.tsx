@@ -9,7 +9,9 @@ import Hero from "@/components/hero"
 import { useApp } from "@/context/AppContext"
 
 export default function AboutPage() {
-  const { instructors, isLoadingInstructors } = useApp()
+  const { hosts, isLoadingHosts } = useApp()
+  const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -88,7 +90,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-2 max-w-5xl mx-auto">
-            {isLoadingInstructors ? (
+            {isLoadingHosts ? (
               [1, 2].map((i) => (
                 <Card key={i} className="overflow-hidden animate-pulse rounded-3xl border-none shadow-xl">
                   <div className="bg-gray-200 h-96 w-full" />
@@ -99,13 +101,13 @@ export default function AboutPage() {
                   </div>
                 </Card>
               ))
-            ) : instructors.length > 0 ? (
-              instructors.map((instructor) => (
-                <Card key={instructor.id} className="overflow-hidden hover:shadow-2xl transition-all duration-500 rounded-[40px] border-none shadow-xl bg-white group">
+            ) : hosts.length > 0 ? (
+              hosts.map((host) => (
+                <Card key={host._id} className="overflow-hidden hover:shadow-2xl transition-all duration-500 rounded-[40px] border-none shadow-xl bg-white group">
                   <div className="relative h-[450px] overflow-hidden">
                     <Image
-                      src={instructor.image_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop"}
-                      alt={instructor.name}
+                      src={host.imageUri ? (host.imageUri.startsWith("http") ? host.imageUri : `${BACKEND}/images/${host.imageUri}`) : "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop"}
+                      alt={host.hostName}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                       sizes="(max-width: 768px) 100vw, 50vw"
@@ -114,12 +116,12 @@ export default function AboutPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   </div>
                   <div className="p-10">
-                    <h3 className="mb-2 text-3xl font-bold text-gray-900 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{instructor.name}</h3>
+                    <h3 className="mb-2 text-3xl font-bold text-gray-900 group-hover:text-blue-500 transition-colors uppercase tracking-tight">{host.hostName}</h3>
                     <p className="mb-6 text-sm font-bold uppercase tracking-widest text-blue-500">
-                      {instructor.profession || "Chief Host & Concierge"}
+                      {host.profession || "Chief Host & Concierge"}
                     </p>
                     <p className="text-lg leading-relaxed text-gray-600 font-medium italic">
-                      "{instructor.bio}"
+                      {host.bio ? `"${host.bio}"` : "Welcome to Himalayan Ama!"}
                     </p>
                   </div>
                 </Card>
