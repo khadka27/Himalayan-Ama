@@ -159,12 +159,9 @@ export function ReviewsSection() {
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : "0.0"
 
-  if (isLoading && reviews.length === 0) {
-    return <Loading color="rgba(0, 0, 0, 0.3)" />
-  }
-
   return (
     <div className="space-y-8">
+      {isLoading && <Loading color="rgba(0, 0, 0, 0.3)" />}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">

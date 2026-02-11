@@ -25,7 +25,6 @@ export function HostsSection() {
     const [isLoading, setIsLoading] = useState(false)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [imageFile, setImageFile] = useState<File | null>(null)
-    const [isSyncing, setIsSyncing] = useState(false)
     const TOKEN = Cookies.get("auth_token")
 
     const [formData, setFormData] = useState({
@@ -74,7 +73,7 @@ export function HostsSection() {
         }
 
         try {
-            setIsSyncing(true)
+            setIsLoading(true)
             const payload = new FormData()
             payload.append("hostName", formData.hostName)
             payload.append("profession", formData.profession)
@@ -115,7 +114,7 @@ export function HostsSection() {
             console.error(err)
             toast.error(err.response?.data?.message || "Something went wrong")
         } finally {
-            setIsSyncing(false)
+            setIsLoading(false)
         }
     }
 
@@ -293,10 +292,10 @@ export function HostsSection() {
                             <div className="flex gap-4 pt-4">
                                 <button
                                     type="submit"
-                                    disabled={isSyncing}
+                                    disabled={isLoading}
                                     className="flex-1 bg-slate-900 hover:bg-black text-white font-bold h-14 rounded-2xl shadow-xl shadow-slate-100 transition-all active:scale-95 disabled:opacity-50"
                                 >
-                                    {isSyncing ? "Saving Changes..." : editingHost ? "Update Profile" : "Create Host Profile"}
+                                    {isLoading ? "Saving Changes..." : editingHost ? "Update Profile" : "Create Host Profile"}
                                 </button>
                                 <button
                                     type="button"

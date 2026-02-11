@@ -138,9 +138,10 @@ export function Bookings() {
     return diffDays || 1
   }
 
-  if (isLoading && bookings.length === 0) {
-    return <Loading color="rgba(0, 0, 0, 0.3)" />
-  }
+
+
+
+
 
   const pendingCount = bookings.filter(b => !b.isVerified).length
   const confirmedCount = bookings.filter(b => b.isVerified).length
@@ -153,6 +154,7 @@ export function Bookings() {
 
   return (
     <div className="space-y-8">
+      {isLoading && <Loading color="rgba(0, 0, 0, 0.3)" />}
       {/* Stats Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">

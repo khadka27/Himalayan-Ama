@@ -162,6 +162,7 @@ export function ApartmentsSection() {
 
     const handleToggleActive = async (flatId: string, currentStatus: boolean) => {
         try {
+            setIsLoading(true)
             const { data } = await axiosInstance.put(`/api/v1/flats/status/${flatId}`, {
                 status: !currentStatus
             }, {
@@ -174,6 +175,8 @@ export function ApartmentsSection() {
             }
         } catch (err) {
             toast.error("Failed to toggle status")
+        } finally {
+            setIsLoading(false)
         }
     }
 

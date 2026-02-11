@@ -141,6 +141,13 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
 
             if (data.status || data.success) {
                 toast.success("Booking inquiry sent successfully!")
+
+                // WhatsApp Redirection
+                const phoneNumber = "9779816685279";
+                const message = `Namaste! I just submitted a booking inquiry for *${flat.flatName}*.%0A%0ADates: ${format(dateRange.from, "PPP")} - ${format(dateRange.to, "PPP")}%0AGuests: ${formData.guests}%0AName: ${formData.name}%0A%0APlease confirm my stay. Thank you!`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+
                 onOpenChange(false)
                 setFormData({
                     name: "",
