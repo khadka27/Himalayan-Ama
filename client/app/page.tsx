@@ -348,7 +348,7 @@ export default function HomePage() {
             >
               <div className="relative h-[400px] md:h-[600px] rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white group">
                 <Image
-                  src="https://th.bing.com/th/id/R.9e139e0c7d53acb285ed8ef79f85c52d?rik=T25LCCDq2zHR4A&riu=http%3a%2f%2fmedia.architecturaldigest.com%2fphotos%2f571e97c5741fcddb16b559c9%2fmaster%2fpass%2fmodernist-decor-inspiration-01.jpg&ehk=pbdpec5%2fi5AFiSpBstLEsKwOxf%2bSMz8P8KieTkvPvP4%3d&risl=1&pid=ImgRaw&r=0"
+                  src="https://th.bing.com/th/id/R.eca02af78c024b183a27d12d22af0979?rik=AC5jizk3yXq9Cg&pid=ImgRaw&r=0"
                   alt="Modern Interior"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"

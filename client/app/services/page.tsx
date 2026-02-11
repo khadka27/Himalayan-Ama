@@ -17,13 +17,23 @@ import {
     Sparkles,
     Check,
     Coffee,
-    Loader2
+    Loader2,
+    Layout,
+    List,
+    Layers,
+    Activity,
+    Cloud,
+    Sun,
+    Moon,
+    Zap,
+    Heart
 } from "lucide-react"
 import Image from "next/image"
 import axiosInstance from "@/services/axios-instance"
 
 const iconsMap: any = {
-    Wifi, Utensils, ParkingCircle, Waves, Flame, Refrigerator, ChefHat, Sparkles
+    Wifi, Utensils, ParkingCircle, Waves, Flame, Refrigerator, ChefHat, Sparkles,
+    Layout, List, Layers, Activity, Cloud, Sun, Moon, Zap, Heart
 }
 
 const fallbackAmenities = [
@@ -109,7 +119,7 @@ export default function ServicesPage() {
 
                                 return (
                                     <motion.div
-                                        key={item.title}
+                                        key={item._id || index}
                                         className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-16 items-center`}
                                         initial={{ opacity: 0, y: 50 }}
                                         whileInView={{ opacity: 1, y: 0 }}
@@ -129,8 +139,8 @@ export default function ServicesPage() {
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {item.features?.map((feature: string) => (
-                                                    <div key={feature} className="flex items-center gap-3">
+                                                {item.features?.map((feature: string, idx: number) => (
+                                                    <div key={`${feature}-${idx}`} className="flex items-center gap-3">
                                                         <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
                                                             <Check className="h-3.5 w-3.5" />
                                                         </div>
@@ -151,9 +161,8 @@ export default function ServicesPage() {
                                                 <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
                                             </div>
                                             <div className={`absolute -bottom-6 ${index % 2 === 0 ? '-right-6' : '-left-6'} h-32 w-32 bg-white rounded-[40px] shadow-2xl hidden md:flex items-center justify-center border border-blue-50`}>
-                                                <div className="text-center">
-                                                    <Sparkles className="h-10 w-10 text-blue-500 mx-auto mb-1" />
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Elite</span>
+                                                <div className="text-center flex flex-col items-center justify-center h-full w-full">
+                                                    <Icon className="h-10 w-10 text-blue-500 mb-1" />
                                                 </div>
                                             </div>
                                         </div>

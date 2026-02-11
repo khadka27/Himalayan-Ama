@@ -97,11 +97,17 @@ export function ServicesSection() {
       let response;
       if (editingService) {
         response = await axiosInstance.put(`/api/v1/services/update/${editingService._id}`, formDataPayload, {
-          headers: { 'Authorization': `Bearer ${TOKEN}` }
+          headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
         })
       } else {
         response = await axiosInstance.post("/api/v1/services/create", formDataPayload, {
-          headers: { 'Authorization': `Bearer ${TOKEN}` }
+          headers: {
+            'Authorization': `Bearer ${TOKEN}`,
+            'Content-Type': 'multipart/form-data'
+          }
         })
       }
 

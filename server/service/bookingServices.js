@@ -3,7 +3,7 @@ const Booking = require("../model/Bookings")
 exports.getAllBookings = () => Booking.find({}).populate("flat");
 exports.getBookingsByFlat = (flatId) => Booking.find({ flat: flatId });
 
-const { sendOverlapNotification } = require("../util/mail")
+const { sendOverlapNotification, sendBookingConfirmation } = require("../util/mail")
 const Flat = require("../model/Flats") // Assuming there's a Flats model
 
 exports.addBooking = async (bookingData) => {
@@ -104,6 +104,17 @@ exports.updateBookingStatus = async (_id, isVerified) => {
         );
 
         if (result.matchedCount === 1) {
+            if (isVerified) {
+                const flat = await Flat.findById(currentBooking.flat);
+                const flatName = flat ? flat.flatName : "the apartment";
+                await sendBookingConfirmation(
+                    currentBooking.email,
+                    currentBooking.userName,
+                    flatName,
+                    new Date(currentBooking.startDate).toLocaleDateString(),
+                    new Date(currentBooking.endDate).toLocaleDateString()
+                );
+            }
             return {
                 success: true,
                 message: isVerified ? "Booking confirmed" : "Booking moved to pending",
