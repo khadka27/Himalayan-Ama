@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit2, Plus, X, Trash2, Home, MapPin, DollarSign, Image as ImageIcon, CheckCircle2, AlertCircle } from "lucide-react"
+import { Edit2, Plus, X, Trash2, Home, MapPin, DollarSign, Image as ImageIcon, CheckCircle2, AlertCircle, Eye, EyeOff, BarChart3 } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Loading from "@/components/loading"
 import Cookies from "js-cookie"
 import Image from "next/image"
 import Swal from "sweetalert2"
+import { ApartmentDetailsModal } from "./apartment-details-modal"
 
 interface Flat {
     _id: string
@@ -27,6 +28,7 @@ export function ApartmentsSection() {
     const [isLoading, setIsLoading] = useState(false)
     const [imagePreviews, setImagePreviews] = useState<string[]>([])
     const [imageFiles, setImageFiles] = useState<File[]>([])
+    const [viewingDetailsFlat, setViewingDetailsFlat] = useState<Flat | null>(null)
     const TOKEN = Cookies.get("auth_token")
 
     const [formData, setFormData] = useState({
@@ -428,11 +430,11 @@ export function ApartmentsSection() {
                                     <td className="px-10 py-6">
                                         {flat.isActive ? (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
-                                                <CheckCircle2 size={10} /> Active
+                                                <Eye size={10} /> Active
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
-                                                <AlertCircle size={10} /> Hidden
+                                                <EyeOff size={10} /> Hidden
                                             </span>
                                         )}
                                     </td>
@@ -440,10 +442,17 @@ export function ApartmentsSection() {
                                         <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
                                             <button
                                                 onClick={() => handleToggleActive(flat._id, flat.isActive)}
-                                                className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all shadow-sm bg-white ${flat.isActive ? 'hover:bg-slate-900 hover:text-white border-slate-100 text-slate-400' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
+                                                className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all shadow-sm bg-white ${flat.isActive ? 'hover:bg-red-500 hover:text-white border-slate-100 text-slate-400' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
                                                 title={flat.isActive ? "Hide Property" : "Show Property"}
                                             >
-                                                {flat.isActive ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
+                                                {flat.isActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                            <button
+                                                onClick={() => setViewingDetailsFlat(flat)}
+                                                className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm bg-white"
+                                                title="View Detailed Analytics"
+                                            >
+                                                <BarChart3 size={18} />
                                             </button>
                                             <button
                                                 onClick={() => handleEditFlat(flat)}
@@ -474,6 +483,11 @@ export function ApartmentsSection() {
                     )}
                 </div>
             </div>
+            <ApartmentDetailsModal
+                open={!!viewingDetailsFlat}
+                onOpenChange={(open) => !open && setViewingDetailsFlat(null)}
+                flat={viewingDetailsFlat}
+            />
         </div>
     )
 }

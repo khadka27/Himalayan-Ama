@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit2, Plus, X, Trash2, Sparkles, Layout, List, Heart, Layers, CheckCircle2, Activity, Cloud, Sun, Moon, Zap } from "lucide-react"
+import { Edit2, Plus, X, Trash2, Sparkles, Layout, List, Heart, Layers, CheckCircle2, Activity, Cloud, Sun, Moon, Zap, Eye, EyeOff } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Loading from "@/components/loading"
@@ -146,6 +146,26 @@ export function ServicesSection() {
       }
     } catch (err) {
       toast.error("Failed to delete service")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      setIsLoading(true)
+      const { data } = await axiosInstance.put(`/api/v1/services/status/${id}`, {
+        status: !currentStatus
+      }, {
+        headers: { 'Authorization': `Bearer ${TOKEN}` }
+      })
+
+      if (data.success) {
+        setServices(prev => prev.map(s => s._id === id ? { ...s, isActive: !currentStatus } : s))
+        toast.success(`Service ${!currentStatus ? "activated" : "deactivated"}`)
+      }
+    } catch (err) {
+      toast.error("Failed to update status")
     } finally {
       setIsLoading(false)
     }
@@ -388,13 +408,24 @@ export function ServicesSection() {
                   </td>
                   <td className="px-10 py-6">
                     {service.isActive ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">Active</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
+                        <Eye size={10} /> Active
+                      </span>
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">Disabled</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
+                        <EyeOff size={10} /> Disabled
+                      </span>
                     )}
                   </td>
                   <td className="px-10 py-6 text-right">
                     <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                      <button
+                        onClick={() => handleToggleStatus(service._id, service.isActive)}
+                        className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all shadow-sm bg-white ${service.isActive ? 'hover:bg-red-500 hover:text-white border-slate-100 text-slate-400' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
+                        title={service.isActive ? "Hide Service" : "Show Service"}
+                      >
+                        {service.isActive ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                       <button
                         onClick={() => handleEdit(service)}
                         className="h-10 w-10 flex items-center justify-center rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm bg-white"
