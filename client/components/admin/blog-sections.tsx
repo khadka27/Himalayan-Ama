@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { Trash2, Edit2, Plus, X, GripVertical, FileText, CheckCircle, Clock, Layout, User, Tag, Calendar } from "lucide-react"
+import { Trash2, Edit2, Plus, X, GripVertical, FileText, CheckCircle, Clock, Layout, User, Tag, Calendar, Eye, EyeOff } from "lucide-react"
 import { toast } from "sonner"
 import axiosInstance from "@/services/axios-instance"
 import Loading from "../loading"
@@ -575,12 +575,12 @@ export function Blogs() {
                   </td>
                   <td className="px-10 py-6">
                     {blog.isActive ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
-                        Published
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest">
+                        <Eye size={10} /> Published
                       </span>
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
-                        Archived
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-400 border border-slate-100 uppercase tracking-widest">
+                        <EyeOff size={10} /> Archived
                       </span>
                     )}
                   </td>
@@ -588,10 +588,10 @@ export function Blogs() {
                     <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
                       <button
                         onClick={() => handleToggleActive(blog._id)}
-                        className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all bg-white shadow-sm ${blog.isActive ? 'hover:bg-slate-900 hover:text-white border-slate-100 text-slate-300' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
-                        title={blog.isActive ? "Archived Story" : "Publish Story"}
+                        className={`h-10 w-10 flex items-center justify-center rounded-xl border transition-all bg-white shadow-sm ${blog.isActive ? 'hover:bg-red-500 hover:text-white border-slate-100 text-slate-300' : 'hover:bg-emerald-500 hover:text-white border-emerald-50 text-emerald-500'}`}
+                        title={blog.isActive ? "Archive Story" : "Publish Story"}
                       >
-                        {blog.isActive ? <Clock size={16} /> : <CheckCircle size={16} />}
+                        {blog.isActive ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                       <button
                         onClick={() => handleEditBlog(blog)}

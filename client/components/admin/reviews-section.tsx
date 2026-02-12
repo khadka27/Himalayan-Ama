@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Star, Trash2, CheckCircle, MessageSquare } from "lucide-react"
+import { Star, Trash2, CheckCircle, MessageSquare, Eye, EyeOff, Clock } from "lucide-react"
 import { toast } from "sonner"
 import axiosInstance from "@/services/axios-instance"
 import Cookies from "js-cookie"
@@ -142,12 +142,12 @@ export function ReviewsSection() {
 
   const getStatusBadge = (isPublished: boolean) => {
     return isPublished ? (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">
-        Approved
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">
+        <Eye size={10} /> Approved
       </span>
     ) : (
-      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">
-        Pending
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">
+        <EyeOff size={10} /> Pending
       </span>
     )
   }
@@ -262,9 +262,9 @@ export function ReviewsSection() {
                           <button
                             onClick={() => handleApprove(review._id)}
                             className="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all p-2.5 rounded-xl border border-emerald-100"
-                            title="Approve Review"
+                            title="Publish Review"
                           >
-                            <CheckCircle size={18} />
+                            <Eye size={18} />
                           </button>
                         )}
                         <button

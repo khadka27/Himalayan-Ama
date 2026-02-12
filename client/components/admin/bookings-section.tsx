@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CheckCircle, Clock, Mail, Users, Calendar, Banknote, Trash2 } from "lucide-react"
+import { CheckCircle, Clock, Mail, Users, Calendar, Banknote, Trash2, XCircle } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import Swal from "sweetalert2"
 import Loading from "../loading"
@@ -85,13 +85,13 @@ export function Bookings() {
     }
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDeny = async (id: string, userName: string) => {
     const result = await Swal.fire({
-      title: "Delete this booking?",
-      text: "This action cannot be undone.",
+      title: "Deny Booking?",
+      text: `Are you sure you want to deny ${userName}'s booking request? An email notification will be sent.`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Delete",
+      confirmButtonText: "Yes, Deny it",
       confirmButtonColor: "#EF4444",
       cancelButtonColor: "#64748b"
     });
@@ -105,12 +105,12 @@ export function Bookings() {
       })
 
       if (data.success) {
-        toast.success("Booking deleted")
-        setBookings(bookings.filter((b) => b._id !== id))
+        toast.success("Booking request denied and user notified")
+        setBookings(bookings.map((b) => b._id === id ? { ...b, status: "rejected", isVerified: false } : b))
       }
     } catch (error) {
-      console.error("Error deleting booking:", error)
-      toast.error("Failed to delete booking")
+      console.error("Error denying booking:", error)
+      toast.error("Failed to deny booking")
     } finally {
       setIsLoading(false)
     }
@@ -250,11 +250,21 @@ export function Bookings() {
                   </td>
                   <td className="px-8 py-6 whitespace-nowrap">
                     {booking.status === "overlap" ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-700 border-red-100 uppercase tracking-wider">Overlap</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-red-50 text-red-700 border-red-100 uppercase tracking-wider">
+                        <XCircle size={10} /> Overlap
+                      </span>
+                    ) : booking.status === "rejected" ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-slate-100 text-slate-500 border-slate-200 uppercase tracking-wider">
+                        <XCircle size={10} /> Denied
+                      </span>
                     ) : booking.isVerified ? (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">Confirmed</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-emerald-50 text-emerald-700 border-emerald-100 uppercase tracking-wider">
+                        <CheckCircle size={10} /> Confirmed
+                      </span>
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">Pending</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border bg-amber-50 text-amber-700 border-amber-100 uppercase tracking-wider">
+                        <Clock size={10} /> Pending
+                      </span>
                     )}
                   </td>
                   <td className="px-8 py-6 whitespace-nowrap text-right">
@@ -268,13 +278,13 @@ export function Bookings() {
                           <CheckCircle size={18} />
                         </button>
                       )}
-                      {!booking.isVerified && (
+                      {!booking.isVerified && booking.status !== "rejected" && (
                         <button
-                          onClick={() => handleDelete(booking._id)}
+                          onClick={() => handleDeny(booking._id, booking.userName)}
                           className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all p-2.5 rounded-xl border border-red-100"
-                          title="Delete inquiry"
+                          title="Deny request"
                         >
-                          <Trash2 size={18} />
+                          <XCircle size={18} />
                         </button>
                       )}
                     </div>
