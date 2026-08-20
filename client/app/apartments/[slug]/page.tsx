@@ -1,6 +1,8 @@
 import { Metadata, ResolvingMetadata } from 'next'
 import ApartmentDetailClient from './apartment-detail-client'
 import axiosInstance from '@/services/axios-instance'
+import JsonLd from '@/components/seo/json-ld'
+import { getApartmentSchema, getBreadcrumbSchema } from '@/lib/seo'
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -27,8 +29,11 @@ export async function generateMetadata(
             return {
                 title: `${flat.flatName} | Luxury Apartment in Pokhara`,
                 description: flat.description || `Experience luxury living at ${flat.flatName} in ${flat.location}. Book your premium stay with Himalayan Ama.`,
+                alternates: {
+                    canonical: `https://himalayanama.com/apartments/${slug}`,
+                },
                 openGraph: {
-                    title: flat.flatName,
+                    title: `${flat.flatName} | Luxury Apartment in Pokhara`,
                     description: flat.description,
                     url: `https://himalayanama.com/apartments/${slug}`,
                     siteName: 'Himalayan Ama',
@@ -53,5 +58,30 @@ export async function generateMetadata(
 }
 
 export default async function Page({ params }: Props) {
-    return <ApartmentDetailClient />
+    const slug = (await params).slug
+    let flat = null
+
+    try {
+        const { data } = await axiosInstance.get(`/api/v1/flats/${slug}`)
+        if (data.success && data.flat) {
+            flat = data.flat
+        }
+    } catch (error) {
+        console.error('Error fetching apartment for JSON-LD:', error)
+    }
+
+    const apartmentSchema = flat ? getApartmentSchema(flat) : null
+    const breadcrumbSchema = getBreadcrumbSchema([
+        { name: "Home", item: "/" },
+        { name: "Apartments", item: "/apartments" },
+        { name: flat?.flatName || "Apartment Detail", item: `/apartments/${slug}` }
+    ])
+
+    return (
+        <>
+            {apartmentSchema && <JsonLd data={apartmentSchema} />}
+            <JsonLd data={breadcrumbSchema} />
+            <ApartmentDetailClient />
+        </>
+    )
 }

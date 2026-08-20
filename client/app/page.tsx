@@ -1,5 +1,7 @@
 import { Metadata } from 'next'
 import HomePage from './home-client'
+import JsonLd from '@/components/seo/json-ld'
+import { getLodgingBusinessSchema, getWebsiteSchema, getOrganizationSchema } from '@/lib/seo'
 
 export const metadata: Metadata = {
     title: "Himalayan Ama | Luxury Apartment Rentals in Pokhara",
@@ -7,33 +9,28 @@ export const metadata: Metadata = {
     alternates: {
         canonical: "https://himalayanama.com",
     },
+    openGraph: {
+        title: "Himalayan Ama | Luxury Apartment Rentals in Pokhara",
+        description: "Experience premium living at Himalayan Ama. We offer luxury apartment rentals in the heart of Pokhara Waterfall.",
+        url: "https://himalayanama.com",
+        siteName: "Himalayan Ama",
+        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Ama Pokhara" }],
+        type: "website"
+    }
 }
 
 export default function Page() {
-    const jsonLd = {
-        "@context": "https://schema.org",
-        "@type": "LodgingBusiness",
-        "name": "Himalayan Ama",
-        "description": "Luxury apartment rentals in the heart of Pokhara Waterfall, Nepal.",
-        "url": "https://himalayanama.com",
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Pokhara",
-            "addressRegion": "Kaski",
-            "addressCountry": "NP"
-        },
-        "telephone": "+977-9816685279",
-        "priceRange": "NPR",
-        "image": "https://himalayanama.com/og-image.jpg"
-    }
+    const lodgingSchema = getLodgingBusinessSchema()
+    const websiteSchema = getWebsiteSchema()
+    const orgSchema = getOrganizationSchema()
 
     return (
         <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <JsonLd data={lodgingSchema} />
+            <JsonLd data={websiteSchema} />
+            <JsonLd data={orgSchema} />
             <HomePage />
         </>
     )
 }
+

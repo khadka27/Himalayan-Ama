@@ -49,11 +49,12 @@ Himalayan Ama is a premium web platform for booking luxury apartment rentals in 
 
 ## ⚙️ Environment Variables
 
-Create a `/client/.env.local` file with:
+Create a `/client/.env` file with:
 
 ```env
-NEXT_PUBLIC_NODE_ENV=development
-NEXT_PUBLIC_BACKEND=http://localhost:4000
+NEXT_PUBLIC_NODE_ENV=dev
+NEXT_PUBLIC_BACKEND=http://localhost:8000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ---

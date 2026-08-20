@@ -1,6 +1,8 @@
 import { Metadata, ResolvingMetadata } from 'next'
 import BlogDetailClient from './blog-detail-client'
 import axiosInstance from '@/services/axios-instance'
+import JsonLd from '@/components/seo/json-ld'
+import { getBlogPostingSchema, getBreadcrumbSchema } from '@/lib/seo'
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -26,6 +28,9 @@ export async function generateMetadata(
             return {
                 title: blog.title,
                 description: blog.shortDescription || blog.subtitle || "Read the latest from Himalayan Ama journal.",
+                alternates: {
+                    canonical: `https://himalayanama.com/blog/${slug}`,
+                },
                 openGraph: {
                     title: blog.title,
                     description: blog.shortDescription || blog.subtitle,
@@ -55,5 +60,29 @@ export async function generateMetadata(
 
 export default async function Page({ params }: Props) {
     const slug = (await params).slug
-    return <BlogDetailClient />
+    let blog = null
+
+    try {
+        const { data } = await axiosInstance.get(`/api/v1/blog/getBlog?slug=${slug}`)
+        if (data.success && data.blog) {
+            blog = data.blog
+        }
+    } catch (error) {
+        console.error('Error fetching blog for JSON-LD:', error)
+    }
+
+    const blogSchema = blog ? getBlogPostingSchema(blog) : null
+    const breadcrumbSchema = getBreadcrumbSchema([
+        { name: "Home", item: "/" },
+        { name: "Journal", item: "/blog" },
+        { name: blog?.title || "Article", item: `/blog/${slug}` }
+    ])
+
+    return (
+        <>
+            {blogSchema && <JsonLd data={blogSchema} />}
+            <JsonLd data={breadcrumbSchema} />
+            <BlogDetailClient />
+        </>
+    )
 }

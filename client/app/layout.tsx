@@ -37,8 +37,19 @@ export const metadata: Metadata = {
     template: "%s | Himalayan Ama"
   },
   description: "Experience premium living at Himalayan Ama. We offer luxury apartment rentals in the heart of Pokhara Waterfall, providing comfort, style, and authentic Nepalese hospitality.",
-  keywords: ["luxury apartments Pokhara", "vacation rentals Nepal", "Himalayan Ama rentals", "short stay Pokhara", "premium accommodation Nepal", "Pokhara Waterfall stay"],
-  authors: [{ name: "Himalayan Ama" }],
+  keywords: [
+    "luxury apartments Pokhara",
+    "vacation rentals Nepal",
+    "Himalayan Ama rentals",
+    "short stay Pokhara",
+    "long term rental Pokhara",
+    "premium accommodation Nepal",
+    "Pokhara Waterfall stay",
+    "luxury residences Pokhara",
+    "serviced apartments Nepal"
+  ],
+  category: "Accommodation",
+  authors: [{ name: "Himalayan Ama", url: "https://himalayanama.com" }],
   creator: "Himalayan Ama",
   publisher: "Himalayan Ama",
   formatDetection: {
@@ -59,10 +70,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg", // Assuming this will be created or exists
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Himalayan Ama Luxury Apartments",
+        alt: "Himalayan Ama Luxury Apartments Pokhara",
       },
     ],
   },

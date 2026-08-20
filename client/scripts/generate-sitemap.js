@@ -5,7 +5,7 @@ const http = require('http');
 console.log("Generating sitemap...");
 
 // Base URL for the frontend
-const FRONTEND_URL = process.env.FRONT_END_HOSTED || 'https://himalayanama.com';
+const FRONTEND_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.FRONT_END_HOSTED || 'https://himalayanama.com';
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND || 'http://localhost:8000';
 
 const sitemapPath = path.join(__dirname, '../public/sitemap.xml');
