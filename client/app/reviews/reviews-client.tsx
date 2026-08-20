@@ -450,7 +450,7 @@ export default function ReviewsPageClient() {
             <div className="space-y-8">
               <div className="text-center space-y-2">
                 <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="h-7 w-7" />
+                  <Star className="h-7 w-7 fill-blue-600" />
                 </div>
                 <DialogTitle className="text-3xl font-bold text-gray-900 tracking-tight">Share Your Experience</DialogTitle>
                 <p className="text-gray-500 font-medium">Your feedback helps us provide better Nepalese hospitality.</p>

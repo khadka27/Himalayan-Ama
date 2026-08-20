@@ -9,6 +9,22 @@ exports.getHostById = (id) => Host.findById(id);
 exports.addHost = async (hostData, imageUri) => {
     try {
         if (imageUri) hostData.imageUri = imageUri;
+        
+        if (typeof hostData.bioParagraphs === "string") {
+            try {
+                hostData.bioParagraphs = JSON.parse(hostData.bioParagraphs);
+            } catch (e) {
+                hostData.bioParagraphs = hostData.bioParagraphs.split("\n").filter(Boolean);
+            }
+        }
+        if (typeof hostData.languages === "string") {
+            try {
+                hostData.languages = JSON.parse(hostData.languages);
+            } catch (e) {
+                hostData.languages = hostData.languages.split(",").map(l => l.trim()).filter(Boolean);
+            }
+        }
+
         await Host.create(hostData);
         return { success: true, message: "Host added successfully" };
     } catch (err) {
@@ -24,6 +40,21 @@ exports.updateHost = async (hostData, imageUri) => {
 
         if (hostData.isActive !== undefined) {
             hostData.isActive = hostData.isActive === 'true' || hostData.isActive === true;
+        }
+
+        if (typeof hostData.bioParagraphs === "string") {
+            try {
+                hostData.bioParagraphs = JSON.parse(hostData.bioParagraphs);
+            } catch (e) {
+                hostData.bioParagraphs = hostData.bioParagraphs.split("\n").filter(Boolean);
+            }
+        }
+        if (typeof hostData.languages === "string") {
+            try {
+                hostData.languages = JSON.parse(hostData.languages);
+            } catch (e) {
+                hostData.languages = hostData.languages.split(",").map(l => l.trim()).filter(Boolean);
+            }
         }
 
         Object.assign(existingHost, hostData);

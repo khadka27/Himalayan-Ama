@@ -243,7 +243,7 @@ export default function ServicesPage() {
                 <div className="container mx-auto px-6 max-w-6xl">
                     <div className="space-y-28">
                         {amenities.map((item, index) => {
-                            const Icon = iconsMap[item.icon] || Sparkles
+                            const Icon = iconsMap[item.icon] || Heart
                             const imageSrc = item.image || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"
 
                             return (

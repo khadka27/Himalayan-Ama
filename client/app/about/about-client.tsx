@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, Heart, Shield, Sparkles, CheckCircle2, MapPin, Utensils, Flame, Compass, CalendarCheck } from "lucide-react"
+import { Users, Heart, Shield, CheckCircle2, MapPin, Utensils, Flame, Compass, CalendarCheck, Home, Award } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import Hero from "@/components/hero"
@@ -32,7 +32,7 @@ export default function AboutPageClient() {
     {
       title: "Transparent Booking",
       desc: "Providing clear and transparent booking communication with no hidden fees.",
-      icon: Sparkles,
+      icon: Award,
     },
     {
       title: "Peaceful Environment",
@@ -140,7 +140,7 @@ export default function AboutPageClient() {
 
                 <div className="flex items-start gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                    <Sparkles className="h-6 w-6" />
+                    <Home className="h-6 w-6" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 text-base">Private & Flexible Stay</h4>
@@ -287,7 +287,7 @@ export default function AboutPageClient() {
         <div className="container mx-auto px-6">
           <div className="mb-20 text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-blue-100 text-blue-600 text-sm font-bold">
-              <Sparkles className="h-4 w-4" />
+              <Users className="h-4 w-4" />
               <span>Our Dedicated Team</span>
             </div>
             <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Meet Your Dedicated Hosts</h2>
@@ -297,53 +297,8 @@ export default function AboutPageClient() {
           </div>
 
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 max-w-6xl mx-auto">
-            {/* Featured Manager/Host: AMA YANG */}
-            <Card className="overflow-hidden hover:shadow-2xl transition-all duration-500 rounded-[40px] border-none shadow-xl bg-white group flex flex-col justify-between">
-              <div className="relative h-[420px] overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop"
-                  alt="AMA YANG - Manager / Host"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white">
-                  <span className="bg-blue-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full inline-block mb-2">
-                    MANAGER / HOST
-                  </span>
-                  <h3 className="text-3xl font-bold tracking-tight">AMA YANG</h3>
-                </div>
-              </div>
-
-              <div className="p-8 md:p-10 space-y-6">
-                <p className="text-lg leading-relaxed text-gray-700 font-semibold italic border-l-4 border-blue-600 pl-4">
-                  &quot;Welcoming guests as part of the family and helping them experience Pokhara with warmth, comfort, and local care.&quot;
-                </p>
-
-                <div className="space-y-4 text-base text-gray-600 font-medium leading-relaxed">
-                  <p>
-                    Himalayan Aama is hosted by the Gurung family from the Himalayan region, who enjoy meeting travelers from different cultures and sharing their own culture and way of life.
-                  </p>
-                  <p>
-                    Guests can enjoy access to the yoga hall for self-practice, explore nearby walking routes, visit a Buddhist monastery uphill, and easily reach Lakeside, restaurants, cafés, and other places around Pokhara.
-                  </p>
-                  <p>
-                    The host is also available to help guests with apartment-related concerns and make their stay feel comfortable and personal.
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-gray-500">
-                  <span>Languages spoken: <strong className="text-gray-900">English, Nepali</strong></span>
-                  <span className="text-blue-600">Gurung Family Hospitality</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Dynamic Hosts from API or Additional Host Cards */}
             {isLoadingHosts ? (
-              <Card className="overflow-hidden animate-pulse rounded-[40px] border-none shadow-xl bg-white h-full">
+              <Card className="overflow-hidden animate-pulse rounded-[40px] border-none shadow-xl bg-white h-full col-span-full max-w-xl mx-auto w-full">
                 <div className="bg-gray-200 h-[420px] w-full" />
                 <div className="p-10 space-y-4">
                   <div className="h-8 bg-gray-200 rounded-xl w-1/2" />
@@ -351,35 +306,77 @@ export default function AboutPageClient() {
                   <div className="h-24 bg-gray-200 rounded-xl" />
                 </div>
               </Card>
-            ) : hosts.length > 0 ? (
-              hosts.map((host) => (
-                <Card key={host._id} className="overflow-hidden hover:shadow-2xl transition-all duration-500 rounded-[40px] border-none shadow-xl bg-white group flex flex-col justify-between">
-                  <div className="relative h-[420px] overflow-hidden">
-                    <Image
-                      src={host.imageUri ? (host.imageUri.startsWith("http") ? host.imageUri : `${BACKEND}/images/${host.imageUri}`) : "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop"}
-                      alt={host.hostName}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                    <div className="absolute bottom-6 left-6 right-6 text-white">
-                      <span className="bg-blue-600 text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full inline-block mb-2">
-                        {host.profession || "HOST & CONCIERGE"}
-                      </span>
-                      <h3 className="text-3xl font-bold tracking-tight">{host.hostName}</h3>
-                    </div>
-                  </div>
+            ) : hosts && hosts.length > 0 ? (
+              hosts.map((host: any) => {
+                const imageSrc = host.imageUri
+                  ? (host.imageUri.startsWith("http") ? host.imageUri : `${BACKEND}/images/${host.imageUri}`)
+                  : "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop"
 
-                  <div className="p-8 md:p-10 space-y-4">
-                    <p className="text-lg leading-relaxed text-gray-700 font-semibold italic border-l-4 border-blue-600 pl-4">
-                      {host.bio ? `"${host.bio}"` : '"Welcoming travelers with local hospitality and helping guests feel at home in Pokhara."'}
-                    </p>
-                  </div>
-                </Card>
-              ))
-            ) : null}
+                const langText = host.languages
+                  ? (Array.isArray(host.languages) ? host.languages.join(", ") : host.languages)
+                  : ""
+
+                const paragraphs = Array.isArray(host.bioParagraphs) && host.bioParagraphs.length > 0
+                  ? host.bioParagraphs
+                  : (host.bio ? [host.bio] : [])
+
+                return (
+                  <Card key={host._id || host.hostName} className="overflow-hidden hover:shadow-2xl transition-all duration-500 rounded-[40px] border-none shadow-xl bg-white group flex flex-col justify-between">
+                    <div className="relative h-[420px] overflow-hidden">
+                      <Image
+                        src={imageSrc}
+                        alt={host.hostName}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        priority
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                      <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
+                        {host.profession && (
+                          <span className="bg-blue-600 text-white text-xs font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full inline-block mb-1 shadow-md">
+                            {host.profession}
+                          </span>
+                        )}
+                        <h3 className="text-3xl font-bold text-white tracking-tight drop-shadow-md">{host.hostName}</h3>
+                      </div>
+                    </div>
+
+                    <div className="p-8 md:p-10 space-y-6">
+                      {host.quote && (
+                        <p className="text-lg leading-relaxed text-gray-700 font-semibold italic border-l-4 border-blue-600 pl-4">
+                          &quot;{host.quote}&quot;
+                        </p>
+                      )}
+
+                      {paragraphs.length > 0 && (
+                        <div className="space-y-4 text-base text-gray-600 font-medium leading-relaxed">
+                          {paragraphs.map((pText: string, pIdx: number) => (
+                            <p key={pIdx}>{pText}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {(langText || host.hospitalityBadge) && (
+                        <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-sm font-bold text-gray-500">
+                          {langText ? (
+                            <span>Languages spoken: <strong className="text-gray-900">{langText}</strong></span>
+                          ) : <span />}
+                          {host.hospitalityBadge && (
+                            <span className="text-blue-600">{host.hospitalityBadge}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )
+              })
+            ) : (
+              <div className="col-span-full text-center py-16 bg-white rounded-[32px] border border-dashed border-gray-200">
+                <Users className="mx-auto h-12 w-12 mb-4 text-gray-300" />
+                <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No host profiles available.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

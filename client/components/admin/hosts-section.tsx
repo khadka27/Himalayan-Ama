@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Edit2, Plus, X, Trash2, Users, User, Shield, Briefcase, Info, Camera, Eye, EyeOff } from "lucide-react"
+import { Edit2, Plus, X, Trash2, Users, User, Briefcase, Info, Camera, Eye, EyeOff, Quote, Globe, Award } from "lucide-react"
 import axiosInstance from "@/services/axios-instance"
 import { toast } from "sonner"
 import Loading from "@/components/loading"
@@ -14,7 +14,11 @@ interface Host {
     hostName: string
     imageUri: string
     profession?: string
+    quote?: string
     bio?: string
+    bioParagraphs?: string[]
+    languages?: string[] | string
+    hospitalityBadge?: string
     isActive: boolean
 }
 
@@ -30,7 +34,11 @@ export function HostsSection() {
     const [formData, setFormData] = useState({
         hostName: "",
         profession: "",
+        quote: "",
         bio: "",
+        bioParagraphsText: "",
+        languagesText: "",
+        hospitalityBadge: "",
         isActive: true
     })
 
@@ -77,8 +85,22 @@ export function HostsSection() {
             const payload = new FormData()
             payload.append("hostName", formData.hostName)
             payload.append("profession", formData.profession)
+            payload.append("quote", formData.quote)
             payload.append("bio", formData.bio)
+            payload.append("hospitalityBadge", formData.hospitalityBadge)
             payload.append("isActive", formData.isActive.toString())
+
+            const paragraphs = formData.bioParagraphsText
+                .split("\n")
+                .map(p => p.trim())
+                .filter(Boolean)
+            payload.append("bioParagraphs", JSON.stringify(paragraphs))
+
+            const langs = formData.languagesText
+                .split(",")
+                .map(l => l.trim())
+                .filter(Boolean)
+            payload.append("languages", JSON.stringify(langs))
 
             if (imageFile) {
                 payload.append("hostImage", imageFile)
@@ -176,7 +198,11 @@ export function HostsSection() {
         setFormData({
             hostName: host.hostName,
             profession: host.profession || "",
+            quote: host.quote || "",
             bio: host.bio || "",
+            bioParagraphsText: Array.isArray(host.bioParagraphs) ? host.bioParagraphs.join("\n\n") : "",
+            languagesText: Array.isArray(host.languages) ? host.languages.join(", ") : (host.languages || ""),
+            hospitalityBadge: host.hospitalityBadge || "",
             isActive: host.isActive
         })
         const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
@@ -190,7 +216,11 @@ export function HostsSection() {
         setFormData({
             hostName: "",
             profession: "",
+            quote: "",
             bio: "",
+            bioParagraphsText: "",
+            languagesText: "",
+            hospitalityBadge: "",
             isActive: true
         })
         setImagePreview(null)
@@ -221,7 +251,7 @@ export function HostsSection() {
 
             {showForm && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
-                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+                    <div className="bg-white rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
                         <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                             <h3 className="text-xl font-bold text-slate-900 leading-none">
                                 {editingHost ? "Edit Host Profile" : "New Host Profile"}
@@ -231,7 +261,7 @@ export function HostsSection() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Full Name</label>
@@ -257,21 +287,78 @@ export function HostsSection() {
                                             value={formData.profession}
                                             onChange={(e) => setFormData({ ...formData, profession: e.target.value })}
                                             className="w-full h-14 pl-14 pr-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-bold text-slate-800 transition-all"
-                                            placeholder="e.g. Chief Concierge"
+                                            placeholder="e.g. MANAGER / HOST"
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Biography / Welcome Message</label>
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Featured Quote / Catchphrase</label>
+                                <div className="relative">
+                                    <Quote className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                                    <input
+                                        type="text"
+                                        value={formData.quote}
+                                        onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
+                                        className="w-full h-14 pl-14 pr-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-800 transition-all"
+                                        placeholder="e.g. Welcoming guests as part of the family..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Languages Spoken</label>
+                                    <div className="relative">
+                                        <Globe className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                                        <input
+                                            type="text"
+                                            value={formData.languagesText}
+                                            onChange={(e) => setFormData({ ...formData, languagesText: e.target.value })}
+                                            className="w-full h-14 pl-14 pr-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-800 transition-all"
+                                            placeholder="e.g. English, Nepali"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Hospitality Badge / Subtitle</label>
+                                    <div className="relative">
+                                        <Award className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+                                        <input
+                                            type="text"
+                                            value={formData.hospitalityBadge}
+                                            onChange={(e) => setFormData({ ...formData, hospitalityBadge: e.target.value })}
+                                            className="w-full h-14 pl-14 pr-5 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-800 transition-all"
+                                            placeholder="e.g. Gurung Family Hospitality"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Card Summary / Brief Intro</label>
                                 <div className="relative">
                                     <Info className="absolute left-5 top-5 h-5 w-5 text-slate-300" />
                                     <textarea
                                         value={formData.bio}
                                         onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                        className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-600 min-h-[120px] transition-all"
-                                        placeholder="Tell guests about this host..."
+                                        className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-600 min-h-[90px] transition-all"
+                                        placeholder="Short summary for card view..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Full Biography Paragraphs (Separate paragraphs with a new line)</label>
+                                <div className="relative">
+                                    <Info className="absolute left-5 top-5 h-5 w-5 text-slate-300" />
+                                    <textarea
+                                        value={formData.bioParagraphsText}
+                                        onChange={(e) => setFormData({ ...formData, bioParagraphsText: e.target.value })}
+                                        className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-600 min-h-[140px] transition-all"
+                                        placeholder="Paragraph 1...&#10;&#10;Paragraph 2...&#10;&#10;Paragraph 3..."
                                     />
                                 </div>
                             </div>
@@ -340,7 +427,7 @@ export function HostsSection() {
                             <tr className="bg-slate-50/30 border-b border-slate-50">
                                 <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Host Profile</th>
                                 <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Profession</th>
-                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Biography</th>
+                                <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Quote & Details</th>
                                 <th className="px-10 py-5 text-left text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Status</th>
                                 <th className="px-10 py-5 text-right text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Actions</th>
                             </tr>
@@ -355,7 +442,7 @@ export function HostsSection() {
                                             </div>
                                             <div>
                                                 <p className="text-base font-bold text-slate-900 tracking-tight leading-tight">{host.hostName}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Himalayan Ama Host</p>
+                                                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">{host.hospitalityBadge || "Himalayan Ama Host"}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -363,8 +450,8 @@ export function HostsSection() {
                                         <span className="text-sm font-bold text-slate-600">{host.profession || "—"}</span>
                                     </td>
                                     <td className="px-10 py-6">
-                                        <p className="text-xs font-medium text-slate-400 line-clamp-2 max-w-[250px] italic">
-                                            {host.bio ? `"${host.bio}"` : "No biography provided."}
+                                        <p className="text-xs font-medium text-slate-700 line-clamp-2 max-w-[280px] italic">
+                                            {host.quote ? `"${host.quote}"` : (host.bio ? `"${host.bio}"` : "No quote/bio provided.")}
                                         </p>
                                     </td>
                                     <td className="px-10 py-6">

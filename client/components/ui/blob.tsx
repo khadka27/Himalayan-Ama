@@ -28,22 +28,22 @@ export interface BlobCursorProps {
 
 export default function BlobCursor({
   blobType = "circle",
-  fillColor = "var(--sage-500)",
+  fillColor = "rgba(59, 130, 246, 0.25)",
   trailCount = 3,
-  sizes = [40, 65, 50],
-  innerSizes = [12, 20, 15],
-  innerColor = "color-mix(in oklch, var(--cream) 85%, transparent)",
-  opacities = [0.55, 0.4, 0.25],
-  shadowColor = "color-mix(in oklch, var(--foreground) 40%, transparent)",
-  shadowBlur = 10,
-  shadowOffsetX = 4,
-  shadowOffsetY = 4,
+  sizes = [36, 24, 16],
+  innerSizes = [8, 6, 4],
+  innerColor = "rgba(255, 255, 255, 0.8)",
+  opacities = [0.6, 0.4, 0.2],
+  shadowColor = "rgba(59, 130, 246, 0.2)",
+  shadowBlur = 12,
+  shadowOffsetX = 0,
+  shadowOffsetY = 0,
   filterId = "blob",
-  filterStdDeviation = 18,
-  filterColorMatrixValues = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 25 -10",
-  useFilter = true,
-  fastDuration = 0.12,
-  slowDuration = 0.55,
+  filterStdDeviation = 12,
+  filterColorMatrixValues = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7",
+  useFilter = false,
+  fastDuration = 0.1,
+  slowDuration = 0.4,
   fastEase = "power3.out",
   slowEase = "power1.out",
   zIndex = 100,
@@ -52,7 +52,8 @@ export default function BlobCursor({
   const blobsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    // Respect reduced motion
+    // Respect reduced motion & touch devices
+    if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (window.matchMedia("(pointer: coarse)").matches) return;
 
@@ -80,7 +81,7 @@ export default function BlobCursor({
     const hoverHandler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!containerRef.current) return;
-      if (target.closest("button, a, input, [data-no-cursor-hide]")) {
+      if (target.closest("button, a, input, textarea, select, [data-no-cursor-hide]")) {
         containerRef.current.style.opacity = "0";
       } else {
         containerRef.current.style.opacity = "1";
@@ -116,13 +117,13 @@ export default function BlobCursor({
       )}
 
       <div
-        className="absolute inset-0 overflow-hidden select-none"
+        className="absolute inset-0 overflow-hidden select-none pointer-events-none"
         style={{ filter: useFilter ? `url(#${filterId})` : undefined }}
       >
         {Array.from({ length: trailCount }).map((_, i) => {
-          const currentSize = sizes[i] ?? sizes[sizes.length - 1] ?? 40;
-          const currentInnerSize = innerSizes[i] ?? innerSizes[innerSizes.length - 1] ?? 12;
-          const currentOpacity = opacities[i] ?? opacities[opacities.length - 1] ?? 0.55;
+          const currentSize = sizes[i] ?? sizes[sizes.length - 1] ?? 36;
+          const currentInnerSize = innerSizes[i] ?? innerSizes[innerSizes.length - 1] ?? 8;
+          const currentOpacity = opacities[i] ?? opacities[opacities.length - 1] ?? 0.5;
 
           return (
             <div
@@ -130,18 +131,20 @@ export default function BlobCursor({
               ref={(el) => {
                 blobsRef.current[i] = el;
               }}
-              className="absolute will-change-transform -translate-x-1/2 -translate-y-1/2"
+              className="absolute will-change-transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               style={{
                 width: currentSize,
                 height: currentSize,
                 borderRadius: blobType === "circle" ? "50%" : "0",
                 backgroundColor: fillColor,
                 opacity: currentOpacity,
-                boxShadow: `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor}`,
+                boxShadow: shadowBlur > 0 ? `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowColor}` : "none",
+                backdropFilter: "blur(2px)",
+                WebkitBackdropFilter: "blur(2px)",
               }}
             >
               <div
-                className="absolute"
+                className="absolute pointer-events-none"
                 style={{
                   width: currentInnerSize,
                   height: currentInnerSize,

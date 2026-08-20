@@ -42,7 +42,7 @@ export default function CancellationPolicyClient() {
                     <Card className="p-8 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-4">
                         <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
                             <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                <Sparkles className="h-6 w-6" />
+                                <CalendarX className="h-6 w-6" />
                             </div>
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Booking Requests</h2>
                         </div>

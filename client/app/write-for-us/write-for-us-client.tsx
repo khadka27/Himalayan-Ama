@@ -4,7 +4,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Card } from "@/components/ui/card"
 import Hero from "@/components/hero"
-import { PenTool, CheckCircle2, Send, Sparkles, Compass, Utensils, Flame, Globe, Mail } from "lucide-react"
+import { PenTool, CheckCircle2, Send, Compass, Utensils, Flame, Globe, Mail, Home } from "lucide-react"
 
 export default function WriteForUsClient() {
     const topics = [
@@ -16,7 +16,7 @@ export default function WriteForUsClient() {
         {
             title: "Self-Catering & Apartment Stays",
             desc: "Tips for making the most of a 1BHK apartment stay in Lakeside Pokhara.",
-            icon: Sparkles,
+            icon: Home,
         },
         {
             title: "Local Culture & Food",
@@ -145,7 +145,7 @@ export default function WriteForUsClient() {
                     <Card className="p-10 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-6">
                         <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
                             <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                                <Sparkles className="h-6 w-6" />
+                                <PenTool className="h-6 w-6" />
                             </div>
                             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Why Write for Himalayan Aama</h2>
                         </div>

@@ -10,30 +10,23 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <Toaster richColors />
             <BlobCursor
                 blobType="circle"
-                fillColor="var(--sage-500)"
-                innerColor="color-mix(in oklch, var(--cream) 85%, transparent)"
-                shadowColor="color-mix(in oklch, var(--foreground) 40%, transparent)"
-                trailCount={5}
-                sizes={[40, 65, 50, 40, 30]}
-                innerSizes={[12, 20, 15, 12, 10]}
-                opacities={[0.55, 0.4, 0.25, 0.15, 0.1]}
-                shadowBlur={10}
-                shadowOffsetX={4}
-                shadowOffsetY={4}
-                filterStdDeviation={18}
-                filterColorMatrixValues="1 0 0 0 0
-                           0 1 0 0 0
-                           0 0 1 0 0
-                           0 0 0 25 -10"
-                useFilter={true}
-                fastDuration={0.12}
-                slowDuration={0.55}
+                fillColor="rgba(59, 130, 246, 0.25)"
+                innerColor="rgba(255, 255, 255, 0.9)"
+                shadowColor="rgba(59, 130, 246, 0.2)"
+                trailCount={3}
+                sizes={[36, 24, 16]}
+                innerSizes={[8, 6, 4]}
+                opacities={[0.6, 0.4, 0.2]}
+                shadowBlur={12}
+                shadowOffsetX={0}
+                shadowOffsetY={0}
+                useFilter={false}
+                fastDuration={0.1}
+                slowDuration={0.4}
                 zIndex={100}
             />
-
 
             {children}
         </>
     )
-
 }
