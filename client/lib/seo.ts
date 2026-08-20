@@ -1,6 +1,6 @@
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://himalayanama.com";
 export const SITE_NAME = "Himalayan Ama";
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:4000";
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000";
 
 export interface FlatItem {
     _id?: string;

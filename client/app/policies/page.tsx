@@ -4,17 +4,17 @@ import JsonLd from '@/components/seo/json-ld'
 import { getFAQSchema, getBreadcrumbSchema } from '@/lib/seo'
 
 export const metadata: Metadata = {
-    title: "Rental Policies & Guidelines | Himalayan Ama",
-    description: "Review Himalayan Ama's rental, booking, cancellation, and security deposit policies for a seamless luxury apartment stay in Pokhara.",
+    title: "Privacy Policy | Himalayan Aama - Lakeside Pokhara",
+    description: "Read the official Privacy Policy for Himalayan Aama self-catering 1BHK apartment in Lakeside, Pokhara. Learn how we collect, protect, and handle your data.",
     alternates: {
         canonical: "https://himalayanama.com/policies",
     },
     openGraph: {
-        title: "Rental Policies & Guidelines | Himalayan Ama",
-        description: "Transparency and fairness for guests. Review booking, cancellation, and check-in standards at Himalayan Ama.",
+        title: "Privacy Policy | Himalayan Aama - Lakeside Pokhara",
+        description: "Official Privacy Policy and data protection guidelines for guests staying at Himalayan Aama, Pokhara.",
         url: "https://himalayanama.com/policies",
-        siteName: "Himalayan Ama",
-        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Ama Policies" }],
+        siteName: "Himalayan Aama",
+        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Aama Privacy Policy" }],
         type: "website"
     }
 }

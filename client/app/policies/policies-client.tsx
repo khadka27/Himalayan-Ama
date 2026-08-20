@@ -4,132 +4,253 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Card } from "@/components/ui/card"
 import Hero from "@/components/hero"
-import { ShieldAlert, BookOpen, CreditCard, Sparkles, Clock, Ban, Phone } from "lucide-react"
+import { ShieldCheck, Lock, Database, Eye, Cookie, UserCheck, ExternalLink, RefreshCw, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react"
 
 export default function PoliciesPageClient() {
     return (
         <div className="min-h-screen bg-white">
             <Header />
 
+            {/* Hero */}
             <Hero
-                title="Rental Policies"
-                description="Transparency and fairness are at the heart of our community. Please review our guidelines for a smooth stay."
+                title="Privacy Policy"
+                description="Himalayan Aama respects your privacy and is committed to protecting your personal information."
                 image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2070&auto=format&fit=crop"
             />
 
-            <section className="py-24">
-                <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-
-                        <div className="lg:col-span-12 xl:col-span-8 space-y-20">
-                            {/* Booking Section */}
-                            <div className="space-y-10 group">
-                                <div className="flex items-center gap-6">
-                                    <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                                        <BookOpen className="h-7 w-7" />
-                                    </div>
-                                    <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Booking & Cancellation</h2>
-                                </div>
-                                <div className="h-1.5 w-20 bg-blue-500 rounded-full" />
-                                <div className="space-y-8 text-xl text-gray-600 font-medium leading-loose">
-                                    <p>
-                                        We strive to make the booking process as seamless as possible. All reservations are subject to our tiered cancellation policy to ensure fairness for both travelers and property hosts.
-                                    </p>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {[
-                                            { title: "Standard", desc: "Full refund 14+ days before check-in.", icon: Sparkles, color: "text-green-500" },
-                                            { title: "Flexible", desc: "50% refund between 7-14 days.", icon: Clock, color: "text-blue-400" },
-                                            { title: "Non-Refundable", desc: "Cancellations under 7 days.", icon: Ban, color: "text-red-400" }
-                                        ].map((item, i) => (
-                                            <Card key={i} className="p-8 rounded-3xl border border-gray-100 shadow-sm bg-slate-50">
-                                                <item.icon className={`h-8 w-8 ${item.color} mb-4`} />
-                                                <h4 className="font-bold text-gray-900 mb-2">{item.title}</h4>
-                                                <p className="text-sm text-gray-500 font-medium">{item.desc}</p>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Security Section */}
-                            <div className="space-y-10 group">
-                                <div className="flex items-center gap-6">
-                                    <div className="h-14 w-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                                        <CreditCard className="h-7 w-7" />
-                                    </div>
-                                    <h2 className="text-4xl font-bold text-gray-900 tracking-tight">Security Deposits</h2>
-                                </div>
-                                <div className="h-1.5 w-20 bg-blue-500 rounded-full" />
-                                <div className="space-y-8 text-xl text-gray-600 font-medium leading-loose">
-                                    <p>
-                                        To maintain our high standards of luxury, a security deposit is required for all stays. This fund is held to cover any potential damages or excessive cleaning requirements.
-                                    </p>
-
-                                    <div className="space-y-4">
-                                        {[
-                                            "Short-term Stays (under 30 days): One week's rent deposit.",
-                                            "Long-term Rentals (30+ days): One month's rent deposit.",
-                                            "Refunds: Processed automatically within 7 business days of an inspection."
-                                        ].map((text, i) => (
-                                            <div key={i} className="flex gap-4 items-start bg-slate-50 p-6 rounded-2xl border border-white">
-                                                <div className="h-2 w-2 rounded-full bg-blue-500 mt-2.5 shrink-0" />
-                                                <span className="text-lg">{text}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Sidebar */}
-                        <div className="lg:col-span-12 xl:col-span-4 space-y-12">
-                            <Card className="p-12 bg-white rounded-[40px] border border-gray-100 shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-full h-2 bg-blue-500" />
-                                <div className="flex items-center gap-4 mb-10">
-                                    <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                                        <ShieldAlert className="h-6 w-6" />
-                                    </div>
-                                    <h3 className="text-2xl font-bold text-gray-900 tracking-tight">House Standards</h3>
-                                </div>
-
-                                <div className="space-y-8">
-                                    {[
-                                        { label: "Check-in", val: "2:00 PM onwards" },
-                                        { label: "Check-out", val: "Until 11:00 AM" },
-                                        { label: "Quiet Hours", val: "10 PM - 7 AM" },
-                                        { label: "Smoking", val: "Outdoor Areas Only", intense: true }
-                                    ].map((item, i) => (
-                                        <div key={i} className="flex justify-between items-center group/item">
-                                            <span className="font-bold text-gray-400 uppercase tracking-widest text-[10px]">{item.label}</span>
-                                            <span className={`font-bold text-gray-900 ${item.intense ? 'text-red-500' : ''}`}>{item.val}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="mt-12 h-1.5 w-full bg-slate-50 rounded-full" />
-                            </Card>
-
-                            <Card className="p-12 bg-blue-500 text-white rounded-[40px] border-none shadow-2xl relative overflow-hidden group">
-                                <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-y-1/2 translate-x-1/2 blur-2xl" />
-                                <h3 className="text-2xl font-bold mb-6 tracking-tight">Need Clarification?</h3>
-                                <p className="mb-10 text-blue-50 font-medium italic leading-relaxed">
-                                    "We believe in hospitality with heart. If any part of our policy is unclear, our team is happy to discuss it with you."
-                                </p>
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-4 group/link cursor-pointer">
-                                        <div className="h-12 w-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center group-hover/link:bg-white/20 transition-all">
-                                            <Phone className="h-5 w-5" />
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-blue-200">Call Support</span>
-                                            <span className="font-bold">+977 9816685279</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-
+            {/* H1 Main Header Section */}
+            <section className="py-16 bg-white border-b border-slate-100">
+                <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs uppercase tracking-widest border border-blue-100">
+                        <ShieldCheck className="h-4 w-4" />
+                        <span>Effective Date: August 20, 2026</span>
                     </div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Privacy Policy – <span className="text-blue-600">Himalayan Aama</span>
+                    </h1>
+                    <p className="text-xl text-gray-600 leading-relaxed font-medium text-left pt-4">
+                        Himalayan Aama respects your privacy and is committed to protecting the personal information you share with us while using our website or booking our self-catering 1BHK apartment in Lakeside, Pokhara. This Privacy Policy explains how we collect, use, and safeguard your information.
+                    </p>
+                </div>
+            </section>
+
+            {/* Content Sections */}
+            <section className="py-20 bg-slate-50">
+                <div className="container mx-auto px-6 max-w-5xl space-y-16">
+
+                    {/* Information We Collect */}
+                    <Card className="p-10 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-6">
+                        <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <Database className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Information We Collect</h2>
+                        </div>
+                        <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                            When you visit our website or make a booking, we may collect the following information:
+                        </p>
+                        <ul className="space-y-4 text-base text-gray-700 font-medium">
+                            <li className="flex items-start gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong className="text-gray-900">Personal Information:</strong> Name, email address, phone number, billing address, and payment details.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong className="text-gray-900">Booking Information:</strong> Dates of stay, number of guests, and special requests.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong className="text-gray-900">Website Usage Data:</strong> IP address, browser type, pages visited, and interaction with our website.
+                                </div>
+                            </li>
+                        </ul>
+                        <p className="text-gray-600 text-base leading-relaxed font-medium pt-2">
+                            We collect this information to provide a seamless experience when booking your private apartment in Pokhara and to improve our services.
+                        </p>
+                    </Card>
+
+                    {/* How We Use Your Information */}
+                    <Card className="p-10 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-6">
+                        <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <Eye className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">How We Use Your Information</h2>
+                        </div>
+                        <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                            We use the information collected to:
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                                "Process bookings and confirm your stay at our apartment near Phewa Lake",
+                                "Communicate with guests regarding reservations, inquiries, and special offers",
+                                "Improve our website, services, and guest experience",
+                                "Ensure the security and safety of guests during their stay"
+                            ].map((text, idx) => (
+                                <div key={idx} className="flex items-start gap-3 bg-blue-50/50 p-5 rounded-2xl border border-blue-100">
+                                    <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 shrink-0" />
+                                    <span className="text-base text-gray-800 font-bold leading-snug">{text}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Sharing Your Information */}
+                    <Card className="p-10 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-6">
+                        <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <Lock className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Sharing Your Information</h2>
+                        </div>
+                        <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                            We do not sell, trade, or rent your personal information to third parties. Your data may be shared only with trusted service providers for:
+                        </p>
+                        <ul className="space-y-3 text-base text-gray-700 font-medium">
+                            <li className="flex items-center gap-3">
+                                <div className="h-2 w-2 rounded-full bg-blue-600" />
+                                <span>Payment processing</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <div className="h-2 w-2 rounded-full bg-blue-600" />
+                                <span>Email communication for booking confirmations</span>
+                            </li>
+                            <li className="flex items-center gap-3">
+                                <div className="h-2 w-2 rounded-full bg-blue-600" />
+                                <span>Website analytics and performance improvements</span>
+                            </li>
+                        </ul>
+                    </Card>
+
+                    {/* Cookies & Data Security Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <Card className="p-8 md:p-10 rounded-[32px] bg-white border border-gray-100 shadow-xl space-y-4">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <Cookie className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Cookies and Tracking Technologies</h2>
+                            <p className="text-gray-600 leading-relaxed font-medium text-base">
+                                Our website may use cookies to enhance user experience, track visitor behavior, and improve functionality. You can choose to disable cookies in your browser settings, but some features of our website may not function properly without them.
+                            </p>
+                        </Card>
+
+                        <Card className="p-8 md:p-10 rounded-[32px] bg-white border border-gray-100 shadow-xl space-y-4">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <ShieldCheck className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Data Security</h2>
+                            <p className="text-gray-600 leading-relaxed font-medium text-base">
+                                Himalayan Aama uses industry-standard security measures to protect your personal information. We take reasonable steps to prevent unauthorized access, disclosure, or misuse of your data.
+                            </p>
+                        </Card>
+                    </div>
+
+                    {/* Your Rights */}
+                    <Card className="p-10 md:p-12 rounded-[36px] bg-white border border-gray-100 shadow-xl space-y-6">
+                        <div className="flex items-center gap-4 border-b border-slate-100 pb-6">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <UserCheck className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Your Rights</h2>
+                        </div>
+                        <p className="text-lg text-gray-600 font-medium leading-relaxed">
+                            You have the right to:
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[
+                                "Access the personal information we hold about you",
+                                "Request corrections to any inaccurate information",
+                                "Request deletion of your data, subject to legal obligations",
+                                "Opt-out of marketing communications"
+                            ].map((right, idx) => (
+                                <div key={idx} className="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />
+                                    <span className="text-base text-gray-800 font-bold">{right}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="text-gray-600 text-base font-medium pt-2">
+                            To exercise these rights, please contact us at{" "}
+                            <a href="mailto:info@himalayanAama.com" className="text-blue-600 font-bold underline">
+                                info@himalayanAama.com
+                            </a>.
+                        </p>
+                    </Card>
+
+                    {/* External Links & Policy Changes */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <Card className="p-8 md:p-10 rounded-[32px] bg-white border border-gray-100 shadow-xl space-y-4">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <ExternalLink className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">External Links</h2>
+                            <p className="text-gray-600 leading-relaxed font-medium text-base">
+                                Our website may contain links to third-party websites. We are not responsible for the privacy practices of these external websites. We encourage you to read their privacy policies before providing any personal information.
+                            </p>
+                        </Card>
+
+                        <Card className="p-8 md:p-10 rounded-[32px] bg-white border border-gray-100 shadow-xl space-y-4">
+                            <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <RefreshCw className="h-6 w-6" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Changes to This Privacy Policy</h2>
+                            <p className="text-gray-600 leading-relaxed font-medium text-base">
+                                Himalayan Aama may update this Privacy Policy periodically. Any changes will be posted on this page with the revised effective date. We encourage you to review this policy regularly to stay informed.
+                            </p>
+                        </Card>
+                    </div>
+
+                    {/* Contact Us (H2) */}
+                    <Card className="p-10 md:p-12 rounded-[36px] bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-2xl space-y-8">
+                        <div className="space-y-3">
+                            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Contact Us</h2>
+                            <p className="text-blue-100 text-lg font-medium">
+                                If you have questions or concerns about this Privacy Policy or the handling of your personal information, please contact us:
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                            <div className="flex items-center gap-4 bg-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <Mail className="h-6 w-6 text-blue-200 shrink-0" />
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-200 block">Email</span>
+                                    <a href="mailto:info@himalayanAama.com" className="font-bold text-white hover:underline text-sm">
+                                        info@himalayanAama.com
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 bg-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <Phone className="h-6 w-6 text-blue-200 shrink-0" />
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-200 block">Phone</span>
+                                    <a href="tel:+9779816685279" className="font-bold text-white hover:underline text-sm">
+                                        +977 9816685279
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 bg-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <MapPin className="h-6 w-6 text-blue-200 shrink-0" />
+                                <div>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-200 block">Address</span>
+                                    <span className="font-bold text-white text-sm">Street No. 16, Lakeside, Pokhara</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-white/10 text-center">
+                            <p className="text-blue-100 text-sm font-medium italic">
+                                By using our website or booking our BBQ-friendly self-catering apartment in Lakeside, Pokhara, you agree to the terms of this Privacy Policy.
+                            </p>
+                        </div>
+                    </Card>
+
                 </div>
             </section>
 

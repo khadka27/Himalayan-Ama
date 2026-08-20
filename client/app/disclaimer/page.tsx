@@ -4,17 +4,17 @@ import JsonLd from '@/components/seo/json-ld'
 import { getBreadcrumbSchema } from '@/lib/seo'
 
 export const metadata: Metadata = {
-    title: "Disclaimer | Himalayan Ama",
-    description: "Read the official legal disclaimer and terms of information for Himalayan Ama luxury apartment rentals in Pokhara.",
+    title: "Disclaimer & Guest Information | Himalayan Aama - Lakeside Pokhara",
+    description: "Read the official Disclaimer & Guest Information for Himalayan Aama self-catering 1BHK apartment in Lakeside, Pokhara near Phewa Lake.",
     alternates: {
         canonical: "https://himalayanama.com/disclaimer",
     },
     openGraph: {
-        title: "Disclaimer | Himalayan Ama",
-        description: "Official legal disclaimer and website information policy for Himalayan Ama.",
+        title: "Disclaimer & Guest Information | Himalayan Aama - Lakeside Pokhara",
+        description: "Official legal disclaimer and guest responsibility guidelines for staying at Himalayan Aama, Pokhara.",
         url: "https://himalayanama.com/disclaimer",
-        siteName: "Himalayan Ama",
-        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Ama Disclaimer" }],
+        siteName: "Himalayan Aama",
+        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Aama Disclaimer" }],
         type: "website"
     }
 }

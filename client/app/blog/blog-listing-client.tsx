@@ -47,28 +47,27 @@ export default function BlogPage() {
         setIsLoading(true);
         const { data } = await axiosInstance.get("/api/v1/blog/getPublishedBlogs");
 
-        if (data.success && Array.isArray(data.blogs)) {
+        if (typeof data === "object" && data !== null && data.success && Array.isArray(data.blogs)) {
           console.log("Fetched blogs:", data.blogs);
           const mappedBlogs = data.blogs.map((blog: any) => ({
             id: blog._id,
             title: blog.title,
             excerpt: blog.shortDescription || blog.excerpt || "",
             image_url: blog.bannerImageURI,
-            author: blog.author?.authorName || "Guest",
+            author: typeof blog.author === "string" ? blog.author : (blog.author?.authorName || "Himalayan Aama"),
             category: blog.category,
             slug: blog.slug,
             created_at: blog.publishDate || blog.createdAt,
             is_active: blog.isActive,
-            // Map other fields as necessary, providing defaults
             subtitle: blog.subtitle || "",
             description: blog.description || "",
             content: blog.content || [],
             conclusion: blog.conclusion || "",
-            read_time: "5 Min Read" // Placeholder or calculate based on content length
+            read_time: "5 Min Read"
           }));
           setBlogs(mappedBlogs);
         } else {
-          console.error("Failed to fetch blogs or invalid format:", data);
+          console.warn("Backend API returned non-JSON or invalid format.");
           setBlogs([]);
         }
       } catch (error) {

@@ -65,7 +65,7 @@ export default function BlogDetailPage() {
             subtitle: backendBlog.subtitle || "",
             description: backendBlog.description || backendBlog.shortDescription || "",
             excerpt: backendBlog.shortDescription || backendBlog.excerpt || "",
-            author: backendBlog.author?.authorName || "Guest",
+            author: typeof backendBlog.author === 'string' ? backendBlog.author : (backendBlog.author?.authorName || "Himalayan Aama"),
             content: content,
             conclusion: backendBlog.conclusion || "",
             is_active: backendBlog.isActive,

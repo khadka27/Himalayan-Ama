@@ -4,17 +4,17 @@ import JsonLd from '@/components/seo/json-ld'
 import { getBreadcrumbSchema, SITE_URL } from '@/lib/seo'
 
 export const metadata: Metadata = {
-    title: "Our Services & Hospitality | Himalayan Ama",
-    description: "Browse the premium services and amenities offered at Himalayan Ama luxury apartments. From curated tours to in-house dining, we ensure a comfortable stay.",
+    title: "Services & Amenities in Lakeside Pokhara | Himalayan Aama",
+    description: "Discover self-catering 1BHK apartment services and amenities at Himalayan Aama, Lakeside Pokhara—including free yoga hall access, complimentary first-day meal, BBQ space, and maintenance support.",
     alternates: {
         canonical: "https://himalayanama.com/services",
     },
     openGraph: {
-        title: "Hospitality & Amenities | Himalayan Ama",
-        description: "Explore the premium concierge services, mountain views, fully equipped kitchens, and bespoke hospitality at Himalayan Ama.",
+        title: "Services & Amenities in Lakeside Pokhara | Himalayan Aama",
+        description: "Explore free yoga access, BBQ compound, complimentary first-day meal, self-catering kitchen, and maintenance services at Himalayan Aama.",
         url: "https://himalayanama.com/services",
-        siteName: "Himalayan Ama",
-        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Ama Services" }],
+        siteName: "Himalayan Aama",
+        images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Himalayan Aama Services & Amenities" }],
         type: "website"
     }
 }

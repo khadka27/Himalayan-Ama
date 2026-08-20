@@ -68,7 +68,7 @@ Structured data files are centralized in [`client/lib/seo.ts`](file:///Users/lyn
 
 ### Dynamic XML Sitemap (`client/app/sitemap.ts`)
 Accessible at `https://himalayanama.com/sitemap.xml`.
-- Includes all 9 core static routes (`/`, `/apartments`, `/blog`, `/about`, `/contact`, `/services`, `/reviews`, `/policies`, `/disclaimer`).
+- Includes all 10 core static routes (`/`, `/apartments`, `/blog`, `/about`, `/contact`, `/services`, `/reviews`, `/policies`, `/disclaimer`, `/terms`).
 - Dynamically queries backend API (`/api/v1/flats/published` & `/api/v1/blog/getPublishedBlogs`) to generate sitemap nodes for every active apartment and published blog article.
 
 ### Robots Directive (`client/app/robots.ts`)
@@ -94,6 +94,9 @@ Accessible at `https://himalayanama.com/robots.txt`.
 | `/reviews` | `https://himalayanama.com/reviews` | `BreadcrumbList`, `AggregateRating` | `website` |
 | `/policies` | `https://himalayanama.com/policies` | `FAQPage`, `BreadcrumbList` | `website` |
 | `/disclaimer` | `https://himalayanama.com/disclaimer` | `BreadcrumbList` | `website` |
+| `/terms` | `https://himalayanama.com/terms` | `WebPage`, `BreadcrumbList` | `website` |
+| `/cancellation-policy` | `https://himalayanama.com/cancellation-policy` | `FAQPage`, `BreadcrumbList` | `website` |
+| `/write-for-us` | `https://himalayanama.com/write-for-us` | `WebPage`, `BreadcrumbList` | `website` |
 
 ---
 
