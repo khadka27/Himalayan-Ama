@@ -90,6 +90,7 @@ export default function ContactPage() {
 
       {/* Hero */}
       <Hero
+        badge="Get in Touch"
         title="Contact Himalayan Aama"
         description="We are always happy to hear from you. Get in touch for inquiries, bookings, or local Pokhara guidance."
         image="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop"
@@ -98,12 +99,9 @@ export default function ContactPage() {
       {/* Main Intro (H1) */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6 max-w-5xl text-center space-y-6">
-          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-            Get in Touch
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
-            Contact <span className="text-blue-600">Himalayan Aama</span>
-          </h1>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+            We&apos;d Love to <span className="text-blue-600">Hear From You</span>
+          </h2>
           <p className="text-xl text-gray-600 font-medium leading-relaxed max-w-4xl mx-auto">
             We are always happy to hear from you. Whether you are planning a short vacation, a long stay, or want more information about our self-catering 1BHK apartment in Lakeside, Pokhara, our team is here to assist you.
           </p>
@@ -198,7 +196,7 @@ export default function ContactPage() {
           {/* Interactive Map */}
           <div className="h-[420px] w-full rounded-[32px] overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e0!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp&maptype=satellite"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e1!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp"
               width="100%"
               height="100%"
               style={{ border: 0 }}

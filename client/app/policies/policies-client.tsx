@@ -13,6 +13,7 @@ export default function PoliciesPageClient() {
 
             {/* Hero */}
             <Hero
+                badge="Privacy & Security"
                 title="Privacy Policy"
                 description="Himalayan Aama respects your privacy and is committed to protecting your personal information."
                 image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2070&auto=format&fit=crop"
@@ -21,13 +22,9 @@ export default function PoliciesPageClient() {
             {/* H1 Main Header Section */}
             <section className="py-16 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-xs uppercase tracking-widest border border-blue-100">
-                        <ShieldCheck className="h-4 w-4" />
-                        <span>Effective Date: August 20, 2026</span>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                        Privacy Policy – <span className="text-blue-600">Himalayan Aama</span>
-                    </h1>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Protecting Your <span className="text-blue-600">Personal Information</span>
+                    </h2>
                     <p className="text-xl text-gray-600 leading-relaxed font-medium text-left pt-4">
                         Himalayan Aama respects your privacy and is committed to protecting the personal information you share with us while using our website or booking our self-catering 1BHK apartment in Lakeside, Pokhara. This Privacy Policy explains how we collect, use, and safeguard your information.
                     </p>

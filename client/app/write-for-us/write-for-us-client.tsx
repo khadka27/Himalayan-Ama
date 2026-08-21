@@ -55,6 +55,7 @@ export default function WriteForUsClient() {
 
             {/* Hero */}
             <Hero
+                badge="Guest Contributions"
                 title="Write for Us"
                 description="Share your travel stories, Pokhara tips, and self-catering guides with our growing Himalayan Aama community."
                 image="https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=2073&auto=format&fit=crop"
@@ -63,12 +64,9 @@ export default function WriteForUsClient() {
             {/* H1 Main Title & Welcome */}
             <section className="py-16 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
-                    <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-                        Guest Contributions
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                        Write for Us – <span className="text-blue-600">Himalayan Aama</span>
-                    </h1>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Share Your Stories With <span className="text-blue-600">Our Community</span>
+                    </h2>
                     <p className="text-xl text-gray-600 leading-relaxed font-medium text-left pt-4">
                         Are you passionate about travel, tourism, or the beauty of Pokhara and Lakeside? Do you love sharing tips on self-catering stays, local attractions, or adventure activities? Himalayan Aama welcomes you to contribute!
                     </p>

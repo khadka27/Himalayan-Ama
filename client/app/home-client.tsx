@@ -306,7 +306,6 @@ export default function HomePage() {
             >
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 text-blue-500 text-xs font-bold uppercase tracking-[0.2em]">
-                  <Sparkles className="h-4 w-4" />
                   <span>Unmatched Quality</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">Redefining the <br /><span className="text-blue-500">Rental Experience</span></h2>
@@ -414,48 +413,52 @@ export default function HomePage() {
                 </form>
               </div>
 
-              <div className="relative hidden lg:block h-full">
+              <div className="relative hidden lg:block h-full overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1760&auto=format&fit=crop"
                   alt="Lakeside View"
                   fill
-                  className="object-cover"
+                  className="object-cover blur-[1.5px] scale-105"
                 />
-                <div className="absolute inset-0 bg-blue-600/40 mix-blend-multiply" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-20 text-center space-y-12">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/70 to-slate-900/60 backdrop-blur-sm" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-10 lg:p-14 text-center space-y-10 z-10">
                   <div className="space-y-4">
-                    <div className="h-20 w-20 rounded-[30px] bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center mx-auto mb-8">
-                      <Mail className="h-10 w-10 text-white" />
+                    <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center mx-auto mb-6 shadow-xl">
+                      <Mail className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-4xl font-bold tracking-tight">Direct Path</h3>
-                    <p className="text-blue-100 font-medium">Reach out via our concierge desk for immediate assistance.</p>
+                    <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-white drop-shadow-xl font-[family-name:var(--font-playful)]">
+                      Direct Path
+                    </h3>
+                    <p className="text-white/95 font-medium max-w-xs mx-auto text-base leading-relaxed drop-shadow-md">
+                      Reach out via our concierge desk for immediate assistance.
+                    </p>
                   </div>
 
-                  <div className="space-y-8 w-full max-w-sm">
+                  <div className="space-y-4 w-full max-w-sm">
                     <a
                       href="https://wa.me/9779816685279"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform decoration-transparent"
+                      className="flex items-center gap-5 text-left group cursor-pointer p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900/80 border border-white/20 backdrop-blur-md transition-all decoration-transparent shadow-xl"
                     >
-                      <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
+                      <div className="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
                         <Phone className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-200">Call Us</p>
-                        <p className="text-lg font-bold">+977 9816685279</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-blue-300">Call Us</p>
+                        <p className="text-base lg:text-lg font-bold text-white tracking-wide">+977 9816685279</p>
                       </div>
                     </a>
                     <a
                       href="mailto:info@himalayanama.com"
-                      className="flex items-center gap-6 text-left group cursor-pointer p-2 hover:translate-x-2 transition-transform decoration-transparent"
+                      className="flex items-center gap-5 text-left group cursor-pointer p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900/80 border border-white/20 backdrop-blur-md transition-all decoration-transparent shadow-lg"
                     >
-                      <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center border border-white/10">
+                      <div className="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
                         <Mail className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-blue-200">Email Us</p>
-                        <p className="text-lg font-bold">info@himalayanama.com</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-blue-300">Email Us</p>
+                        <p className="text-base lg:text-lg font-bold text-white tracking-wide">info@himalayanama.com</p>
                       </div>
                     </a>
                   </div>

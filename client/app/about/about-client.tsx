@@ -52,8 +52,9 @@ export default function AboutPageClient() {
 
       {/* Hero Section */}
       <Hero
+        badge="Welcome to Pokhara"
         title="About Himalayan Aama"
-        description="A peaceful self-catering 1BHK apartment in Lakeside, Pokhara created for travelers seeking comfort, privacy, and freedom."
+        description="Your Home Away from Home in Lakeside Pokhara"
         image="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop"
       />
 
@@ -61,12 +62,6 @@ export default function AboutPageClient() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="space-y-8 text-center">
-            <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-              Welcome to Pokhara
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight leading-tight">
-              About <span className="text-blue-600">Himalayan Aama</span>
-            </h1>
             <div className="space-y-6 text-xl text-gray-600 leading-relaxed font-medium text-left max-w-4xl mx-auto pt-4">
               <p>
                 Welcome to <strong>Himalayan Aama</strong>, a peaceful self-catering 1BHK apartment in Lakeside, Pokhara, created for travelers who prefer comfort, privacy, and a home-like stay instead of a traditional hotel experience.

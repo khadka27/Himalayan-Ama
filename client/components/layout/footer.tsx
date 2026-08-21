@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="bg-slate-900 text-white border-t border-slate-800">
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
-          
+
           {/* Brand & Mission */}
           <div className="space-y-6">
             <div className="space-y-2">
@@ -87,7 +87,6 @@ export function Footer() {
 
             <div className="mt-6 pt-4 border-t border-slate-800">
               <span className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                <Sparkles className="h-3.5 w-3.5 text-blue-400" />
                 <span>Near Phewa Lake, Pokhara</span>
               </span>
             </div>

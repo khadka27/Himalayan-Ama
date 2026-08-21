@@ -212,6 +212,7 @@ export default function ServicesPage() {
 
             {/* Hero Section */}
             <Hero
+                badge="Apartment Amenities"
                 title="Services & Amenities in Lakeside Pokhara"
                 description="Comfort that makes you feel at home. Experience apartment-style independence with practical guest support."
                 image="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"
@@ -220,14 +221,8 @@ export default function ServicesPage() {
             {/* H1 Title & Intro */}
             <section className="py-16 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
-                    <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-                        Apartment Amenities
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                        Services & Amenities in <span className="text-blue-600">Lakeside Pokhara</span>
-                    </h1>
-                    <h2 className="text-2xl font-bold text-gray-800 pt-2">
-                        Comfort That Makes You Feel at Home
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Everything You Need for a <span className="text-blue-600">Comfortable Stay</span>
                     </h2>
                     <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-medium text-left pt-2">
                         At Himalayan Aama, we believe a comfortable stay in Pokhara should give you more than just a place to sleep. It should give you the freedom to live at your own pace, prepare your own meals, relax when you need to, and get support if something in the apartment needs attention.

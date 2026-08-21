@@ -131,7 +131,7 @@ export default function BlogDetailPage() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/30 to-black/20 backdrop-blur-[2px]" />
 
         <div className="absolute inset-0 flex items-end pb-24">
           <div className="container mx-auto px-6">

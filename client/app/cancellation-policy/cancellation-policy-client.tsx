@@ -14,6 +14,7 @@ export default function CancellationPolicyClient() {
 
             {/* Hero */}
             <Hero
+                badge="Booking Flexibility"
                 title="Cancellation & Refund Policy"
                 description="Transparent, simple, and flexible booking cancellation guidelines for your stay at Himalayan Aama."
                 image="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop"
@@ -22,12 +23,9 @@ export default function CancellationPolicyClient() {
             {/* H1 Title & Intro */}
             <section className="py-16 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
-                    <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-                        Booking Flexibility
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                        Cancellation & Refund Policy – <span className="text-blue-600">Himalayan Aama</span>
-                    </h1>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Flexible & Transparent <span className="text-blue-600">Booking Terms</span>
+                    </h2>
                     <p className="text-xl text-gray-600 leading-relaxed font-medium text-left pt-4">
                         At Himalayan Aama, we aim to make booking a self-catering 1BHK apartment in Lakeside, Pokhara simple, flexible, and transparent. Our cancellation and refund policy ensures guests can plan their stay confidently while reflecting the manual booking request system on our website.
                     </p>

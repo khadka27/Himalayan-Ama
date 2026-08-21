@@ -13,6 +13,7 @@ export default function DisclaimerPageClient() {
 
             {/* Hero */}
             <Hero
+                badge="Legal Information"
                 title="Disclaimer & Guest Information"
                 description="Important information regarding the use of our self-catering 1BHK apartment in Lakeside, Pokhara."
                 image="https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2070&auto=format&fit=crop"
@@ -21,12 +22,9 @@ export default function DisclaimerPageClient() {
             {/* H1 Main Title & Welcome */}
             <section className="py-16 bg-white border-b border-slate-100">
                 <div className="container mx-auto px-6 max-w-4xl text-center space-y-6">
-                    <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
-                        Legal Information
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                        Disclaimer & <span className="text-blue-600">Guest Information</span>
-                    </h1>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
+                        Important Guest & <span className="text-blue-600">Property Details</span>
+                    </h2>
                     <p className="text-xl text-gray-600 leading-relaxed font-medium text-left pt-4">
                         Welcome to Himalayan Aama, a peaceful self-catering 1BHK apartment in Lakeside, Pokhara. By using our website and staying at our property, you agree to the following terms and understand the scope of our responsibilities.
                     </p>
