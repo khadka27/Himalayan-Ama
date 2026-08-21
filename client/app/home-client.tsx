@@ -367,7 +367,7 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto bg-white rounded-[40px] overflow-hidden shadow-2xl border-none relative">
             <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-8 md:p-12 lg:p-20 space-y-10">
+              <div className="p-6 sm:p-10 md:p-12 lg:p-20 space-y-8 md:space-y-10">
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight">Need a <span className="text-blue-500">Consultation?</span></h2>
                   <p className="text-base md:text-lg text-gray-500 font-medium leading-relaxed">
@@ -413,7 +413,7 @@ export default function HomePage() {
                 </form>
               </div>
 
-              <div className="relative hidden lg:block h-full overflow-hidden">
+              <div className="relative block h-full min-h-[420px] rounded-b-[40px] lg:rounded-b-none lg:rounded-r-[40px] overflow-hidden">
                 <Image
                   src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1760&auto=format&fit=crop"
                   alt="Lakeside View"
@@ -421,7 +421,7 @@ export default function HomePage() {
                   className="object-cover blur-[1.5px] scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/70 to-slate-900/60 backdrop-blur-sm" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-10 lg:p-14 text-center space-y-10 z-10">
+                <div className="relative lg:absolute inset-0 flex flex-col items-center justify-center text-white p-8 sm:p-10 lg:p-14 text-center space-y-8 lg:space-y-10 z-10 py-12">
                   <div className="space-y-4">
                     <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center mx-auto mb-6 shadow-xl">
                       <Mail className="h-8 w-8 text-white" />

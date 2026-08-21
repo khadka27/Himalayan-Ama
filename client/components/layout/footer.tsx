@@ -4,8 +4,8 @@ import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail, Sparkles } 
 export function Footer() {
   return (
     <footer className="bg-slate-900 text-white border-t border-slate-800">
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 sm:px-6 py-12 md:py-16">
+        <div className="grid grid-cols-1 gap-8 sm:gap-12 sm:grid-cols-2 lg:grid-cols-4">
 
           {/* Brand & Mission */}
           <div className="space-y-6">

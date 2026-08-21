@@ -113,10 +113,10 @@ export default function ContactPage() {
         <div className="container mx-auto px-6 max-w-6xl space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Reach Us Card */}
-            <Card className="p-10 rounded-[32px] bg-white shadow-xl border-none space-y-8">
+            <Card className="p-6 sm:p-10 rounded-[24px] sm:rounded-[32px] bg-white shadow-xl border-none space-y-6 sm:space-y-8">
               <div className="space-y-3">
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-600">Contact Details</span>
-                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">How to Reach Us</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">How to Reach Us</h2>
               </div>
 
               <div className="space-y-6">
@@ -126,7 +126,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Address</span>
-                    <p className="text-lg font-bold text-gray-900">Street No. 16, Lakeside, Pokhara, Nepal</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900">Street No. 16, Lakeside, Pokhara, Nepal</p>
                   </div>
                 </div>
 
@@ -136,7 +136,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Phone</span>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-base sm:text-lg font-bold text-gray-900">
                       <a href="tel:+9779816685279" className="hover:text-blue-600 transition-colors">
                         +977 9816685279
                       </a>
@@ -150,7 +150,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Email</span>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-base sm:text-lg font-bold text-gray-900 break-all sm:break-normal">
                       <a href="mailto:info@himalayanAama.com" className="hover:text-blue-600 transition-colors">
                         info@himalayanAama.com
                       </a>
@@ -159,22 +159,22 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <p className="text-gray-600 text-base leading-relaxed font-medium pt-2 border-t border-slate-100">
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed font-medium pt-2 border-t border-slate-100">
                 Himalayan Aama is conveniently located near Phewa Lake, making it easy to reach from anywhere in Pokhara. Whether you are a local guest or an international traveler, finding us is simple.
               </p>
             </Card>
 
             {/* Booking Inquiries Card */}
-            <Card className="p-10 rounded-[32px] bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-xl border-none space-y-6 flex flex-col justify-between h-full">
+            <Card className="p-6 sm:p-10 rounded-[24px] sm:rounded-[32px] bg-gradient-to-br from-blue-600 to-blue-800 text-white shadow-xl border-none space-y-6 flex flex-col justify-between h-full">
               <div className="space-y-4">
                 <div className="h-14 w-14 rounded-2xl bg-white/10 text-white flex items-center justify-center backdrop-blur-md">
                   <CalendarCheck className="h-7 w-7" />
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight">Booking Inquiries</h2>
-                <p className="text-lg text-blue-50 leading-relaxed font-medium">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Booking Inquiries</h2>
+                <p className="text-base sm:text-lg text-blue-50 leading-relaxed font-medium">
                   To reserve your private apartment in Pokhara or check availability, simply send us an email or call. We respond promptly to all booking requests.
                 </p>
-                <p className="text-base text-blue-100/90 leading-relaxed font-medium">
+                <p className="text-sm sm:text-base text-blue-100/90 leading-relaxed font-medium">
                   Guests can also use our online booking form below to confirm their stay at our BBQ-friendly self-catering apartment in Lakeside Pokhara.
                 </p>
               </div>
@@ -194,7 +194,7 @@ export default function ContactPage() {
           </div>
 
           {/* Interactive Map */}
-          <div className="h-[420px] w-full rounded-[32px] overflow-hidden shadow-2xl border-8 border-white bg-slate-100">
+          <div className="h-[300px] sm:h-[420px] w-full rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-2xl border-4 sm:border-8 border-white bg-slate-100">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d878.8156819840887!2d83.9399961!3d28.2297043!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595c96a3e7797%3A0xf5808af50c886ae1!2sHimalayan%20Aama%20Apartment!5e1!3m2!1sen!2snp!4v1770621608284!5m2!1sen!2snp"
               width="100%"
@@ -211,9 +211,9 @@ export default function ContactPage() {
       </section>
 
       {/* Send Us a Message (H2) & Form */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <Card className="p-10 md:p-14 rounded-[40px] shadow-2xl border border-gray-100 bg-white space-y-10">
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
+          <Card className="p-6 sm:p-10 md:p-14 rounded-[24px] sm:rounded-[40px] shadow-2xl border border-gray-100 bg-white space-y-8 sm:space-y-10">
             <div className="text-center space-y-3">
               <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100 inline-block">
                 Online Form
