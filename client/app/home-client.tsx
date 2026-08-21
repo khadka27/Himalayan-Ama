@@ -421,71 +421,67 @@ export default function HomePage() {
         </div>
       </AnimatedSection>
 
-      {/* Why Choose Us */}
-      <AnimatedSection className="py-16 md:py-32 bg-white">
+      {/* Why Choose Us / Minimal Luxury Section */}
+      <AnimatedSection className="py-20 lg:py-32 bg-white relative overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Content Column */}
             <motion.div
-              className="space-y-8 md:space-y-10"
-              initial={{ opacity: 0, x: -50 }}
+              className="lg:col-span-6 space-y-8"
+              initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 text-blue-500 text-xs font-bold uppercase tracking-[0.2em]">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/80 text-blue-600 text-xs font-bold uppercase tracking-widest border border-blue-100/80 shadow-xs">
                   <span>Unmatched Quality</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight">Redefining the <br /><span className="text-blue-500">Rental Experience</span></h2>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-[1.1] tracking-tight font-[family-name:var(--font-playful)]">
+                  Redefining the <br />
+                  <span className="text-blue-600">Rental Experience</span>
+                </h2>
+                <p className="text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-xl">
+                  We believe that luxury is not just about aesthetics, but about the feeling of complete peace, privacy, and seamless living.
+                </p>
               </div>
 
-              <p className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
-                We believe that luxury is not just about aesthetics, but about the feeling of complete peace and seamless living.
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 {[
                   { icon: <MapPin className="h-5 w-5" />, label: "Prime Lakeside Locations" },
                   { icon: <DollarSign className="h-5 w-5" />, label: "Transparent Pricing" },
                   { icon: <Check className="h-5 w-5" />, label: "Luxury Furnishing" },
                   { icon: <Phone className="h-5 w-5" />, label: "Custom Concierge" },
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center gap-4 p-5 bg-slate-50 rounded-2xl border border-white hover:bg-blue-50 hover:border-blue-100 transition-all group">
-                    <div className="text-blue-500 group-hover:scale-110 transition-transform">{feature.icon}</div>
-                    <span className="font-bold text-gray-900">{feature.label}</span>
+                  <div key={index} className="flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200/60 shadow-xs hover:bg-white hover:shadow-md hover:border-blue-200/80 transition-all group cursor-default">
+                    <div className="h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xs">
+                      {feature.icon}
+                    </div>
+                    <span className="font-bold text-slate-900 text-sm">{feature.label}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
+            {/* Right Image Column */}
             <motion.div
-              className="relative"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              className="lg:col-span-6 relative"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <div className="relative h-[400px] md:h-[600px] rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white group">
+              <div className="relative h-[380px] sm:h-[480px] lg:h-[540px] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-4 sm:border-8 border-white group">
                 <Image
                   src="https://th.bing.com/th/id/R.eca02af78c024b183a27d12d22af0979?rik=AC5jizk3yXq9Cg&pid=ImgRaw&r=0"
-                  alt="Modern Interior"
+                  alt="Modern Luxury Interior"
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-blue-500/5 mix-blend-overlay" />
-              </div>
-              <div className="absolute -bottom-10 -left-10 bg-white p-8 rounded-[40px] shadow-2xl border border-gray-50 hidden md:block">
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
-                    <Star className="h-8 w-8 fill-current" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900 tracking-tight">4.9/5</p>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Average Resident Rating</p>
-                  </div>
-                </div>
               </div>
             </motion.div>
+
           </div>
         </div>
       </AnimatedSection>
