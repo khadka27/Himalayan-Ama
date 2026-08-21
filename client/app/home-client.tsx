@@ -11,6 +11,13 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Star,
   Check,
   Phone,
@@ -19,7 +26,9 @@ import {
   MapPin,
   DollarSign,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Loader2,
+  Send
 } from "lucide-react"
 import Image from "next/image"
 import { ApartmentBookingModal } from "@/components/apartment-booking-modal"
@@ -55,6 +64,7 @@ export default function HomePage() {
     name: "",
     email: "",
     phone: "",
+    service: "general",
     message: "",
   })
 
@@ -76,30 +86,43 @@ export default function HomePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.message || !formData.email) {
-      toast.info("Please fill in all required details")
+      toast.error("Please fill in all required details")
+      return
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address")
       return
     }
 
     try {
       setIsSubmitting(true)
-      const payload = { ...formData, flat: "General Inquiry" }
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        phone: formData.phone || undefined,
+        flat: formData.service === "general" ? "General Inquiry" : `Apartment Inquiry: ${formData.service}`,
+      }
 
       const { data } = await axiosInstance.post("/api/v1/inquiry", payload)
 
       if (data.status || data.success) {
-        toast.success("Inquiry sent successfully!")
+        toast.success(data.message || "Message sent successfully!")
         setFormData({
           name: "",
           email: "",
           phone: "",
+          service: "general",
           message: "",
         })
       } else {
-        toast.info(data.message || "Inquiry not sent")
+        toast.error(data.message || "Failed to send inquiry")
       }
     } catch (err) {
-      const Err = err as Error
-      toast.error(Err.message)
+      const error = err as Error
+      toast.error(error.message || "An error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -111,71 +134,177 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      <section className="relative h-screen min-h-[700px] overflow-hidden">
-        <motion.div style={{ scale: heroScale }} className="absolute inset-0">
+      {/* Hero Section (SolCharge Style - 1 Single Screen Fold) */}
+      <section className="relative w-full lg:h-screen min-h-[620px] lg:max-h-[920px] overflow-hidden bg-[#ebf3fa] flex flex-col justify-between pb-3 lg:pb-6 border-b border-slate-200/80">
+        {/* Top Hero Photo Frame */}
+        <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[68%] min-h-[360px] max-h-[580px] overflow-hidden shrink-0">
           <Image
-            src={"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2000&auto=format&fit=crop"}
+            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2000&auto=format&fit=crop"
             alt="Luxury Residence in Pokhara"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
           />
-          <div className="absolute inset-0 bg-black/40" />
-        </motion.div>
-
-        <div className="relative container mx-auto h-full flex flex-col items-center justify-center px-6">
-          <motion.div
-            className="max-w-4xl space-y-10 text-center"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          >
-            <div className="space-y-6">
-
-
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] text-white tracking-tighter drop-shadow-2xl font-[family-name:var(--font-playful)]">
-                <span className="text-white">Experience</span>
-                <br />
-                <span className="text-blue-200">Pokhara</span>
-                <span className="text-white"> Refined</span>
-              </h1>
-            </div>
-
-            <p className="text-lg md:text-xl lg:text-2xl text-white/90 leading-relaxed font-medium max-w-2xl mx-auto text-balance drop-shadow-lg">
-              Indulge in carefully curated apartments where modern luxury meets the timeless serenity of the Himalayas.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center pt-6">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 transition-all font-bold px-8 md:px-12 h-14 md:h-16 text-base md:text-lg rounded-xl shadow-2xl shadow-blue-500/20 hover:scale-105"
-                onClick={() => router.push("/apartments")}
-              >
-                Explore Residences
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto border-2 border-white/30 text-white hover:bg-white hover:text-gray-900 transition-all font-bold px-8 md:px-12 h-14 md:h-16 text-base md:text-lg rounded-xl backdrop-blur-md bg-white/5"
-                onClick={() => {
-                  document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })
-                }}
-              >
-                Featured Suites
-              </Button>
-            </div>
-          </motion.div>
+          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-slate-900/35 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#ebf3fa] via-[#ebf3fa]/80 to-transparent pointer-events-none" />
         </div>
 
-        <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="h-10 w-6 rounded-full border-2 border-white/20 flex justify-center p-1">
-            <div className="h-2 w-1 bg-white rounded-full" />
+        {/* Content Wrapper */}
+        <div className="container mx-auto px-4 sm:px-6 relative z-10 -mt-32 sm:-mt-44 lg:-mt-56 flex-1 flex flex-col justify-end pb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+
+            {/* Left Content Column */}
+            <motion.div
+              className="lg:col-span-7 space-y-3 sm:space-y-4 text-left pt-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-blue-200/80 text-blue-700 text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-xs">
+                <span>Self-Catering 1BHK in Lakeside Pokhara</span>
+              </div>
+
+              <div className="space-y-2 sm:space-y-3">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-[1.05] text-slate-900 tracking-tight font-[family-name:var(--font-playful)]">
+                  Experience <br />
+                  <span className="text-blue-600">Pokhara Refined</span>
+                </h1>
+                <p className="text-xs sm:text-sm lg:text-base text-slate-700 font-medium leading-relaxed max-w-lg">
+                  Indulge in carefully curated apartments where modern luxury meets the timeless serenity of the Himalayas.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
+                  onClick={() => router.push("/apartments")}
+                >
+                  Explore Residences
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full bg-white/80 backdrop-blur-sm"
+                  onClick={() => {
+                    document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })
+                  }}
+                >
+                  Featured Suites
+                </Button>
+              </div>
+            </motion.div>
+
+            {/* Right Overlapping Card + Micro Badges */}
+            <motion.div
+              className="lg:col-span-5 space-y-3 lg:space-y-4"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              {/* Floating Form Overlay Card */}
+              <div className="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] shadow-2xl border border-white/80 space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight font-[family-name:var(--font-playful)]">Quick Stay Consultation</h3>
+                  <p className="text-xs text-slate-500 font-medium">Reach out directly for availability & instant quotes.</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-3.5">
+                  <div className="grid grid-cols-2 gap-3.5">
+                    <Input
+                      placeholder="Your Name"
+                      className="bg-slate-100/90 border-none h-11 sm:h-12 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium px-4 text-slate-800"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                    />
+                    <Input
+                      placeholder="Phone Number"
+                      className="bg-slate-100/90 border-none h-11 sm:h-12 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium px-4 text-slate-800"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3.5">
+                    <Input
+                      placeholder="Email Address"
+                      type="email"
+                      className="bg-slate-100/90 border-none h-11 sm:h-12 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium px-4 text-slate-800"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
+                    />
+                    <Select
+                      value={formData.service}
+                      onValueChange={(value) => setFormData({ ...formData, service: value })}
+                    >
+                      <SelectTrigger className="bg-slate-100/90 border-none h-11 sm:h-12 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium px-4 text-slate-800">
+                        <SelectValue placeholder="Inquiry Type" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-none shadow-xl">
+                        <SelectItem value="general" className="text-xs sm:text-sm font-medium">General Inquiry</SelectItem>
+                        {flats.map((flat) => (
+                          <SelectItem key={flat._id} value={flat.flatName} className="text-xs sm:text-sm font-medium">
+                            {flat.flatName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Textarea
+                    placeholder="Your Message / Travel Dates..."
+                    className="bg-slate-100/90 border-none min-h-[85px] rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium p-4 resize-none text-slate-800"
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    required
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-blue-500/20 text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <span>Submit Inquiry</span>
+                        <Send className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </div>
+
+              {/* 3 Micro Feature Badges */}
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <Home className="h-3.5 w-3.5" />
+                  </div>
+                  <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">Self-Catering Kitchen</p>
+                </div>
+
+                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <Phone className="h-3.5 w-3.5" />
+                  </div>
+                  <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">BBQ & Open Yard</p>
+                </div>
+
+                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                    <MapPin className="h-3.5 w-3.5" />
+                  </div>
+                  <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">Walk to Phewa Lake</p>
+                </div>
+              </div>
+            </motion.div>
+
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Featured Apartments */}
@@ -241,7 +370,6 @@ export default function HomePage() {
 
                         {activeOffer && (
                           <div className="absolute top-4 md:top-6 left-4 md:left-6 bg-red-600 text-white px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-1.5 animate-pulse z-10 transition-transform group-hover:scale-110">
-                            <Sparkles className="h-3 w-3 text-yellow-300 fill-yellow-300" />
                             {activeOffer.discountPercentage}% OFF
                           </div>
                         )}
@@ -426,7 +554,7 @@ export default function HomePage() {
                     <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center mx-auto mb-6 shadow-xl">
                       <Mail className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-white drop-shadow-xl font-[family-name:var(--font-playful)]">
+                    <h3 className="text-4xl lg:text-5xl font-bold tracking-tight !text-white drop-shadow-xl font-[family-name:var(--font-playful)]">
                       Direct Path
                     </h3>
                     <p className="text-white/95 font-medium max-w-xs mx-auto text-base leading-relaxed drop-shadow-md">
