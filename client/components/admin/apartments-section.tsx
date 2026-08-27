@@ -42,6 +42,18 @@ export function ApartmentsSection() {
         fetchFlats()
     }, [])
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                resetForm()
+            }
+        }
+        if (showForm) {
+            window.addEventListener("keydown", handleKeyDown)
+        }
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [showForm])
+
     const fetchFlats = async () => {
         try {
             setIsLoading(true)
@@ -233,10 +245,10 @@ export function ApartmentsSection() {
             </div>
 
             {showForm && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
-                    <div className="bg-white rounded-[40px] w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
-                        <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                            <h3 className="text-xl font-bold text-slate-900 leading-none">
+                <div className="fixed inset-0 w-screen h-screen min-h-screen bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6 overflow-y-auto">
+                    <div className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in duration-300 my-auto">
+                        <div className="px-6 sm:px-10 py-5 sm:py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-none">
                                 {editingFlat ? "Refine Property" : "New Listing"}
                             </h3>
                             <button onClick={resetForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
@@ -244,7 +256,7 @@ export function ApartmentsSection() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Property Name</label>
@@ -294,7 +306,7 @@ export function ApartmentsSection() {
 
                             <div className="space-y-4">
                                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Gallery</label>
-                                <div className="border-2 border-dashed border-slate-100 rounded-[32px] p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer relative">
+                                <div className="border-2 border-dashed border-slate-100 rounded-[32px] p-6 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer relative">
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -303,7 +315,7 @@ export function ApartmentsSection() {
                                         className="absolute inset-0 opacity-0 cursor-pointer"
                                     />
                                     <div className="flex flex-col items-center gap-2">
-                                        <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 mb-2">
+                                        <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 mb-1">
                                             <ImageIcon size={24} />
                                         </div>
                                         <p className="text-sm font-bold text-slate-700">Drop images here or click to browse</p>
@@ -324,7 +336,7 @@ export function ApartmentsSection() {
                                                 <button
                                                     type="button"
                                                     onClick={() => removeImage(index)}
-                                                    className="absolute top-2 right-2 h-7 w-7 bg-white/90 backdrop-blur-sm text-red-500 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                                                    className="absolute top-2 right-2 h-7 w-7 bg-white/90 backdrop-blur-sm text-red-500 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm cursor-pointer"
                                                 >
                                                     <X size={14} />
                                                 </button>
@@ -345,18 +357,18 @@ export function ApartmentsSection() {
                                 <span className="text-sm font-bold text-slate-600">Visible for potential clients</span>
                             </div>
 
-                            <div className="flex gap-4 pt-4">
+                            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md pt-4 pb-2 border-t border-slate-100 -mx-6 sm:-mx-10 px-6 sm:px-10 -mb-6 sm:-mb-10 mt-6 flex gap-4 z-20">
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-14 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:bg-slate-200"
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-13 sm:h-14 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:bg-slate-200 cursor-pointer"
                                 >
                                     {isLoading ? "Synchronizing..." : editingFlat ? "Update Listing" : "Publish Listing"}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={resetForm}
-                                    className="h-14 px-8 rounded-2xl font-bold bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                    className="h-13 sm:h-14 px-6 sm:px-8 rounded-2xl font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all cursor-pointer"
                                 >
                                     Cancel
                                 </button>

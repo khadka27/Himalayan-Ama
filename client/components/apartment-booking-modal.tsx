@@ -49,6 +49,18 @@ export function ApartmentBookingModal({ open, onOpenChange, flat }: ApartmentBoo
         }
     }, [open, flat])
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onOpenChange(false)
+            }
+        }
+        if (open) {
+            window.addEventListener("keydown", handleKeyDown)
+        }
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [open])
+
     const fetchBookings = async () => {
         try {
             const { data } = await axiosInstance.get(`/api/v1/bookings/flat/${flat?._id}`)

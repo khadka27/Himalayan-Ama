@@ -7,38 +7,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "kirsten-vaulted-margarita.ngrok-free.dev",
+        hostname: "**",
       },
       {
         protocol: "http",
-        hostname: "209.126.86.149",
+        hostname: "**",
       },
-      {
-        protocol: "https",
-        hostname: "avatar.vercel.sh",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8000",
-      },
-      {
-        protocol: "http",
-        hostname: "127.0.0.1",
-        port: "8000",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "th.bing.com",
-      }
     ],
   },
 

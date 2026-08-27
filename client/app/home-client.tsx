@@ -134,10 +134,10 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section (SolCharge Style - 1 Single Screen Fold) */}
-      <section className="relative w-full lg:h-screen min-h-[620px] lg:max-h-[920px] overflow-hidden bg-[#ebf3fa] flex flex-col justify-between pb-3 lg:pb-6 border-b border-slate-200/80">
+      {/* Hero Section (SolCharge Style - Dynamic Screen Fold) */}
+      <section className="relative w-full min-h-[calc(100vh-80px)] h-auto bg-[#ebf3fa] flex flex-col justify-between py-6 sm:py-8 lg:py-12 border-b border-slate-200/80">
         {/* Top Hero Photo Frame */}
-        <div className="relative w-full h-[400px] sm:h-[480px] lg:h-[68%] min-h-[360px] max-h-[580px] overflow-hidden shrink-0">
+        <div className="absolute top-0 left-0 right-0 h-[420px] sm:h-[500px] lg:h-[65%] min-h-[360px] max-h-[600px] overflow-hidden pointer-events-none">
           <Image
             src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=2000&auto=format&fit=crop"
             alt="Luxury Residence in Pokhara"
@@ -145,17 +145,17 @@ export default function HomePage() {
             className="object-cover object-center"
             priority
           />
-          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-slate-900/35 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#ebf3fa] via-[#ebf3fa]/80 to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-900/40 via-slate-900/15 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-56 bg-gradient-to-t from-[#ebf3fa] via-[#ebf3fa]/85 to-transparent pointer-events-none" />
         </div>
 
         {/* Content Wrapper */}
-        <div className="container mx-auto px-4 sm:px-6 relative z-10 -mt-32 sm:-mt-44 lg:-mt-56 flex-1 flex flex-col justify-end pb-2">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-end">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-16 sm:pt-24 lg:pt-32 my-auto flex-1 flex flex-col justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-end">
 
             {/* Left Content Column */}
             <motion.div
-              className="lg:col-span-7 space-y-3 sm:space-y-4 text-left pt-2"
+              className="lg:col-span-7 space-y-4 sm:space-y-5 text-left pb-2 lg:pb-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -175,10 +175,10 @@ export default function HomePage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Button
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   onClick={() => router.push("/apartments")}
                 >
                   Explore Residences
@@ -186,7 +186,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full bg-white/80 backdrop-blur-sm"
+                  className="border-2 border-blue-200 text-blue-700 hover:bg-blue-50 transition-all font-bold px-6 sm:px-8 h-11 sm:h-12 text-xs sm:text-sm rounded-full bg-white/80 backdrop-blur-sm cursor-pointer"
                   onClick={() => {
                     document.getElementById("featured")?.scrollIntoView({ behavior: "smooth" })
                   }}
@@ -204,14 +204,14 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               {/* Floating Form Overlay Card */}
-              <div className="bg-white/95 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] shadow-2xl border border-white/80 space-y-4">
+              <div className="bg-white/95 backdrop-blur-xl p-5 sm:p-7 rounded-[32px] shadow-2xl border border-white/80 space-y-4">
                 <div className="space-y-1">
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight font-[family-name:var(--font-playful)]">Quick Stay Consultation</h3>
                   <p className="text-xs text-slate-500 font-medium">Reach out directly for availability & instant quotes.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-3.5">
-                  <div className="grid grid-cols-2 gap-3.5">
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <Input
                       placeholder="Your Name"
                       className="bg-slate-100/90 border-none h-11 sm:h-12 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium px-4 text-slate-800"
@@ -227,7 +227,7 @@ export default function HomePage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-2 gap-3">
                     <Input
                       placeholder="Email Address"
                       type="email"
@@ -256,14 +256,14 @@ export default function HomePage() {
 
                   <Textarea
                     placeholder="Your Message / Travel Dates..."
-                    className="bg-slate-100/90 border-none min-h-[85px] rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium p-4 resize-none text-slate-800"
+                    className="bg-slate-100/90 border-none min-h-[80px] rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 text-xs sm:text-sm font-medium p-3.5 resize-none text-slate-800"
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     required
                   />
                   <Button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-blue-500/20 text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 sm:h-12 rounded-xl shadow-lg shadow-blue-500/20 text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -279,23 +279,23 @@ export default function HomePage() {
               </div>
 
               {/* 3 Micro Feature Badges */}
-              <div className="grid grid-cols-3 gap-2.5">
-                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
-                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+              <div className="grid grid-cols-3 gap-2 sm:gap-2.5 pt-1">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 backdrop-blur-md border border-white/90 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
                     <Home className="h-3.5 w-3.5" />
                   </div>
                   <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">Self-Catering Kitchen</p>
                 </div>
 
-                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
-                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 backdrop-blur-md border border-white/90 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
                     <Phone className="h-3.5 w-3.5" />
                   </div>
                   <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">BBQ & Open Yard</p>
                 </div>
 
-                <div className="p-2.5 sm:p-3 rounded-xl bg-[#dce8f5] border border-white/80 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
-                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 backdrop-blur-md border border-white/90 text-center space-y-1 flex flex-col items-center justify-center shadow-xs">
+                  <div className="h-6 w-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
                     <MapPin className="h-3.5 w-3.5" />
                   </div>
                   <p className="text-[9px] sm:text-[10px] font-bold text-slate-900 leading-tight">Walk to Phewa Lake</p>

@@ -46,6 +46,18 @@ export function HostsSection() {
         fetchHosts()
     }, [])
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                closeForm()
+            }
+        }
+        if (showForm) {
+            window.addEventListener("keydown", handleKeyDown)
+        }
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [showForm])
+
     const fetchHosts = async () => {
         try {
             setIsLoading(true)
@@ -250,10 +262,10 @@ export function HostsSection() {
             </div>
 
             {showForm && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
-                    <div className="bg-white rounded-[40px] w-full max-w-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
-                        <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                            <h3 className="text-xl font-bold text-slate-900 leading-none">
+                <div className="fixed inset-0 w-screen h-screen min-h-screen bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6 overflow-y-auto">
+                    <div className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in duration-300 my-auto">
+                        <div className="px-6 sm:px-10 py-5 sm:py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-none">
                                 {editingHost ? "Edit Host Profile" : "New Host Profile"}
                             </h3>
                             <button onClick={closeForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
@@ -261,7 +273,7 @@ export function HostsSection() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                        <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Full Name</label>
@@ -357,7 +369,7 @@ export function HostsSection() {
                                     <textarea
                                         value={formData.bioParagraphsText}
                                         onChange={(e) => setFormData({ ...formData, bioParagraphsText: e.target.value })}
-                                        className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-600 min-h-[140px] transition-all"
+                                        className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-4 focus:ring-blue-50 font-medium text-slate-600 min-h-[120px] transition-all"
                                         placeholder="Paragraph 1...&#10;&#10;Paragraph 2...&#10;&#10;Paragraph 3..."
                                     />
                                 </div>
@@ -365,21 +377,25 @@ export function HostsSection() {
 
                             <div className="space-y-4">
                                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Profile Photo</label>
-                                <div className="border-2 border-dashed border-slate-100 rounded-[32px] p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer relative">
+                                <div className="border-2 border-dashed border-slate-200 rounded-[32px] p-6 text-center bg-slate-50/50 hover:bg-slate-100/80 transition-colors cursor-pointer relative group">
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
-                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                                     />
                                     {imagePreview ? (
-                                        <div className="relative w-40 h-40 mx-auto rounded-[32px] overflow-hidden shadow-xl border-4 border-white">
+                                        <div className="relative w-36 h-36 mx-auto rounded-[28px] overflow-hidden shadow-xl border-4 border-white group-hover:scale-105 transition-all">
                                             <Image src={imagePreview} alt="Preview" fill className="object-cover" />
+                                            <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1 z-10">
+                                                <Camera size={22} />
+                                                <span className="text-[10px] font-bold uppercase tracking-wider">Change Photo</span>
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center gap-2">
-                                            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 mb-2">
-                                                <Camera size={28} />
+                                            <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-slate-400 mb-1">
+                                                <Camera size={24} />
                                             </div>
                                             <p className="text-sm font-bold text-slate-700">Upload a professional portrait</p>
                                             <p className="text-xs text-slate-400 font-medium italic">Supports JPG, PNG (Recommended 800x800)</p>
@@ -399,18 +415,18 @@ export function HostsSection() {
                                 <span className="text-sm font-bold text-slate-600">Profile is visible in "About Us" section</span>
                             </div>
 
-                            <div className="flex gap-4 pt-4">
+                            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md pt-4 pb-2 border-t border-slate-100 -mx-6 sm:-mx-10 px-6 sm:px-10 -mb-6 sm:-mb-10 mt-6 flex gap-4 z-20">
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="flex-1 bg-slate-900 hover:bg-black text-white font-bold h-14 rounded-2xl shadow-xl shadow-slate-100 transition-all active:scale-95 disabled:opacity-50"
+                                    className="flex-1 bg-slate-900 hover:bg-black text-white font-bold h-13 sm:h-14 rounded-2xl shadow-xl shadow-slate-100 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                                 >
                                     {isLoading ? "Saving Changes..." : editingHost ? "Update Profile" : "Create Host Profile"}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={closeForm}
-                                    className="h-14 px-8 rounded-2xl font-bold bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                    className="h-13 sm:h-14 px-6 sm:px-8 rounded-2xl font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all cursor-pointer"
                                 >
                                     Cancel
                                 </button>

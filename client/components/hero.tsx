@@ -3,7 +3,7 @@ import React from 'react'
 export default function Hero({ badge, title, description, isReview, image }: { badge?: React.ReactNode, title?: React.ReactNode, description?: string, isReview?: boolean, image?: string }) {
   return (
     <section
-      className="relative h-[260px] sm:h-[340px] md:h-[450px] overflow-hidden bg-slate-900"
+      className="relative min-h-[260px] sm:min-h-[320px] md:min-h-[400px] h-auto overflow-hidden bg-slate-900 py-12 sm:py-16 flex items-center justify-center"
     >
       <div
         className="absolute inset-0 bg-cover bg-center blur-[3px] scale-105"
@@ -14,7 +14,7 @@ export default function Hero({ badge, title, description, isReview, image }: { b
       {/* Overlay with Backdrop Blur for high contrast & text readability */}
       <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px]" />
 
-      <div className="relative container mx-auto flex h-full flex-col items-center justify-center px-4 sm:px-6 text-center z-10 pt-8 sm:pt-0">
+      <div className="relative container mx-auto flex h-full flex-col items-center justify-center px-4 sm:px-6 text-center z-10">
         {badge && (
           <span className="mb-2 sm:mb-4 text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/20 backdrop-blur-md inline-block shadow-lg">
             {badge}

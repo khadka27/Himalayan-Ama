@@ -33,14 +33,22 @@ import {
     Footprints,
     FileText,
     Coins,
-    Glasses
+    Glasses,
+    Layout,
+    List,
+    Layers,
+    Activity,
+    Cloud,
+    Sun,
+    Moon
 } from "lucide-react"
 import Image from "next/image"
 import axiosInstance from "@/services/axios-instance"
 
 const iconsMap: any = {
     Wifi, Utensils, Flame, Refrigerator, ChefHat, Sparkles,
-    Heart, Wrench, MapPin, Building2, Compass, Shield, ShowerHead, Lock, Trash2, Zap
+    Heart, Wrench, MapPin, Building2, Compass, Shield, ShowerHead, Lock, Trash2, Zap,
+    Layout, List, Layers, Activity, Cloud, Sun, Moon
 }
 
 const detailedServices = [
@@ -205,6 +213,49 @@ export default function ServicesPage() {
     const [isLoading, setIsLoading] = useState(false)
 
     const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:8000"
+
+    useEffect(() => {
+        fetchServices()
+    }, [])
+
+    const fetchServices = async () => {
+        try {
+            setIsLoading(true)
+            const { data } = await axiosInstance.get("/api/v1/services/active")
+            if (data.success && data.services && data.services.length > 0) {
+                const mapped = data.services.map((srv: any) => {
+                    let parsedFeatures: string[] = []
+                    if (Array.isArray(srv.features)) {
+                        parsedFeatures = srv.features
+                    } else if (typeof srv.features === "string") {
+                        try {
+                            parsedFeatures = JSON.parse(srv.features)
+                        } catch {
+                            parsedFeatures = srv.features.split(",").map((f: string) => f.trim()).filter(Boolean)
+                        }
+                    }
+                    const imageSrc = srv.image 
+                        ? (srv.image.startsWith("http") ? srv.image : `${BACKEND}/images/${srv.image}`)
+                        : "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2000&auto=format&fit=crop"
+
+                    return {
+                        _id: srv._id,
+                        category: srv.category || "AMENITY & SERVICE",
+                        title: srv.title,
+                        description: srv.description,
+                        image: imageSrc,
+                        icon: srv.icon || "Sparkles",
+                        features: parsedFeatures
+                    }
+                })
+                setAmenities([...detailedServices, ...mapped])
+            }
+        } catch (err) {
+            console.error("Failed to fetch dynamic services:", err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     return (
         <div className="min-h-screen bg-white">

@@ -49,6 +49,18 @@ export default function OffersPage() {
         fetchOffers()
     }, [])
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                resetForm()
+            }
+        }
+        if (showForm) {
+            window.addEventListener("keydown", handleKeyDown)
+        }
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [showForm])
+
     const fetchFlats = async () => {
         try {
             const { data } = await axiosInstance.get("/api/v1/flats/all")
@@ -212,10 +224,10 @@ export default function OffersPage() {
             </div>
 
             {showForm && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-8">
-                    <div className="bg-white rounded-[40px] w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in duration-300">
-                        <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                            <h3 className="text-xl font-bold text-slate-900 leading-none">
+                <div className="fixed inset-0 w-screen h-screen min-h-screen bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6 overflow-y-auto">
+                    <div className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in duration-300 my-auto">
+                        <div className="px-6 sm:px-10 py-5 sm:py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-none">
                                 {editingOffer ? "Adjust Campaign" : "New Promotion"}
                             </h3>
                             <button onClick={resetForm} className="h-10 w-10 bg-white shadow-sm border border-slate-100 flex items-center justify-center rounded-xl hover:bg-slate-50 transition-colors">
@@ -223,7 +235,7 @@ export default function OffersPage() {
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+                        <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 ml-1">Target Apartment</label>
                                 <select
