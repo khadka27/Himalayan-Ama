@@ -300,18 +300,18 @@ export default function OffersPage() {
                                 />
                             </div>
 
-                            <div className="flex gap-4 pt-4">
+                            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md pt-4 pb-4 border-t border-slate-100 -mx-6 sm:-mx-10 px-6 sm:px-10 -mb-6 sm:-mb-10 mt-6 flex gap-4 z-20">
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold h-14 rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95"
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold h-13 sm:h-14 rounded-2xl shadow-xl shadow-blue-100 transition-all active:scale-95 cursor-pointer"
                                 >
                                     {isSubmitting ? "Syncing..." : editingOffer ? "Update Promotion" : "Launch Now"}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={resetForm}
-                                    className="h-14 px-8 rounded-2xl font-bold bg-slate-100 text-slate-400 hover:bg-slate-200 transition-all"
+                                    className="h-13 sm:h-14 px-6 sm:px-8 rounded-2xl font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all cursor-pointer"
                                 >
                                     Cancel
                                 </button>

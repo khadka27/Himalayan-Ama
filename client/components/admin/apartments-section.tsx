@@ -346,32 +346,34 @@ export function ApartmentsSection() {
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-3 py-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
-                                    className={`w-12 h-6 rounded-full transition-all relative ${formData.isActive ? 'bg-indigo-600' : 'bg-slate-200'}`}
-                                >
-                                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
-                                </button>
-                                <span className="text-sm font-bold text-slate-600">Visible for potential clients</span>
-                            </div>
+                            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md pt-4 pb-4 border-t border-slate-100 -mx-6 sm:-mx-10 px-6 sm:px-10 -mb-6 sm:-mb-10 mt-6 space-y-4 z-20">
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
+                                        className={`w-12 h-6 rounded-full transition-all relative shrink-0 cursor-pointer ${formData.isActive ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                    >
+                                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isActive ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                    <span className="text-sm font-bold text-slate-700">Visible for potential clients</span>
+                                </div>
 
-                            <div className="sticky bottom-0 bg-white/95 backdrop-blur-md pt-4 pb-2 border-t border-slate-100 -mx-6 sm:-mx-10 px-6 sm:px-10 -mb-6 sm:-mb-10 mt-6 flex gap-4 z-20">
-                                <button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-13 sm:h-14 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:bg-slate-200 cursor-pointer"
-                                >
-                                    {isLoading ? "Synchronizing..." : editingFlat ? "Update Listing" : "Publish Listing"}
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="h-13 sm:h-14 px-6 sm:px-8 rounded-2xl font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
+                                <div className="flex gap-4">
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-13 sm:h-14 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 disabled:bg-slate-200 cursor-pointer"
+                                    >
+                                        {isLoading ? "Synchronizing..." : editingFlat ? "Update Listing" : "Publish Listing"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={resetForm}
+                                        className="h-13 sm:h-14 px-6 sm:px-8 rounded-2xl font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all cursor-pointer"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
